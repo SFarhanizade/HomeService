@@ -2,10 +2,7 @@ package ir.farhanizade.homeservice.entity.user;
 
 import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.core.BasePerson;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
@@ -23,7 +20,17 @@ import java.util.List;
 public class User extends BasePerson {
     private Date dateTime;
     private BigDecimal credit;
-    private UserStatus status;
+    @Builder.Default
+    private UserStatus status = UserStatus.NEW;
     @OneToMany
     private List<Transaction> transactions;
+
+    public void addTransaction(Transaction transaction){
+        if(transaction==null)
+            throw new IllegalStateException("Null Transaction!");
+        BigDecimal amount = transaction.getAmount();
+        if(this.getId()==transaction.getPayer().getId())
+            amount.multiply(new BigDecimal(-1));
+        credit.add(amount);
+    }
 }
