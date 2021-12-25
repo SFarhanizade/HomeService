@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -16,4 +18,6 @@ import javax.persistence.Entity;
 @Data
 @SuperBuilder
 public class MainService extends BaseService {
+    @OneToMany
+    private List<SubService> subServices;
 }
