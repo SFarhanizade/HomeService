@@ -29,6 +29,8 @@ public class BaseMessage extends BaseEntity {
 
     private Date suggestedDateTime;
 
+    private String details;
+
     @Builder.Default
     private BaseMessageStatus status = BaseMessageStatus.HELD;
 }
