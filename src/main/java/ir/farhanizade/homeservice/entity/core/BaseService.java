@@ -15,4 +15,5 @@ import javax.persistence.MappedSuperclass;
 @SuperBuilder
 @MappedSuperclass
 public class BaseService extends BaseEntity{
+    private String name;
 }
