@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @SuperBuilder
+@Entity
 public class User extends BasePerson {
     private Date dateTime;
     private BigDecimal credit;
