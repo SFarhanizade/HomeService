@@ -1,4 +1,4 @@
-package ir.farhanizade.homeservice.entity.order;
+package ir.farhanizade.homeservice.entity.order.message;
 
 import ir.farhanizade.homeservice.entity.user.Customer;
 import lombok.AllArgsConstructor;

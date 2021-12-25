@@ -1,8 +1,8 @@
-package ir.farhanizade.homeservice.entity.order;
+package ir.farhanizade.homeservice.entity.order.message;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.core.BasePerson;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.order.Order;
 import lombok.*;
 
 import javax.persistence.ManyToOne;

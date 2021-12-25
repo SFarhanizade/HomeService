@@ -1,6 +1,8 @@
 package ir.farhanizade.homeservice.entity.order;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
+import ir.farhanizade.homeservice.entity.order.message.Request;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -9,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

@@ -1,6 +1,5 @@
-package ir.farhanizade.homeservice.entity.order;
+package ir.farhanizade.homeservice.entity.order.message;
 
-import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
