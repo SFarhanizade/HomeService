@@ -8,18 +8,19 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Entity
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@MappedSuperclass
 public class Transaction extends BaseEntity {
     private BigDecimal amount;
     @ManyToOne(fetch = FetchType.EAGER)
