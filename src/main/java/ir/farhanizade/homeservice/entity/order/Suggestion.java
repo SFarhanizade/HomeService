@@ -16,18 +16,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-public class Suggestion extends BaseEntity {
-    @ManyToOne
-    private Order order;
-
-    @ManyToOne
-    private Expert expert;
-
-    private Date dateTime;
-    private BigDecimal price;
+public class Suggestion extends BaseMessage {
 
     private Double duration;
-    private Date startDateTime;
 
     @Builder.Default
     private SuggestionStatus status = SuggestionStatus.PENDING;
