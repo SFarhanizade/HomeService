@@ -1,4 +1,4 @@
-package ir.farhanizade.homeservice;
+package ir.farhanizade.homeservice.entity.user;
 
 import ir.farhanizade.homeservice.entity.core.BasePerson;
 import lombok.AllArgsConstructor;
