@@ -7,10 +7,7 @@ import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +21,13 @@ import java.util.List;
 public class Order extends BaseEntity {
 
     @ManyToOne
+    @Column(nullable = false)
     private SubService service;
 
     private Date finishDateTime;
 
     @OneToOne
+    @Column(nullable = false)
     private Request request;
 
     @OneToMany
@@ -38,6 +37,7 @@ public class Order extends BaseEntity {
     private Suggestion suggestion;
 
     @Builder.Default
+    @Column(nullable = false)
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
 
     public void suggest(Suggestion suggestion){

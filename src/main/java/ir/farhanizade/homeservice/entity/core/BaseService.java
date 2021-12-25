@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,5 +16,6 @@ import javax.persistence.MappedSuperclass;
 @SuperBuilder
 @MappedSuperclass
 public class BaseService extends BaseEntity{
+    @Column(nullable = false)
     private String name;
 }

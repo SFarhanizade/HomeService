@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @EqualsAndHashCode(callSuper = true)
@@ -16,5 +17,6 @@ import javax.persistence.Entity;
 @Data
 @SuperBuilder
 public class Request extends BaseMessage<Customer> {
+    @Column(nullable = false)
     private String address;
 }

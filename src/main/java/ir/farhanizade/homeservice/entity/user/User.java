@@ -5,8 +5,8 @@ import ir.farhanizade.homeservice.entity.core.BasePerson;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,10 +19,16 @@ import java.util.List;
 @SuperBuilder
 @Entity
 public class User extends BasePerson {
+    @Column(nullable = false)
     private Date dateTime;
+
+    @Column(nullable = false)
     private BigDecimal credit;
+
     @Builder.Default
+    @Column(nullable = false)
     private UserStatus status = UserStatus.NEW;
+
     @OneToMany
     private List<Transaction> transactions;
 
