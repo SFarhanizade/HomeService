@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -16,5 +17,6 @@ import javax.persistence.Entity;
 @Data
 @SuperBuilder
 public class SubService extends BaseService {
-
+    private BigDecimal basePrice;
+    private String description;
 }
