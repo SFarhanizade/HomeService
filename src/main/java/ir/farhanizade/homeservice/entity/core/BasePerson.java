@@ -2,10 +2,12 @@ package ir.farhanizade.homeservice.entity.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.MappedSuperclass;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @SuperBuilder
