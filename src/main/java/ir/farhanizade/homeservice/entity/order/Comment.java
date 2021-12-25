@@ -1,0 +1,4 @@
+package ir.farhanizade.homeservice.entity.order;
+
+public class Comment {
+}
