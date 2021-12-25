@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
