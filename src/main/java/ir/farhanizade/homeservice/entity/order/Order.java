@@ -1,4 +1,4 @@
-package ir.farhanizade.homeservice.entity.oder;
+package ir.farhanizade.homeservice.entity.order;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -15,5 +15,5 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-public class Oder extends BaseEntity {
+public class Order extends BaseEntity {
 }
