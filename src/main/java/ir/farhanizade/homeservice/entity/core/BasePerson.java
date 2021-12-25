@@ -1,4 +1,4 @@
-package ir.farhanizade.homeservice.entity;
+package ir.farhanizade.homeservice.entity.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
