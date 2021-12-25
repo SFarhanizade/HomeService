@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.entity.user;
 
 import ir.farhanizade.homeservice.entity.core.BasePerson;
+import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,5 +25,6 @@ public class Expert extends BasePerson {
     @OneToMany
     private List<SubService> expertise;
 
-
+    @OneToMany
+    private List<Comment> comments;
 }
