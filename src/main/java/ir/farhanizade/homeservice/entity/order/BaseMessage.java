@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.entity.order;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
+import ir.farhanizade.homeservice.entity.core.BasePerson;
 import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 
@@ -15,13 +16,13 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @MappedSuperclass
-public class BaseMessage extends BaseEntity {
+public class BaseMessage<T extends BasePerson> extends BaseEntity {
 
     @OneToOne
     private Order order;
 
     @ManyToOne
-    private User owner;
+    private T owner;
 
     private BigDecimal price;
 
