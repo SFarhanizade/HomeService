@@ -20,4 +20,5 @@ import java.util.Date;
 public class User extends BasePerson {
     private Date dateTime;
     private BigDecimal credit;
+    private UserStatus status;
 }
