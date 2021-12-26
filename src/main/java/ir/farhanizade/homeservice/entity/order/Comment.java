@@ -26,14 +26,11 @@ public class Comment extends BaseEntity {
     private String description;
 
     @ManyToOne
-    @Column(nullable = false)
     private Customer sender;
 
     @ManyToOne
-    @Column(nullable = false)
     private Expert recipient;
 
     @OneToOne
-    @Column(nullable = false)
-    private Order order;
+    private ServiceOrder order;
 }
