@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-public class Expert extends BasePerson {
+public class Expert extends User {
     private String picURL;
 
     @OneToMany
