@@ -1,23 +1,22 @@
 package ir.farhanizade.homeservice.entity.service;
 
 import ir.farhanizade.homeservice.entity.core.BaseService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @SuperBuilder
 public class SubService extends BaseService {
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
+    private MainService parent;
     @Column(nullable = false)
     private BigDecimal basePrice;
     private String description;
