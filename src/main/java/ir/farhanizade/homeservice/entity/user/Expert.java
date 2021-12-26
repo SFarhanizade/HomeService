@@ -23,7 +23,7 @@ public class Expert extends User {
     private String picURL;
 
     @OneToMany
-    private List<SubService> expertise;
+    private List<SubService> expertises;
 
     @OneToMany
     private List<Comment> comments;
