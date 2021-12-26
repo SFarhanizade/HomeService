@@ -32,6 +32,8 @@ public class CustomerService {
     }
 
     public Customer findByEmail(String email) {
+        if(email==null)
+            throw new IllegalStateException("Null Email");
         return repository.findByEmail(email);
     }
 
