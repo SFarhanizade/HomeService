@@ -1,4 +1,6 @@
 package ir.farhanizade.homeservice.repository;
 
-public interface TransactionRepository {
+import ir.farhanizade.homeservice.entity.Transaction;
+
+public interface TransactionRepository extends BaseRepository<Transaction>{
 }

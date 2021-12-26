@@ -1,4 +1,7 @@
 package ir.farhanizade.homeservice.repository.user;
 
-public interface ExpertRepository {
+import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.repository.BaseRepository;
+
+public interface ExpertRepository extends BaseRepository<Expert> {
 }
