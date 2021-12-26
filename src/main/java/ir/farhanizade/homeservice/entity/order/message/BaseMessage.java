@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.core.BasePerson;
 import ir.farhanizade.homeservice.entity.order.Order;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
@@ -17,6 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @MappedSuperclass
+@SuperBuilder
 public class BaseMessage<T extends BasePerson> extends BaseEntity {
 
     @OneToOne
