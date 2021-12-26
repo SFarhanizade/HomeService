@@ -20,9 +20,9 @@ import java.util.List;
 @Entity
 public class User extends BasePerson {
     @Column(nullable = false)
-    private Date dateTime;
+    @Builder.Default
+    private Date dateTime = new Date(System.currentTimeMillis());
 
-    @Column(nullable = false)
     private BigDecimal credit;
 
     @Builder.Default
