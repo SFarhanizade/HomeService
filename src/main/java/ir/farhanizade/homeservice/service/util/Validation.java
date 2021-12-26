@@ -23,7 +23,7 @@ public class Validation {
         }
 
         String password = user.getPassword();
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8}$";
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}$";
         pattern = Pattern.compile(passwordPattern);
         matcher = pattern.matcher(password);
         boolean passwordIsValid = matcher.matches();
