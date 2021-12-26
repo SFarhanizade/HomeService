@@ -1,14 +1,14 @@
 package ir.farhanizade.homeservice.entity.service;
 
 import ir.farhanizade.homeservice.entity.core.BaseService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +18,13 @@ import java.util.List;
 @Data
 @SuperBuilder
 public class MainService extends BaseService {
-    @OneToMany
-    private List<SubService> subServices;
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SubService> subServices = new ArrayList<>();;
+
+    public void addSubService(SubService service) {
+        if(subServices==null)
+            subServices=new ArrayList<>();
+        subServices.add(service);
+    }
 }
