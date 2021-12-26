@@ -13,12 +13,12 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-public class Suggestion extends BaseMessage<Expert> {
+public class Suggestion extends BaseMessage {
 
     @Column(nullable = false)
     private Double duration;
 
     @Builder.Default
     @Column(nullable = false)
-    private SuggestionStatus status = SuggestionStatus.PENDING;
+    private SuggestionStatus suggestionStatus = SuggestionStatus.PENDING;
 }

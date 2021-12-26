@@ -16,7 +16,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-public class Request extends BaseMessage<Customer> {
+public class Request extends BaseMessage {
     @Column(nullable = false)
     private String address;
 }

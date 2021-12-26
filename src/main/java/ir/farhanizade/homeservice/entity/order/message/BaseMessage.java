@@ -1,8 +1,8 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.core.BasePerson;
-import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,20 +14,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@MappedSuperclass
 @SuperBuilder
-public class BaseMessage<T extends BasePerson> extends BaseEntity {
+@MappedSuperclass
+
+public class BaseMessage extends BaseEntity {
 
     @OneToOne
-    @Column(nullable = false)
-    private Order order;
+    private ServiceOrder order;
 
     @ManyToOne
-    @Column(nullable = false)
-    private T owner;
+    private User owner;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -40,7 +39,8 @@ public class BaseMessage<T extends BasePerson> extends BaseEntity {
 
     private String details;
 
-    @Builder.Default
+
     @Column(nullable = false)
+    @Builder.Default
     private BaseMessageStatus status = BaseMessageStatus.HELD;
 }
