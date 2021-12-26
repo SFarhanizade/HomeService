@@ -13,8 +13,8 @@ import java.util.List;
 
 public interface ExpertRepository extends BaseRepository<Expert> {
     Expert findByEmail(String email);
-    Expert findByCredit(BigDecimal credit);
-    Expert findByStatus(UserStatus status);
+    List<Expert> findByCredit(BigDecimal credit);
+    List<Expert> findByStatus(UserStatus status);
 
     @Query("from Expert e where :service in e.expertises")
     List<Expert> findByExpertise(SubService service);
