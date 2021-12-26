@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
 public class Expert extends User {
     private String picURL;
 
-    @OneToMany
+    @ManyToMany
     private List<SubService> expertises;
 
     @OneToMany
