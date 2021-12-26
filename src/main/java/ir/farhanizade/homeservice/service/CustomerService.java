@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +35,11 @@ public class CustomerService {
         return repository.findByEmail(email);
     }
 
-    public Customer findByCredit(BigDecimal credit) {
+    public List<Customer> findByCredit(BigDecimal credit) {
         return repository.findByCredit(credit);
     }
 
-    public Customer findByStatus(UserStatus status) {
+    public List<Customer> findByStatus(UserStatus status) {
         return repository.findByStatus(status);
     }
 }
