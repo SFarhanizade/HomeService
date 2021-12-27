@@ -32,10 +32,8 @@ public class TransactionService {
             throw new NotEnoughMoneyException("");
         payer.setCredit(payer.getCredit().add(amount.multiply(new BigDecimal(-1))));
         recipient.setCredit(recipient.getCredit().add(amount));
-        payer.addTransaction(transaction);
-        recipient.addTransaction(transaction);
-        customerRepository.save(payer);
-        expertRepository.save(recipient);
-
+        /*payer.addTransaction(transaction);
+        recipient.addTransaction(transaction);*/
+        repository.save(transaction);
     }
 }
