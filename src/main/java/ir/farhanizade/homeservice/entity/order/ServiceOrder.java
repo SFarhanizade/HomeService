@@ -1,8 +1,10 @@
 package ir.farhanizade.homeservice.entity.order;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -39,11 +41,21 @@ public class ServiceOrder extends BaseEntity {
     @Builder.Default
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
 
-    public void suggest(Suggestion suggestion){
-        if(suggestion==null)
+    public void suggest(Suggestion suggestion) {
+        if (suggestion == null)
             throw new IllegalArgumentException("Null Suggestion!");
-        if(suggestions==null)
+        if (suggestions == null)
             suggestions = new ArrayList<>();
         suggestions.add(suggestion);
+        status = OrderStatus.WAITING_FOR_SELECTION;
+    }
+
+    public void acceptSuggestion(Suggestion suggestion) {
+        this.suggestion = suggestion;
+        suggestions.stream()
+                .filter(s -> !s.equals(suggestion))
+                .forEach(s -> s.setSuggestionStatus(SuggestionStatus.REJECTED));
+        request.setStatus(BaseMessageStatus.BUSY);
+        status = OrderStatus.WAITING_FOR_EXPERT;
     }
 }
