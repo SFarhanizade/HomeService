@@ -31,8 +31,8 @@ public class BaseMessage extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(nullable = false)
-    private Date dateTime;
+    @Builder.Default
+    private Date dateTime = new Date(System.currentTimeMillis());
 
     @Column(nullable = false)
     private Date suggestedDateTime;
