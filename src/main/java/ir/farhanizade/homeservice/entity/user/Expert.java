@@ -6,9 +6,11 @@ import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 
 //@EqualsAndHashCode(callSuper = true)
@@ -22,9 +24,11 @@ import java.util.List;
 public class Expert extends User {
     private String picURL;
 
-    @ManyToMany
-    private List<SubService> expertises;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<SubService> expertises = new ArrayList<>();
 
-    @OneToMany
-    private List<Comment> comments;
+    @OneToMany(cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 }
