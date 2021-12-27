@@ -1,14 +1,13 @@
 package ir.farhanizade.homeservice.entity;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
+import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -22,9 +21,9 @@ import java.util.Date;
 @SuperBuilder
 public class Transaction extends BaseEntity {
     private BigDecimal amount;
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User payer;
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User recipient;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Customer payer;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Expert recipient;
     private Date dateTime;
 }
