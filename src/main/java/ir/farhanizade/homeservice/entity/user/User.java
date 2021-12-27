@@ -5,10 +5,9 @@ import ir.farhanizade.homeservice.entity.core.BasePerson;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,15 +30,14 @@ public class User extends BasePerson {
     @Column(nullable = false)
     private UserStatus status = UserStatus.NEW;
 
-    @OneToMany
-    private List<Transaction> transactions;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<Transaction> transactions = new ArrayList<>();
 
     public void addTransaction(Transaction transaction){
         if(transaction==null)
             throw new IllegalStateException("Null Transaction!");
-        BigDecimal amount = transaction.getAmount();
-        if(this.getId()==transaction.getPayer().getId())
-            amount.multiply(new BigDecimal(-1));
-        credit.add(amount);
+        transactions.add(transaction);
+
     }
 }
