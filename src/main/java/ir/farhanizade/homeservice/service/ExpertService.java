@@ -34,6 +34,7 @@ public class ExpertService {
         repository.save(expert);
     }
 
+    @Transactional(readOnly = true)
     public Expert findByEmail(String email){
         if(email==null)
             throw new IllegalStateException("Null Email");
