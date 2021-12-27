@@ -45,4 +45,8 @@ public class CustomerService {
     public List<Customer> findByStatus(UserStatus status) {
         return repository.findByStatus(status);
     }
+
+    public List<Customer> findAll() {
+        return repository.findAll();
+    }
 }
