@@ -21,21 +21,26 @@ public class SubServiceService {
     @Transactional
     public void save(SubService entity) throws DuplicateEntityException {
         MainService parent = entity.getParent();
-        if(parent==null)
+        if (parent == null)
             throw new IllegalStateException();
         List<SubService> siblings = parent.getSubServices();
         boolean noneMatch = true;
-        if(siblings.size()> 0) {
+        if (siblings.size() > 0) {
             noneMatch = siblings.stream()
                     .noneMatch(s -> s.getName().equals(entity.getName()));
         }
-        if(noneMatch) {
+        if (noneMatch) {
             repository.save(entity);
             parent.addSubService(entity);
             parentRepository.save(parent);
-        }
-        else{
+        } else {
             throw new DuplicateEntityException("");
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<SubService> loadAll() {
+        return repository.findAll();
+    }
 }
+
