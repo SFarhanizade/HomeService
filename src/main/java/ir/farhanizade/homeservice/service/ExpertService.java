@@ -28,7 +28,8 @@ public class ExpertService {
             throw new UserNotValidException("");
         String email = expert.getEmail();
         Expert byEmail = repository.findByEmail(email);
-        if(byEmail!=null)
+        boolean finalCheck = byEmail!=null && expert.getId()==null;
+        if(finalCheck)
             throw new DuplicateEntityException("");
         repository.save(expert);
     }

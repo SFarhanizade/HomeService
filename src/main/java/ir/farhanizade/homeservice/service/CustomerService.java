@@ -26,7 +26,8 @@ public class CustomerService {
             throw new UserNotValidException("");
         String email = customer.getEmail();
         Customer byEmail = repository.findByEmail(email);
-        if(byEmail!=null)
+        boolean finalCheck = byEmail!=null && customer.getId()==null;
+        if(finalCheck)
             throw new DuplicateEntityException("");
         repository.save(customer);
     }
