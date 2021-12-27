@@ -6,10 +6,12 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
-@Data
 @SuperBuilder
 public class Admin extends BasePerson {
 }
