@@ -21,7 +21,7 @@ public class MainServiceService {
         repository.save(entity);
     }
 
-    public List<MainService> findAll(){
+    public List<MainService> loadAll(){
         return repository.findAll();
     }
 }
