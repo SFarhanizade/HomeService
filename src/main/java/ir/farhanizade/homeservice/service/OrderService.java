@@ -5,6 +5,8 @@ import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -12,5 +14,9 @@ public class OrderService {
 
     public void save(ServiceOrder order){
         repository.save(order);
+    }
+
+    public List<ServiceOrder> loadAll(){
+        return repository.findAll();
     }
 }
