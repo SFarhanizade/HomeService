@@ -1,5 +1,5 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
 public enum BaseMessageStatus{
-    CANCELLED, HELD, BUSY;
+    CANCELLED, WAITING, BUSY;
 }

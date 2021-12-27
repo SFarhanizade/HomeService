@@ -42,5 +42,5 @@ public class BaseMessage extends BaseEntity {
 
     @Column(nullable = false)
     @Builder.Default
-    private BaseMessageStatus status = BaseMessageStatus.HELD;
+    private BaseMessageStatus status = BaseMessageStatus.WAITING;
 }
