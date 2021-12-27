@@ -24,8 +24,6 @@ public class BaseMessage extends BaseEntity {
     @OneToOne
     private ServiceOrder order;
 
-    @ManyToOne
-    private User owner;
 
     @Column(nullable = false)
     private BigDecimal price;
