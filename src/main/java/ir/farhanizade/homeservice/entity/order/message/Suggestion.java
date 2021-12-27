@@ -7,11 +7,13 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @SuperBuilder
 public class Suggestion extends BaseMessage {
 

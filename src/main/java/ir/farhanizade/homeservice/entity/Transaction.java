@@ -2,10 +2,7 @@ package ir.farhanizade.homeservice.entity;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.user.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
@@ -16,8 +13,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Data
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

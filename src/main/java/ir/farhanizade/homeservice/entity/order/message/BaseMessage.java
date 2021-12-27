@@ -6,15 +6,14 @@ import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

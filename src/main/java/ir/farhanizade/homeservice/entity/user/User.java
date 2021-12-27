@@ -12,10 +12,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @SuperBuilder
 @Entity
 public class User extends BasePerson {

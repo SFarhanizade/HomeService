@@ -7,12 +7,13 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
 @SuperBuilder
 public class SubService extends BaseService {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, optional = false)

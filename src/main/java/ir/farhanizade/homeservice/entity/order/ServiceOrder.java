@@ -12,26 +12,28 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @SuperBuilder
 public class ServiceOrder extends BaseEntity {
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private SubService service;
 
     private Date finishDateTime;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Request request;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Suggestion> suggestions;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Suggestion suggestion;
 
     @Builder.Default

@@ -3,10 +3,7 @@ package ir.farhanizade.homeservice.entity.user;
 import ir.farhanizade.homeservice.entity.core.BasePerson;
 import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.service.SubService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
@@ -14,11 +11,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
+//@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @SuperBuilder
 public class Expert extends User {
     private String picURL;
