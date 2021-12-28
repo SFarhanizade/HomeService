@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.entity.order.ServiceOrder;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import java.util.List;
 public class SuggestionService {
     private final SuggestionRepository repository;
     public void save(Suggestion suggestion) {
+        ServiceOrder order = suggestion.getOrder();
+        order.suggest(suggestion);
         repository.save(suggestion);
     }
 
