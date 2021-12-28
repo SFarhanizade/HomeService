@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.entity.order;
 
+import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
@@ -40,6 +41,12 @@ public class ServiceOrder extends BaseEntity {
 
     @Builder.Default
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
+
+    @OneToOne
+    private Transaction transaction;
+
+    @OneToOne
+    private Comment comment;
 
     public void suggest(Suggestion suggestion) {
         if (suggestion == null)

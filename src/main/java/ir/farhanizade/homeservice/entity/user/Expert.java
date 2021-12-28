@@ -6,10 +6,7 @@ import ir.farhanizade.homeservice.entity.service.SubService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +25,9 @@ public class Expert extends User {
     @Builder.Default
     private List<SubService> expertises = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
+    private Integer points;
+
+    public void addPoints(Integer points) {
+        this.points += points;
+    }
 }
