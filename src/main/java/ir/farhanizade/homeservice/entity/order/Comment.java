@@ -6,10 +6,7 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
@@ -24,10 +21,10 @@ public class Comment extends BaseEntity {
     private Integer points;
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Customer sender;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Expert recipient;
 
     @OneToOne
