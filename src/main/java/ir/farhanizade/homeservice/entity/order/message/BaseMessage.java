@@ -21,7 +21,7 @@ import java.util.Date;
 
 public class BaseMessage extends BaseEntity {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private ServiceOrder order;
 
 
