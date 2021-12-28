@@ -25,7 +25,8 @@ public class Expert extends User {
     @Builder.Default
     private List<SubService> expertises = new ArrayList<>();
 
-    private Integer points;
+    @Builder.Default
+    private Integer points = 0;
 
     public void addPoints(Integer points) {
         this.points += points;
