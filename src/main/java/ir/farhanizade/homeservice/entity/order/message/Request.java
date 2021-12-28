@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -18,7 +19,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @SuperBuilder
 public class Request extends BaseMessage {
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Customer owner;
 
     @Column(nullable = false)
