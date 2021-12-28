@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.entity;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
+import ir.farhanizade.homeservice.entity.order.ServiceOrder;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
@@ -20,6 +21,9 @@ import java.util.Date;
 @NoArgsConstructor
 @SuperBuilder
 public class Transaction extends BaseEntity {
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    private ServiceOrder order;
+
     private BigDecimal amount;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Customer payer;
