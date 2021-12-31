@@ -20,20 +20,18 @@ public class CustomerService {
     @Transactional
     public void save(Customer customer) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
         boolean isValid = false;
-            isValid = Validation.isValid(customer);
+        isValid = Validation.isValid(customer);
 
-        if(!isValid)
+        if (!isValid)
             throw new UserNotValidException("");
-        String email = customer.getEmail();
-        Customer byEmail = repository.findByEmail(email);
-        boolean finalCheck = byEmail!=null && customer.getId()==null;
-        if(finalCheck)
+
+        if (finalCheck(customer))
             throw new DuplicateEntityException("");
         repository.save(customer);
     }
 
     public Customer findByEmail(String email) {
-        if(email==null)
+        if (email == null)
             throw new IllegalStateException("Null Email");
         return repository.findByEmail(email);
     }
@@ -48,5 +46,11 @@ public class CustomerService {
 
     public List<Customer> findAll() {
         return repository.findAll();
+    }
+
+    private boolean finalCheck(Customer customer) {
+        String email = customer.getEmail();
+        Customer byEmail = repository.findByEmail(email);
+        return byEmail != null && customer.getId() == null;
     }
 }

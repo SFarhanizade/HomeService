@@ -21,15 +21,10 @@ public class ExpertService {
 
     @Transactional
     public void save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException {
-        boolean isValid = false;
-        isValid = Validation.isValid(expert);
 
-        if(!isValid)
+        if(!Validation.isValid(expert))
             throw new UserNotValidException("");
-        String email = expert.getEmail();
-        Expert byEmail = repository.findByEmail(email);
-        boolean finalCheck = byEmail!=null && expert.getId()==null;
-        if(finalCheck)
+        if(finalCheck(expert))
             throw new DuplicateEntityException("");
         repository.save(expert);
     }
@@ -51,5 +46,11 @@ public class ExpertService {
 
     public List<Expert> findByExpertise(SubService service){
         return repository.findByExpertise(service.getId());
+    }
+
+    private boolean finalCheck(Expert expert){
+        String email = expert.getEmail();
+        Expert byEmail = repository.findByEmail(email);
+        return byEmail!=null && expert.getId()==null;
     }
 }
