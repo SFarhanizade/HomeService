@@ -20,6 +20,10 @@ import java.util.List;
 @SuperBuilder
 @Entity
 public class User extends BasePerson {
+    //many to many -> role
+    @ManyToOne
+    private UserType role;
+
     @Column(nullable = false)
     @Builder.Default
     private Date dateTime = new Date(System.currentTimeMillis());
