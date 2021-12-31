@@ -21,8 +21,8 @@ import java.util.List;
 @Entity
 public class User extends BasePerson {
     //many to many -> role
-    @ManyToOne
-    private UserType role;
+    @ManyToMany
+    private List<UserType> roles;
 
     @Column(nullable = false)
     @Builder.Default
