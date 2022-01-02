@@ -65,4 +65,8 @@ public class ServiceOrder extends BaseEntity {
         request.setStatus(BaseMessageStatus.BUSY);
         status = OrderStatus.WAITING_FOR_EXPERT;
     }
+
+    public void addRequest(Request request) {
+        this.request = request;
+    }
 }
