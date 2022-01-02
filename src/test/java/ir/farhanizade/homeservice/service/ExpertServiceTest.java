@@ -77,6 +77,8 @@ class ExpertServiceTest {
             assertTrue(true);
         } catch (PasswordNotValidException e) {
             e.printStackTrace();
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
     }
 
@@ -104,6 +106,8 @@ class ExpertServiceTest {
         } catch (PasswordNotValidException e) {
             e.printStackTrace();
             assertTrue(true);
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
     }
 
@@ -130,6 +134,8 @@ class ExpertServiceTest {
         } catch (EmailNotValidException e) {
             e.printStackTrace();
         } catch (PasswordNotValidException e) {
+            e.printStackTrace();
+        } catch (NullFieldException e) {
             e.printStackTrace();
         }
     }
