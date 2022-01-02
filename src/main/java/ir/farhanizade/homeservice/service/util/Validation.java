@@ -1,10 +1,14 @@
 package ir.farhanizade.homeservice.service.util;
 
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
 
@@ -85,6 +89,25 @@ public class Validation {
             throw new NullFieldException("MainService is null!");
         if (parent.getName() == null)
             throw new NullFieldException("MainService name is null!");
+        return true;
+    }
+
+    public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
+        Expert owner = suggestion.getOwner();
+        isValid(owner);
+        ServiceOrder order = suggestion.getOrder();
+        Request request = order.getRequest();
+        isValid(order);
+        SubService service = order.getService();
+        if (!order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION)
+                || !request.getStatus().equals(BaseMessageStatus.WAITING))
+            throw new BusyOrderException("The order is not open to suggest!");
+        if (suggestion.getDuration() <= 0)
+            throw new BadEntryException("The duration is 0 or less!");
+        if (suggestion.getSuggestedDateTime().getTime() - suggestion.getDateTime().getTime() > 0)
+            throw new BadEntryException("The suggested time is sooner than the present time");
+        if (service.getBasePrice().compareTo(suggestion.getPrice()) > 0)
+            throw new BadEntryException("The suggested price is lower than the base price!");
         return true;
     }
 }
