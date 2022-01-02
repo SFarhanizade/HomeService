@@ -24,7 +24,17 @@ public class SuggestionService {
         repository.save(suggestion);
     }
 
-    public List<Suggestion> loadAll(){
+    @Transactional
+    public void acceptSuggestion(Suggestion suggestion) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+        Validation.isValid(suggestion);
+        ServiceOrder order = suggestion.getOrder();
+        if (order.getSuggestion() != null)
+            throw new BusyOrderException("The order has already had an accepted suggestion!");
+        order.acceptSuggestion(suggestion);
+        repository.save(suggestion);
+    }
+
+    public List<Suggestion> loadAll() {
         return repository.findAll();
     }
 }
