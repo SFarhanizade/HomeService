@@ -25,4 +25,7 @@ public class Customer extends User {
     private List<ServiceOrder> orders = new ArrayList<>();
 
 
+    public void addOrder(ServiceOrder order) {
+        orders.add(order);
+    }
 }
