@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.order.ServiceOrder;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Customer;
@@ -98,6 +99,8 @@ class CustomerServiceTest {
             assertTrue(true);
         } catch (PasswordNotValidException e) {
             e.printStackTrace();
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
     }
 
@@ -125,6 +128,8 @@ class CustomerServiceTest {
         } catch (PasswordNotValidException e) {
             e.printStackTrace();
             assertTrue(true);
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
     }
 
@@ -151,6 +156,8 @@ class CustomerServiceTest {
         } catch (EmailNotValidException e) {
             e.printStackTrace();
         } catch (PasswordNotValidException e) {
+            e.printStackTrace();
+        } catch (NullFieldException e) {
             e.printStackTrace();
         }
     }
@@ -318,18 +325,19 @@ class CustomerServiceTest {
                 .build();
 
         //Saving the order with the request
-        requestService.save(request);
+        try {
+            requestService.save(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
 
-        //Loding the request I just saved
-        List<Request> requests = requestService.loadWaitingRequests();
-        Request requestResult = requests.get(0);
-
-        //Getting the order of that request
-        ServiceOrder resultOrder = requestResult.getOrder();
+        List<ServiceOrder> orderServices = orderService.loadByExpertises(expert1.getExpertises());
+        ServiceOrder orderService = orderServices.get(0);
 
         //Creating a suggestion for that order
         Suggestion suggestion = Suggestion.builder()
-                .order(resultOrder)
+                .order(orderService)
                 .details("details")
                 .owner(expert1)
                 .price(new BigDecimal(120))
@@ -338,7 +346,12 @@ class CustomerServiceTest {
                 .build();
 
         //Saving the suggestion
-        suggestionService.save(suggestion);
+        try {
+            suggestionService.save(suggestion);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
 
         //Loading the customer to see suggestions for the order
         Customer resultCustomer = customerService.findByEmail("123@123.ir");
@@ -346,12 +359,9 @@ class CustomerServiceTest {
         Suggestion currentSuggestion = currentOrder.getSuggestions().get(0);
 
         //Accepting the suggestion
-        currentOrder.acceptSuggestion(currentSuggestion);
+        orderService.acceptSuggestion(currentSuggestion);
 
-        //Saving the order
-        orderService.save(currentOrder);
-
-        //Creating a Transaction for the order to pay the expert
+        /*//Creating a Transaction for the order to pay the expert
         Transaction transaction = Transaction.builder()
                 .order(currentOrder)
                 .amount(currentOrder.getSuggestion().getPrice())
@@ -382,9 +392,9 @@ class CustomerServiceTest {
         commentService.save(comment);
 
         //Loading the order to check if the comment is saved flawlessly
-        ServiceOrder order1 = orderService.loadAll().get(0);
-        Comment comment1 = order1.getComment();
-        assertEquals(comment1.getPoints(), comment.getPoints());
+        ServiceOrder order1 = this.orderService.loadAll().get(0);
+        Comment comment1 = order1.getComment();*/
+        assertEquals(SuggestionStatus.ACCEPTED,currentSuggestion.getSuggestionStatus());
     }
 
 }
