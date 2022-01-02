@@ -59,6 +59,8 @@ public class ServiceOrder extends BaseEntity {
 
     public void acceptSuggestion(Suggestion suggestion) {
         this.suggestion = suggestion;
+        suggestion.setStatus(BaseMessageStatus.BUSY);
+        suggestion.setSuggestionStatus(SuggestionStatus.ACCEPTED);
         suggestions.stream()
                 .filter(s -> !s.equals(suggestion))
                 .forEach(s -> s.setSuggestionStatus(SuggestionStatus.REJECTED));
