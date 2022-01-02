@@ -11,5 +11,5 @@ import java.util.List;
 public interface OrderRepository extends BaseRepository<ServiceOrder> {
 
     @Query("From ServiceOrder o where o.service in :expertises")
-    List<OrderService> loadByExpertises(List<SubService> expertises);
+    List<ServiceOrder> loadByExpertises(List<SubService> expertises);
 }

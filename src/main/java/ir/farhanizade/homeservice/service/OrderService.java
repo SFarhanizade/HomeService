@@ -17,7 +17,7 @@ public class OrderService {
         repository.save(order);
     }
 
-    public List<OrderService> loadByExpertises(List<SubService> expertises){
+    public List<ServiceOrder> loadByExpertises(List<SubService> expertises){
         return repository.loadByExpertises(expertises);
     }
 
