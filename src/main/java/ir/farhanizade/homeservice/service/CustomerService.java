@@ -18,7 +18,7 @@ public class CustomerService {
     private final CustomerRepository repository;
 
     @Transactional
-    public void save(Customer customer) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
+    public void save(Customer customer) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         boolean isValid = false;
         isValid = Validation.isValid(customer);
 
