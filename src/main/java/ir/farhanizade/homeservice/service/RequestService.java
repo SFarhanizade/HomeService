@@ -24,8 +24,8 @@ public class RequestService {
         isValid(request);
         ServiceOrder order = request.getOrder();
         Customer owner = request.getOwner();
-        order.setRequest(request);
-        owner.getOrders().add(order);
+        order.addRequest(request);
+        owner.addOrder(order);
         repository.save(request);
     }
 
