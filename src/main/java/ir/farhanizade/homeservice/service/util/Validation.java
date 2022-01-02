@@ -1,24 +1,28 @@
 package ir.farhanizade.homeservice.service.util;
 
+import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.message.Request;
+import ir.farhanizade.homeservice.entity.service.MainService;
+import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.User;
-import ir.farhanizade.homeservice.exception.EmailNotValidException;
-import ir.farhanizade.homeservice.exception.NameNotValidException;
-import ir.farhanizade.homeservice.exception.PasswordNotValidException;
+import ir.farhanizade.homeservice.exception.*;
 
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validation {
-    public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException {
-        if(user==null)
-            throw new IllegalArgumentException();
+    public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
+        if (user == null)
+            throw new NullFieldException("User is null!");
         String email = user.getEmail();
         String emailPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         Pattern pattern = Pattern.compile(emailPattern);
         Matcher matcher = pattern.matcher(email);
         boolean emailIsValid = matcher.matches();
-        if(!emailIsValid) {
+        if (!emailIsValid) {
             throw new EmailNotValidException("");
         }
 
@@ -32,9 +36,55 @@ public class Validation {
 
         String fName = user.getFName();
         String lName = user.getLName();
-        if(fName.length()<3 || lName.length()<3) {
+        if (fName.length() < 3 || lName.length() < 3) {
             throw new NameNotValidException("");
         }
+        return true;
+    }
+
+    public static boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
+        Customer owner = request.getOwner();
+        isValid(owner);
+        ServiceOrder order = request.getOrder();
+        isValid(order);
+        if (request.getAddress() == null)
+            throw new NullFieldException("The address is null");
+
+        SubService service = order.getService();
+        if (service.getBasePrice().compareTo(request.getPrice()) > 0) {
+            throw new BadEntryException("The requested price is lower than the base price!");
+        }
+        if (request.getSuggestedDateTime().getTime() - request.getDateTime().getTime() > 0) {
+            throw new BadEntryException("The requested time is sooner than the present time");
+        }
+        return true;
+    }
+
+    private static boolean isValid(ServiceOrder order) throws NullFieldException, BadEntryException {
+        if (order == null)
+            throw new NullFieldException("Order is null!");
+        SubService service = order.getService();
+        boolean serviceIsValid = isValid(service);
+        return true && serviceIsValid;
+    }
+
+    private static boolean isValid(SubService service) throws NullFieldException, BadEntryException {
+        if (service == null)
+            throw new NullFieldException("Service is null!");
+        isValid(service.getParent());
+        if (service.getName() == null)
+            throw new NullFieldException("Service name is null!");
+        BigDecimal basePrice = service.getBasePrice();
+        if (basePrice.compareTo(new BigDecimal(0)) <= 0)
+            throw new BadEntryException("The service price is not valid!");
+        return true;
+    }
+
+    private static boolean isValid(MainService parent) throws NullFieldException {
+        if (parent == null)
+            throw new NullFieldException("MainService is null!");
+        if (parent.getName() == null)
+            throw new NullFieldException("MainService name is null!");
         return true;
     }
 }
