@@ -1,8 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.entity.Transaction;
-import ir.farhanizade.homeservice.entity.order.Comment;
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
@@ -13,7 +11,6 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -286,7 +283,7 @@ class CustomerServiceTest {
         SubService subService = subServices.get(0);
 
         //Creating an Order with SubService -> s1
-        ServiceOrder order = ServiceOrder.builder()
+        Order order = Order.builder()
                 .service(subService)
                 .build();
 
@@ -308,8 +305,8 @@ class CustomerServiceTest {
             fail();
         }
 
-        List<ServiceOrder> orderServices = orderService.loadByExpertises(expert1.getExpertises());
-        ServiceOrder orderService = orderServices.get(0);
+        List<Order> orderServices = orderService.loadByExpertises(expert1.getExpertises());
+        Order orderService = orderServices.get(0);
 
         //Creating a suggestion for that order
         Suggestion suggestion = Suggestion.builder()
@@ -331,7 +328,7 @@ class CustomerServiceTest {
 
         //Loading the customer to see suggestions for the order
         Customer resultCustomer = customerService.findByEmail("123@123.ir");
-        ServiceOrder currentOrder = resultCustomer.getOrders().get(0);
+        Order currentOrder = resultCustomer.getOrders().get(0);
         Suggestion currentSuggestion = currentOrder.getSuggestions().get(0);
 
         //Accepting the suggestion
@@ -368,7 +365,7 @@ class CustomerServiceTest {
         commentService.save(comment);
 
         //Loading the order to check if the comment is saved flawlessly
-        ServiceOrder order1 = this.orderService.loadAll().get(0);
+        Order order1 = this.orderService.loadAll().get(0);
         Comment comment1 = order1.getComment();*/
         assertEquals(SuggestionStatus.ACCEPTED,currentSuggestion.getSuggestionStatus());
     }

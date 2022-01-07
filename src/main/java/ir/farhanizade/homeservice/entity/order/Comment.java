@@ -28,5 +28,5 @@ public class Comment extends BaseEntity {
     private Expert recipient;
 
     @OneToOne
-    private ServiceOrder order;
+    private Order order;
 }

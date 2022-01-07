@@ -1,9 +1,8 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
-import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.RequestRepository;
@@ -22,7 +21,7 @@ public class RequestService {
     @Transactional
     public void save(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
         isValid(request);
-        ServiceOrder order = request.getOrder();
+        Order order = request.getOrder();
         Customer owner = request.getOwner();
         order.addRequest(request);
         owner.addOrder(order);

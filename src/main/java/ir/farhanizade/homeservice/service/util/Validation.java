@@ -1,7 +1,7 @@
 package ir.farhanizade.homeservice.service.util;
 
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
@@ -49,7 +49,7 @@ public class Validation {
     public static boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
         Customer owner = request.getOwner();
         isValid(owner);
-        ServiceOrder order = request.getOrder();
+        Order order = request.getOrder();
         isValid(order);
         if (request.getAddress() == null)
             throw new NullFieldException("The address is null");
@@ -64,7 +64,7 @@ public class Validation {
         return true;
     }
 
-    private static boolean isValid(ServiceOrder order) throws NullFieldException, BadEntryException {
+    private static boolean isValid(Order order) throws NullFieldException, BadEntryException {
         if (order == null)
             throw new NullFieldException("Order is null!");
         SubService service = order.getService();
@@ -95,7 +95,7 @@ public class Validation {
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         Expert owner = suggestion.getOwner();
         isValid(owner);
-        ServiceOrder order = suggestion.getOrder();
+        Order order = suggestion.getOrder();
         Request request = order.getRequest();
         isValid(order);
         SubService service = order.getService();

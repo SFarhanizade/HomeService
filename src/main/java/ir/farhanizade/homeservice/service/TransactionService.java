@@ -1,10 +1,9 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.entity.Transaction;
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.NotEnoughMoneyException;
 import ir.farhanizade.homeservice.repository.TransactionRepository;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -26,7 +25,7 @@ public class TransactionService {
     public void save(Transaction transaction) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
-        ServiceOrder order = transaction.getOrder();
+        Order order = transaction.getOrder();
         Customer payer = transaction.getPayer();
         Expert recipient = transaction.getRecipient();
         BigDecimal amount = transaction.getAmount();

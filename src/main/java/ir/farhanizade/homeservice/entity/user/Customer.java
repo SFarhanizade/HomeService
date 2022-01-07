@@ -1,6 +1,6 @@
 package ir.farhanizade.homeservice.entity.user;
 
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -22,10 +22,10 @@ public class Customer extends User {
 
     @OneToMany(cascade = CascadeType.ALL)
     @Builder.Default
-    private List<ServiceOrder> orders = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
 
-    public void addOrder(ServiceOrder order) {
+    public void addOrder(Order order) {
         orders.add(order);
     }
 }

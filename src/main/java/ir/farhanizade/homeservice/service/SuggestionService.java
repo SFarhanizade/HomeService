@@ -1,6 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
@@ -19,7 +19,7 @@ public class SuggestionService {
     @Transactional
     public void save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         Validation.isValid(suggestion);
-        ServiceOrder order = suggestion.getOrder();
+        Order order = suggestion.getOrder();
         order.suggest(suggestion);
         repository.save(suggestion);
     }
@@ -27,7 +27,7 @@ public class SuggestionService {
     @Transactional
     public void acceptSuggestion(Suggestion suggestion) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         Validation.isValid(suggestion);
-        ServiceOrder order = suggestion.getOrder();
+        Order order = suggestion.getOrder();
         if (order.getSuggestion() != null)
             throw new BusyOrderException("The order has already had an accepted suggestion!");
         order.acceptSuggestion(suggestion);

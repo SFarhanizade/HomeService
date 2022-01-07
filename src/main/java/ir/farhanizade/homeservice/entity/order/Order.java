@@ -17,13 +17,14 @@ import java.util.List;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
+@Entity
+@Table(name = "MyOrder")
 @Setter
 @Getter
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class ServiceOrder extends BaseEntity {
+public class Order extends BaseEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private SubService service;

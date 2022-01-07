@@ -1,8 +1,7 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.order.Order;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -22,7 +21,7 @@ import java.util.Date;
 public class BaseMessage extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
-    private ServiceOrder order;
+    private Order order;
 
 
     @Column(nullable = false)

@@ -1,6 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.entity.order.ServiceOrder;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +13,15 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository repository;
 
-    public void save(ServiceOrder order){
+    public void save(Order order){
         repository.save(order);
     }
 
-    public List<ServiceOrder> loadByExpertises(List<SubService> expertises){
+    public List<Order> loadByExpertises(List<SubService> expertises){
         return repository.loadByExpertises(expertises);
     }
 
-    public List<ServiceOrder> loadAll(){
+    public List<Order> loadAll(){
         return repository.findAll();
     }
 }
