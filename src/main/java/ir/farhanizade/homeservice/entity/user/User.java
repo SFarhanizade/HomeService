@@ -20,7 +20,7 @@ import java.util.List;
 @SuperBuilder
 @Entity
 public class User extends BasePerson {
-    //many to many -> role
+
     @ManyToMany
     private List<UserType> roles;
 
