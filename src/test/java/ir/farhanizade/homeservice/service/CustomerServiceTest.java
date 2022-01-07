@@ -165,32 +165,6 @@ class CustomerServiceTest {
     }
 
     @Test
-    void testLoadCustomerByNullEmail_throwException() {
-        Customer customer = Customer.builder()
-                .fName("ali")
-                .lName("alavi")
-                .email("123@123.ir")
-                .password("abcd1234")
-                .credit(new BigDecimal(0))
-                .dateTime(new Date(System.currentTimeMillis()))
-                .build();
-        try {
-            customerService.save(customer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            customerService.findByEmail(null);
-            fail();
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getMessage().equals("Null Email"));
-        }
-
-    }
-
-    @Test
     void testLoadCustomerByCredit_isOK() {
         Customer customer1 = Customer.builder()
                 .fName("customer1")
