@@ -20,13 +20,14 @@ public class ExpertService {
     private final ExpertRepository repository;
 
     @Transactional
-    public void save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
+    public Expert save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
 
         if(!Validation.isValid(expert))
             throw new UserNotValidException("");
         if(finalCheck(expert))
             throw new DuplicateEntityException("");
-        repository.save(expert);
+        Expert result = repository.save(expert);
+        return result;
     }
 
     @Transactional(readOnly = true)

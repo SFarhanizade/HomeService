@@ -18,7 +18,7 @@ public class CustomerService {
     private final CustomerRepository repository;
 
     @Transactional
-    public void save(Customer customer) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
+    public Customer save(Customer customer) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         boolean isValid = false;
         isValid = Validation.isValid(customer);
 
@@ -27,7 +27,8 @@ public class CustomerService {
 
         if (finalCheck(customer))
             throw new DuplicateEntityException("");
-        repository.save(customer);
+        Customer result = repository.save(customer);
+        return result;
     }
 
     public Customer findByEmail(String email) {
