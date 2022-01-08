@@ -1,11 +1,15 @@
 package ir.farhanizade.homeservice.dto.out;
 
 import ir.farhanizade.homeservice.entity.user.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserSearchOutDto {
     protected Long id;
     protected String type;
