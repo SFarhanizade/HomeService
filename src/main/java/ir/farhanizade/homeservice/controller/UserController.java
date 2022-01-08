@@ -2,7 +2,7 @@ package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.UserOutDto;
-import ir.farhanizade.homeservice.exception.*;
+import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.ExpertService;
 import lombok.RequiredArgsConstructor;
@@ -23,20 +23,21 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserOutDto> create(@RequestBody UserInDto user) {
+        User result = new User();
         if ("expert".equals(user.getType())) {
             try {
-                expertService.save(user.convert2Expert());
+                result = expertService.save(user.convert2Expert());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else if ("customer".equals(user.getType())) {
             try {
-                customerService.save(user.convert2Customer());
+                result = customerService.save(user.convert2Customer());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        UserOutDto userOutDto = new UserOutDto(user.getType(), 0L);
+        UserOutDto userOutDto = new UserOutDto(user.getType(), result.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(userOutDto);
     }
 }
