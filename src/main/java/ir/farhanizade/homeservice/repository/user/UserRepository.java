@@ -12,5 +12,5 @@ public interface UserRepository extends BaseRepository<User> {
 
     @Modifying
     @Query("Update User u set u.password=:newPassword where u.id=:id")
-    User updatePassword(Long id, String newPassword);
+    int updatePassword(Long id, String newPassword);
 }
