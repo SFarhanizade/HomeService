@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class ResponseResult<T> {
     private int code;
-    private T date;
+    private T data;
     private String message;
 }
