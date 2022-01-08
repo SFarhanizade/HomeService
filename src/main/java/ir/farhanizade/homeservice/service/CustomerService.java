@@ -23,10 +23,10 @@ public class CustomerService {
         isValid = Validation.isValid(customer);
 
         if (!isValid)
-            throw new UserNotValidException("");
+            throw new UserNotValidException("User is not valid!");
 
         if (finalCheck(customer))
-            throw new DuplicateEntityException("");
+            throw new DuplicateEntityException("User exists!");
         Customer result = repository.save(customer);
         return result;
     }
