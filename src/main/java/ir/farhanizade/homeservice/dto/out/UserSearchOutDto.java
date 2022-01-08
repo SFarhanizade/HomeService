@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class UserSearchOutDto {
-    private String type;
-    private String firstname;
-    private String lastname;
-    private String email;
+    protected String type;
+    protected String firstname;
+    protected String lastname;
+    protected String email;
 }
