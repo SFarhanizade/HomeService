@@ -27,7 +27,7 @@ public class Validation {
         Matcher matcher = pattern.matcher(email);
         boolean emailIsValid = matcher.matches();
         if (!emailIsValid) {
-            throw new EmailNotValidException("");
+            throw new EmailNotValidException("Email is not valid!");
         }
 
         String password = user.getPassword();
@@ -36,12 +36,12 @@ public class Validation {
         matcher = pattern.matcher(password);
         boolean passwordIsValid = matcher.matches();
         if (!passwordIsValid)
-            throw new PasswordNotValidException("");
+            throw new PasswordNotValidException("Password is not valid!");
 
         String fName = user.getFName();
         String lName = user.getLName();
         if (fName.length() < 3 || lName.length() < 3) {
-            throw new NameNotValidException("");
+            throw new NameNotValidException("Name is not valid!");
         }
         return true;
     }
