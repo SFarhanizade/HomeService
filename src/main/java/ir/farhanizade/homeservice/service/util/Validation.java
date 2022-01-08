@@ -17,25 +17,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validation {
+    static Pattern pattern;
+    static Matcher matcher;
     public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
         if (user == null)
             throw new NullFieldException("User is null!");
         String email = user.getEmail();
         String emailPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        Pattern pattern = Pattern.compile(emailPattern);
-        Matcher matcher = pattern.matcher(email);
+        pattern = Pattern.compile(emailPattern);
+        matcher = pattern.matcher(email);
         boolean emailIsValid = matcher.matches();
         if (!emailIsValid) {
             throw new EmailNotValidException("Email is not valid!");
         }
 
         String password = user.getPassword();
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}$";
-        pattern = Pattern.compile(passwordPattern);
-        matcher = pattern.matcher(password);
-        boolean passwordIsValid = matcher.matches();
-        if (!passwordIsValid)
+        if (!passwordIsValid(password))
             throw new PasswordNotValidException("Password is not valid!");
 
         String fName = user.getFName();
@@ -109,5 +107,13 @@ public class Validation {
         if (service.getBasePrice().compareTo(suggestion.getPrice()) > 0)
             throw new BadEntryException("The suggested price is lower than the base price!");
         return true;
+    }
+
+    public static boolean passwordIsValid(String password){
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}$";
+        pattern = Pattern.compile(passwordPattern);
+        matcher = pattern.matcher(password);
+        boolean passwordIsValid = matcher.matches();
+        return passwordIsValid;
     }
 }
