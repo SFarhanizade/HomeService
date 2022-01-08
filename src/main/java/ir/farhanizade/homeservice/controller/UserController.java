@@ -1,8 +1,10 @@
 package ir.farhanizade.homeservice.controller;
 
+import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.UserOutDto;
 import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.ExpertService;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +24,29 @@ public class UserController {
     private final ExpertService expertService;
 
     @PostMapping
-    public ResponseEntity<UserOutDto> create(@RequestBody UserInDto user) {
+    public ResponseEntity<ResponseResult<UserOutDto>> create(@RequestBody UserInDto user) {
         User result = new User();
-        if ("expert".equals(user.getType())) {
-            try {
+        ResponseResult<UserOutDto> userOutDtoResponseResult = ResponseResult.<UserOutDto>builder()
+                .code(1)
+                .message("User saved successfully!")
+                .build();
+        HttpStatus status = HttpStatus.CREATED;
+        try {
+            if ("expert".equals(user.getType())) {
                 result = expertService.save(user.convert2Expert());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if ("customer".equals(user.getType())) {
-            try {
+            } else if ("customer".equals(user.getType())) {
                 result = customerService.save(user.convert2Customer());
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            userOutDtoResponseResult.setCode(-1);
+            userOutDtoResponseResult.setMessage(e.getMessage());
+            status = HttpStatus.NOT_ACCEPTABLE;
         }
+
         UserOutDto userOutDto = new UserOutDto(user.getType(), result.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(userOutDto);
+        userOutDtoResponseResult.setData(userOutDto);
+        return ResponseEntity.status(status).body(userOutDtoResponseResult);
     }
 }
 
