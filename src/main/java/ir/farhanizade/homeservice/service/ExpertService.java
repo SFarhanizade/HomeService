@@ -23,9 +23,9 @@ public class ExpertService {
     public Expert save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
 
         if(!Validation.isValid(expert))
-            throw new UserNotValidException("");
+            throw new UserNotValidException("User is not valid!");
         if(finalCheck(expert))
-            throw new DuplicateEntityException("");
+            throw new DuplicateEntityException("User exists!");
         Expert result = repository.save(expert);
         return result;
     }
