@@ -1,5 +1,7 @@
 package ir.farhanizade.homeservice.dto.in;
 
+import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import lombok.Data;
 
@@ -11,8 +13,17 @@ public class UserInDto {
     private String email;
     private String password;
 
-    public User convert() {
-        return User.builder()
+    public Expert convert2Expert() {
+        return Expert.builder()
+                .fName(firstname)
+                .lName(lastname)
+                .email(email)
+                .password(password)
+                .build();
+    }
+
+    public Customer convert2Customer() {
+        return Customer.builder()
                 .fName(firstname)
                 .lName(lastname)
                 .email(email)
