@@ -6,6 +6,7 @@ import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
@@ -57,12 +58,21 @@ public class UserService {
     }
 
     public List<UserSearchOutDto> search(UserSearchInDto user) {
-        List<UserSearchOutDto> result = new ArrayList<>();
+        List<UserSearchOutDto> result;
         if ("expert".equals(user.getType())) {
             result = expertService.search(user);
         } else if("customer".equals(user.getType())){
             result = customerService.search(user);
+        } else{
+            result = searchUser(user);
         }
+        return result;
+    }
+
+    private List<UserSearchOutDto> searchUser(UserSearchInDto user) {
+        List<User> searchResult = repository.search(user);
+        List<UserSearchOutDto> result = searchResult.stream()
+                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
         return result;
     }
 }
