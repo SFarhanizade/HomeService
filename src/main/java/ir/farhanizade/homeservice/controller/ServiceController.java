@@ -7,7 +7,7 @@ import ir.farhanizade.homeservice.dto.out.MainServiceOutDto;
 import ir.farhanizade.homeservice.dto.out.ServiceOutDto;
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.service.MainService;
-import ir.farhanizade.homeservice.exception.DuplicateEntityException;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.service.MainServiceService;
 import ir.farhanizade.homeservice.service.SubServiceService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,15 @@ public class ServiceController {
                 .code(1)
                 .message("Done!")
                 .build();
-        List<MainService> mainServices = mainService.loadAll();
+        HttpStatus status = HttpStatus.OK;
+        List<MainService> mainServices = null;
+        try {
+            mainServices = mainService.loadAll();
+        } catch (EntityNotFoundException e) {
+            e.printStackTrace();
+            status = HttpStatus.NOT_FOUND;
+            response.setMessage(e.getMessage());
+        }
         List<MainServiceOutDto> dtos = mainServices.stream()
                 .map(m -> MainServiceOutDto.builder()
                         .id(m.getId())
@@ -43,7 +51,7 @@ public class ServiceController {
                         )
                         .build()).toList();
         response.setData(dtos);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        return ResponseEntity.status(status).body(response);
     }
 
     @GetMapping
@@ -52,6 +60,7 @@ public class ServiceController {
                 .code(1)
                 .message("add successfully!")
                 .build();
+        HttpStatus status = HttpStatus.CREATED;
         BaseEntity result = new BaseEntity();
 
             try {
@@ -62,12 +71,12 @@ public class ServiceController {
                     result = subService.save(service.convert2SubService(), service.getParent());
                     response.setMessage("SubService "+response.getMessage());
                 }
-            } catch (DuplicateEntityException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 response.setMessage(e.getMessage());
                 response.setCode(-1);
             }
-            response.setData(new EntityOutDto(result.getId()));
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        response.setData(new EntityOutDto(result.getId()));
+            return ResponseEntity.status(status).body(response);
     }
 }
