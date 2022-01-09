@@ -41,7 +41,7 @@ public class ServiceController {
             status = HttpStatus.NOT_FOUND;
             response.setMessage(e.getMessage());
         }
-        List<MainServiceOutDto> dtos = mainServices.stream()
+        List<MainServiceOutDto> result = mainServices.stream()
                 .map(m -> MainServiceOutDto.builder()
                         .id(m.getId())
                         .name(m.getName())
@@ -50,7 +50,7 @@ public class ServiceController {
                                 .collect(Collectors.toList())
                         )
                         .build()).toList();
-        response.setData(dtos);
+        response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
 
@@ -61,22 +61,22 @@ public class ServiceController {
                 .message("add successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
-        BaseEntity result = new BaseEntity();
+        EntityOutDto result = new EntityOutDto();
 
-            try {
-                if (service.getParent() == 0) {
-                    result = mainService.save(service);
-                    response.setMessage("MainService "+response.getMessage());
-                } else {
-                    result = subService.save(service, service.getParent());
-                    response.setMessage("SubService "+response.getMessage());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.setMessage(e.getMessage());
-                response.setCode(-1);
+        try {
+            if (service.getParent() == 0) {
+                result = mainService.save(service);
+                response.setMessage("MainService " + response.getMessage());
+            } else {
+                result = subService.save(service, service.getParent());
+                response.setMessage("SubService " + response.getMessage());
             }
-        response.setData(new EntityOutDto(result.getId()));
-            return ResponseEntity.status(status).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+            response.setCode(-1);
+        }
+        response.setData(result);
+        return ResponseEntity.status(status).body(response);
     }
 }
