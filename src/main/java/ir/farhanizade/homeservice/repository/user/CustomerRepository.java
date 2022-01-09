@@ -7,7 +7,7 @@ import ir.farhanizade.homeservice.repository.BaseRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface CustomerRepository extends BaseRepository<Customer> {
+public interface CustomerRepository extends BaseRepository<Customer>, CustomCustomerRepository {
     Customer findByEmail(String email);
     List<Customer> findByCredit(BigDecimal credit);
     List<Customer> findByStatus(UserStatus status);
