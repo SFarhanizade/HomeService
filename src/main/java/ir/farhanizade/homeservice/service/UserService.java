@@ -61,9 +61,9 @@ public class UserService {
         List<UserSearchOutDto> result;
         if ("expert".equals(user.getType())) {
             result = expertService.search(user);
-        } else if("customer".equals(user.getType())){
+        } else if ("customer".equals(user.getType())) {
             result = customerService.search(user);
-        } else{
+        } else {
             result = searchUser(user);
         }
         return result;
@@ -72,7 +72,9 @@ public class UserService {
     private List<UserSearchOutDto> searchUser(UserSearchInDto user) {
         List<User> searchResult = repository.search(user);
         List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
+                .map(e -> new UserSearchOutDto().convert2Dto(e))
+                .peek(e -> e.setType("user"))
+                .toList();
         return result;
     }
 }

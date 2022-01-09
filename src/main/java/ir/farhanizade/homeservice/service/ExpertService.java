@@ -62,7 +62,9 @@ public class ExpertService {
     public List<UserSearchOutDto> search(UserSearchInDto user) {
         List<Expert> searchResult = repository.search(user);
         List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
+                .map(e -> new UserSearchOutDto().convert2Dto(e))
+                .peek(e -> e.setType("expert"))
+                .toList();
         return result;
     }
 }

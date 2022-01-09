@@ -64,7 +64,9 @@ public class CustomerService {
     public List<UserSearchOutDto> search(UserSearchInDto user) {
         List<Customer> searchResult = repository.search(user);
         List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
+                .map(e -> new UserSearchOutDto().convert2Dto(e))
+                .peek(e -> e.setType("customer"))
+                .toList();
         return result;
     }
 }
