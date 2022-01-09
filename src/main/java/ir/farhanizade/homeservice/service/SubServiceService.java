@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,15 @@ public class SubServiceService {
     @Transactional(readOnly = true)
     public List<SubService> loadAll() {
         return repository.findAll();
+    }
+
+    public SubService loadById(Long serviceId) throws EntityNotFoundException {
+        Optional<SubService> byId = repository.findById(serviceId);
+        if(byId.isPresent()){
+            return byId.get();
+        }else{
+            throw new EntityNotFoundException("Service doesn't exist!");
+        }
     }
 }
 
