@@ -262,8 +262,8 @@ class ExpertServiceTest {
                 .expertises(List.of(s1, s2))
                 .build();
         try {
-            expertiseService.save(s1);
-            expertiseService.save(s2);
+            expertiseService.save(s1, parent.getId());
+            expertiseService.save(s2, parent.getId());
             expertService.save(expert);
             Expert byEmail = expertService.findByEmail("expert@expert.expert");
             assertEquals(2, byEmail.getExpertises().size());
@@ -313,8 +313,8 @@ class ExpertServiceTest {
                 .expertises(List.of(s1))
                 .build();
         try {
-            expertiseService.save(s1);
-            expertiseService.save(s2);
+            expertiseService.save(s1, parent.getId());
+            expertiseService.save(s2, parent.getId());
             expertService.save(expert1);
             expertService.save(expert2);
             List<Expert> byExpertise = expertService.findByExpertise(s2);

@@ -255,10 +255,10 @@ class CustomerServiceTest {
                 .build();
         try {
             //Saving SubService s1
-            expertiseService.save(s1);
+            expertiseService.save(s1, parent.getId());
 
             //Saving SubService s2
-            expertiseService.save(s2);
+            expertiseService.save(s2, parent.getId());
 
             //Saving Expert expert1
             expertService.save(expert1);

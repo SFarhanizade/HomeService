@@ -54,13 +54,13 @@ class SubServiceServiceTest {
                 .build();
 
         try {
-            repository.save(s1);
+            repository.save(s1, parent.getId());
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
         }
         System.out.println();
         try {
-            repository.save(s2);
+            repository.save(s2, parent.getId());
             fail();
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
