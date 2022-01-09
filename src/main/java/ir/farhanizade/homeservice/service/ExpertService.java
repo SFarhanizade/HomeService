@@ -1,8 +1,10 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.ExpertAddServiceOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
@@ -13,15 +15,18 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExpertService {
     private final ExpertRepository repository;
+    private final SubServiceService serviceManager;
 
     @Transactional
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -65,6 +70,31 @@ public class ExpertService {
                 .map(e -> new UserSearchOutDto().convert2Dto(e))
                 .peek(e -> e.setType("expert"))
                 .toList();
+        return result;
+    }
+
+    @Transactional
+    public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException {
+        Expert expert;
+        Optional<Expert> byId = repository.findById(request.getExpertId());
+        if (byId.isPresent()) {
+            expert = byId.get();
+        } else {
+            throw new EntityNotFoundException("User doesn't exist!");
+        }
+        SubService service = serviceManager.loadById(request.getServiceId());
+        boolean serviceExists = !expert.addService(service);
+        if(serviceExists){
+            throw new DuplicateEntityException("The service exists for this expert!");
+        }
+        Expert saved = repository.save(expert);
+        ExpertAddServiceOutDto result = ExpertAddServiceOutDto.builder()
+                .expertId(saved.getId())
+                .services(expert.getExpertises().stream()
+                        .map(s -> new EntityOutDto(s.getId()))
+                        .collect(Collectors.toSet())
+                )
+                .build();
         return result;
     }
 }
