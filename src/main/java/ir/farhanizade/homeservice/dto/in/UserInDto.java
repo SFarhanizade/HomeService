@@ -3,6 +3,7 @@ package ir.farhanizade.homeservice.dto.in;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 @Data
+@Builder
 public class UserInDto {
     @NonNull
     private String type;
