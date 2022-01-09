@@ -1,5 +1,9 @@
 package ir.farhanizade.homeservice.dto.in;
 
-public class ServiceInDto {
+import lombok.Data;
 
+@Data
+public class ServiceInDto {
+    private Long parent;
+    private String name;
 }
