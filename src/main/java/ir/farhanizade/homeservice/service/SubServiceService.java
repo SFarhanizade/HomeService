@@ -19,10 +19,11 @@ public class SubServiceService {
     private final MainServiceRepository parentRepository;
 
     @Transactional
-    public void save(SubService entity) throws DuplicateEntityException {
-        MainService parent = entity.getParent();
+    public SubService save(SubService entity, Long parentId) throws DuplicateEntityException {
+        MainService parent = parentRepository.getById(parentId);
         if (parent == null)
             throw new IllegalStateException();
+        entity.setParent(parent);
         List<SubService> siblings = parent.getSubServices();
         boolean noneMatch = true;
         if (siblings.size() > 0) {
@@ -30,9 +31,7 @@ public class SubServiceService {
                     .noneMatch(s -> s.getName().equals(entity.getName()));
         }
         if (noneMatch) {
-            repository.save(entity);
-            parent.addSubService(entity);
-            parentRepository.save(parent);
+            return repository.save(entity);
         } else {
             throw new DuplicateEntityException("");
         }
