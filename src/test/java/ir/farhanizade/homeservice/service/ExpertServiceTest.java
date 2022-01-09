@@ -239,6 +239,8 @@ class ExpertServiceTest {
             mainExpertiseService.save(parent);
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
         SubService s1 = SubService.builder()
                 .name("s1")
@@ -282,6 +284,8 @@ class ExpertServiceTest {
         try {
             mainExpertiseService.save(parent);
         } catch (DuplicateEntityException e) {
+            e.printStackTrace();
+        } catch (NullFieldException e) {
             e.printStackTrace();
         }
         SubService s1 = SubService.builder()
