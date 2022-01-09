@@ -10,11 +10,9 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -56,8 +54,7 @@ public class UserController {
                 .code(1)
                 .message("Done!")
                 .build();
-        List<UserSearchOutDto> result = new ArrayList<>();
-            result = userService.search(user);
+        List<UserSearchOutDto> result = userService.search(user);
 
         response.setData(result);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
