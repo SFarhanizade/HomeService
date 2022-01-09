@@ -34,7 +34,7 @@ public class Expert extends User {
         this.points += points;
     }
 
-    public void addService(SubService service) {
-        expertises.add(service);
+    public boolean addService(SubService service) {
+        return expertises.add(service);
     }
 }
