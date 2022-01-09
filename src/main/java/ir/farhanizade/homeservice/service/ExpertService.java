@@ -1,7 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.entity.service.SubService;
-import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -10,7 +10,6 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -22,36 +21,40 @@ public class ExpertService {
     @Transactional
     public Expert save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
 
-        if(!Validation.isValid(expert))
+        if (!Validation.isValid(expert))
             throw new UserNotValidException("User is not valid!");
-        if(finalCheck(expert))
+        if (finalCheck(expert))
             throw new DuplicateEntityException("User exists!");
         Expert result = repository.save(expert);
         return result;
     }
 
     @Transactional(readOnly = true)
-    public Expert findByEmail(String email){
-        if(email==null)
+    public Expert findByEmail(String email) {
+        if (email == null)
             throw new IllegalStateException("Null Email");
         return repository.findByEmail(email);
     }
 
-    public List<Expert> findByCredit(BigDecimal credit){
+    public List<Expert> findByCredit(BigDecimal credit) {
         return repository.findByCredit(credit);
     }
 
-    public List<Expert> findByStatus(UserStatus status){
+    public List<Expert> findByStatus(UserStatus status) {
         return repository.findByStatus(status);
     }
 
-    public List<Expert> findByExpertise(SubService service){
+    public List<Expert> findByExpertise(SubService service) {
         return repository.findByExpertise(service.getId());
     }
 
-    private boolean finalCheck(Expert expert){
+    private boolean finalCheck(Expert expert) {
         String email = expert.getEmail();
         Expert byEmail = repository.findByEmail(email);
-        return byEmail!=null && expert.getId()==null;
+        return byEmail != null && expert.getId() == null;
+    }
+
+    public List<Expert> search(UserSearchInDto user) {
+        return repository.search(user);
     }
 }
