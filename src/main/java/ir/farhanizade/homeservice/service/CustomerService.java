@@ -1,8 +1,11 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -56,5 +59,12 @@ public class CustomerService {
         String email = customer.getEmail();
         Customer byEmail = repository.findByEmail(email);
         return byEmail != null && customer.getId() == null;
+    }
+
+    public List<UserSearchOutDto> search(UserSearchInDto user) {
+        List<Customer> searchResult = repository.search(user);
+        List<UserSearchOutDto> result = searchResult.stream()
+                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
+        return result;
     }
 }
