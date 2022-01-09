@@ -8,7 +8,9 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
@@ -23,12 +25,16 @@ public class Expert extends User {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @Builder.Default
-    private List<SubService> expertises = new ArrayList<>();
+    private Set<SubService> expertises = new HashSet<>();
 
     @Builder.Default
     private Integer points = 0;
 
     public void addPoints(Integer points) {
         this.points += points;
+    }
+
+    public void addService(SubService service) {
+        expertises.add(service);
     }
 }
