@@ -5,7 +5,7 @@ import ir.farhanizade.homeservice.repository.BaseRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository extends BaseRepository<User> {
+public interface UserRepository extends BaseRepository<User>, CustomUserRepository {
 
     @Query("From User u where u.id=:id and u.password=:currentPassword")
     User isCorrectByPassword(Long id, String currentPassword);
