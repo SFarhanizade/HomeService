@@ -15,10 +15,10 @@ public class MainServiceService {
     private final MainServiceRepository repository;
 
     @Transactional
-    public void save(MainService entity) throws DuplicateEntityException {
+    public MainService save(MainService entity) throws DuplicateEntityException {
         MainService result = repository.findByName(entity.getName());
         if (result != null && entity.getId()==null) throw new DuplicateEntityException("");
-        repository.save(entity);
+        return repository.save(entity);
     }
 
     public List<MainService> loadAll(){
