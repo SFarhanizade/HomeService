@@ -20,42 +20,42 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 class MainServiceServiceTest {
-    @Autowired
-    private MainServiceService repository;
-
-    @TestConfiguration
-    @ComponentScan("ir.farhanizade.homeservice")
-    public static class MainServiceServiceTestConfig{}
-
-    @Test
-    void save(){
-        MainService service1 = MainService.builder()
-                .name("1")
-                .build();
-        MainService service2 = MainService.builder()
-                .name("1")
-                .build();
-        try {
-            repository.save(service1);
-        } catch (DuplicateEntityException e) {
-            e.printStackTrace();
-        } catch (NullFieldException e) {
-            e.printStackTrace();
-        }
-        try {
-            repository.save(service2);
-            fail();
-        } catch (DuplicateEntityException e) {
-            e.printStackTrace();
-            List<MainService> all = null;
-            try {
-                all = repository.loadAll();
-            } catch (EntityNotFoundException ex) {
-                ex.printStackTrace();
-            }
-            assertEquals(1,all.size());
-        } catch (NullFieldException e) {
-            e.printStackTrace();
-        }
-    }
+//    @Autowired
+//    private MainServiceService repository;
+//
+//    @TestConfiguration
+//    @ComponentScan("ir.farhanizade.homeservice")
+//    public static class MainServiceServiceTestConfig{}
+//
+//    @Test
+//    void save(){
+//        MainService service1 = MainService.builder()
+//                .name("1")
+//                .build();
+//        MainService service2 = MainService.builder()
+//                .name("1")
+//                .build();
+//        try {
+//            repository.save(service1);
+//        } catch (DuplicateEntityException e) {
+//            e.printStackTrace();
+//        } catch (NullFieldException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            repository.save(service2);
+//            fail();
+//        } catch (DuplicateEntityException e) {
+//            e.printStackTrace();
+//            List<MainService> all = null;
+//            try {
+//                all = repository.loadAll();
+//            } catch (EntityNotFoundException ex) {
+//                ex.printStackTrace();
+//            }
+//            assertEquals(1,all.size());
+//        } catch (NullFieldException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
