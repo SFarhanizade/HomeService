@@ -20,8 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    //private final CustomerService customerService;
-    private final ExpertService expertService;
     private final UserService userService;
 
     @PostMapping
