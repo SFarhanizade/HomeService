@@ -275,7 +275,12 @@ class CustomerServiceTest {
             fail();
         }
         //Loading the MainService I just saved
-        List<MainService> mainServices = mainExpertiseService.loadAll();
+        List<MainService> mainServices = null;
+        try {
+            mainServices = mainExpertiseService.loadAll();
+        } catch (EntityNotFoundException e) {
+            e.printStackTrace();
+        }
         MainService mainService = mainServices.get(0);
 
         //Loading the SubServices I just saved

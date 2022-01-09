@@ -3,6 +3,8 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
+import ir.farhanizade.homeservice.exception.NullFieldException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,13 +32,15 @@ class SubServiceServiceTest {
     public static class SubServiceServiceTestConfig{}
 
     @Test
-    void test_save_duplicate_throwException(){
+    void test_save_duplicate_throwException() throws EntityNotFoundException {
         MainService parent = MainService.builder()
                 .name("parent")
                 .build();
         try {
             parentRepository.save(parent);
         } catch (DuplicateEntityException e) {
+            e.printStackTrace();
+        } catch (NullFieldException e) {
             e.printStackTrace();
         }
         SubService s1 = SubService.builder()

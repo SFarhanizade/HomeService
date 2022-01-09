@@ -2,6 +2,8 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
+import ir.farhanizade.homeservice.exception.NullFieldException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -37,14 +39,23 @@ class MainServiceServiceTest {
             repository.save(service1);
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
         try {
             repository.save(service2);
             fail();
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
-            List<MainService> all = repository.loadAll();
+            List<MainService> all = null;
+            try {
+                all = repository.loadAll();
+            } catch (EntityNotFoundException ex) {
+                ex.printStackTrace();
+            }
             assertEquals(1,all.size());
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
     }
 }
