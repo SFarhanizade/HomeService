@@ -217,6 +217,8 @@ class CustomerServiceTest {
             mainExpertiseService.save(parent);
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
+        } catch (NullFieldException e) {
+            e.printStackTrace();
         }
 
         //Creating a SubService of parent called "s1"
