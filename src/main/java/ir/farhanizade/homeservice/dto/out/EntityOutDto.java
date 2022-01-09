@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserOutDto {
-    private String type;
+public class EntityOutDto {
     private Long id;
 }

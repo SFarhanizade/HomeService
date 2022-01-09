@@ -4,7 +4,7 @@ import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.dto.out.UserOutDto;
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
@@ -29,9 +29,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ResponseResult<UserOutDto>> create(@RequestBody UserInDto user) {
+    public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) {
         User result = new User();
-        ResponseResult<UserOutDto> response = ResponseResult.<UserOutDto>builder()
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("User saved successfully!")
                 .build();
@@ -51,14 +51,14 @@ public class UserController {
             status = HttpStatus.NOT_ACCEPTABLE;
         }
 
-        UserOutDto userOutDto = new UserOutDto(user.getType(), result.getId());
-        response.setData(userOutDto);
+        EntityOutDto entityOutDto = new EntityOutDto(result.getId());
+        response.setData(entityOutDto);
         return ResponseEntity.status(status).body(response);
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<ResponseResult<UserOutDto>> changePassword(@RequestBody UserPasswordInDto user) {
-        ResponseResult<UserOutDto> response = ResponseResult.<UserOutDto>builder()
+    public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) {
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Password changed successfully!")
                 .build();
@@ -71,8 +71,8 @@ public class UserController {
             response.setMessage(e.getMessage());
             status = HttpStatus.NOT_ACCEPTABLE;
         }
-        UserOutDto userOutDto = new UserOutDto("User", user.getId());
-        response.setData(userOutDto);
+        EntityOutDto entityOutDto = new EntityOutDto(user.getId());
+        response.setData(entityOutDto);
         return ResponseEntity.status(status).body(response);
     }
 
