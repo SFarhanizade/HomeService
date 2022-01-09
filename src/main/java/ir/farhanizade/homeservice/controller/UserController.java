@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) {
-        User result = new User();
+        EntityOutDto result = new EntityOutDto();
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("User saved successfully!")
@@ -48,9 +48,7 @@ public class UserController {
             response.setMessage(e.getMessage());
             status = HttpStatus.NOT_ACCEPTABLE;
         }
-
-        EntityOutDto entityOutDto = new EntityOutDto(result.getId());
-        response.setData(entityOutDto);
+        response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
 
@@ -61,16 +59,16 @@ public class UserController {
                 .message("Password changed successfully!")
                 .build();
         HttpStatus status = HttpStatus.ACCEPTED;
+        EntityOutDto result = new EntityOutDto();
         try {
-            userService.changePassword(user);
+            result = userService.changePassword(user);
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(-1);
             response.setMessage(e.getMessage());
             status = HttpStatus.NOT_ACCEPTABLE;
         }
-        EntityOutDto entityOutDto = new EntityOutDto(user.getId());
-        response.setData(entityOutDto);
+        response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
 
@@ -80,13 +78,10 @@ public class UserController {
                 .code(1)
                 .message("Done!")
                 .build();
-        List<Expert> resultList = new ArrayList<>();
+        List<UserSearchOutDto> result = new ArrayList<>();
         if("expert".equals(user.getType())){
-            resultList = expertService.search(user);
+            result = expertService.search(user);
         }
-        List<UserSearchOutDto> result = resultList.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e))
-                .collect(Collectors.toList());
         response.setData(result);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }

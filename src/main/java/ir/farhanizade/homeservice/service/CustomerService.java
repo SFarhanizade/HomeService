@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -19,7 +20,7 @@ public class CustomerService {
     private final CustomerRepository repository;
 
     @Transactional
-    public Customer save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
+    public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         Customer customer = user.convert2Customer();
         boolean isValid = false;
         isValid = Validation.isValid(customer);
@@ -30,7 +31,7 @@ public class CustomerService {
         if (finalCheck(customer))
             throw new DuplicateEntityException("User exists!");
         Customer result = repository.save(customer);
-        return result;
+        return new EntityOutDto(result.getId());
     }
 
     public Customer findByEmail(String email) {

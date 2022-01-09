@@ -2,6 +2,8 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +23,14 @@ public class ExpertService {
     private final ExpertRepository repository;
 
     @Transactional
-    public Expert save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
+    public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
         Expert expert = user.convert2Expert();
         if (!Validation.isValid(expert))
             throw new UserNotValidException("User is not valid!");
         if (finalCheck(expert))
             throw new DuplicateEntityException("User exists!");
         Expert result = repository.save(expert);
-        return result;
+        return new EntityOutDto(result.getId());
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +58,10 @@ public class ExpertService {
         return byEmail != null && expert.getId() == null;
     }
 
-    public List<Expert> search(UserSearchInDto user) {
-        return repository.search(user);
+    public List<UserSearchOutDto> search(UserSearchInDto user) {
+        List<Expert> searchResult = repository.search(user);
+        List<UserSearchOutDto> result = searchResult.stream()
+                .map(e -> new UserSearchOutDto().convert2Dto(e)).toList();
+        return result;
     }
 }
