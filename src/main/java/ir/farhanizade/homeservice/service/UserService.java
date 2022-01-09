@@ -3,7 +3,9 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
@@ -11,6 +13,9 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +52,16 @@ public class UserService {
 
         } else if ("customer".equals(user.getType())) {
             result = customerService.save(user);
+        }
+        return result;
+    }
+
+    public List<UserSearchOutDto> search(UserSearchInDto user) {
+        List<UserSearchOutDto> result = new ArrayList<>();
+        if ("expert".equals(user.getType())) {
+            result = expertService.search(user);
+        } else if("customer".equals(user.getType())){
+            result = customerService.search(user);
         }
         return result;
     }
