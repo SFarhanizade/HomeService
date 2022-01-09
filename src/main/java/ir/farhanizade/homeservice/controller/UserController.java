@@ -57,9 +57,8 @@ public class UserController {
                 .message("Done!")
                 .build();
         List<UserSearchOutDto> result = new ArrayList<>();
-        if ("expert".equals(user.getType())) {
-            result = expertService.search(user);
-        }
+            result = userService.search(user);
+
         response.setData(result);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
