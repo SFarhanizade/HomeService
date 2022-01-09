@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class ExpertAddServiceOutDto {
     private Long expertId;
-    private List<EntityOutDto> services;
+    private Set<EntityOutDto> services;
 }
