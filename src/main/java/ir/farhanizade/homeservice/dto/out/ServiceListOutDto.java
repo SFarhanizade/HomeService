@@ -1,4 +1,4 @@
 package ir.farhanizade.homeservice.dto.out;
 
-public class ServiceOutDto {
+public class ServiceListOutDto {
 }
