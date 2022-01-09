@@ -3,19 +3,21 @@ package ir.farhanizade.homeservice.controller;
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.UserOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
-import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -35,6 +37,8 @@ public class UserController {
                 .build();
         HttpStatus status = HttpStatus.CREATED;
         try {
+            if(user.getType()==null)
+                throw new Exception("Type is not specified!");
             if ("expert".equals(user.getType())) {
                 result = expertService.save(user.convert2Expert());
             } else if ("customer".equals(user.getType())) {
@@ -70,6 +74,23 @@ public class UserController {
         UserOutDto userOutDto = new UserOutDto("User", user.getId());
         response.setData(userOutDto);
         return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseResult<List<UserSearchOutDto>>> search(@RequestBody UserSearchInDto user){
+        ResponseResult<List<UserSearchOutDto>> response = ResponseResult.<List<UserSearchOutDto>>builder()
+                .code(1)
+                .message("Done!")
+                .build();
+        List<Expert> resultList = new ArrayList<>();
+        if("expert".equals(user.getType())){
+            resultList = expertService.search(user);
+        }
+        List<UserSearchOutDto> result = resultList.stream()
+                .map(e -> new UserSearchOutDto().convert2Dto(e))
+                .collect(Collectors.toList());
+        response.setData(result);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }
 
