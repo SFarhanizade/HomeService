@@ -65,10 +65,10 @@ public class ServiceController {
 
             try {
                 if (service.getParent() == 0) {
-                    result = mainService.save(service.convert2MainService());
+                    result = mainService.save(service);
                     response.setMessage("MainService "+response.getMessage());
                 } else {
-                    result = subService.save(service.convert2SubService(), service.getParent());
+                    result = subService.save(service, service.getParent());
                     response.setMessage("SubService "+response.getMessage());
                 }
             } catch (Exception e) {

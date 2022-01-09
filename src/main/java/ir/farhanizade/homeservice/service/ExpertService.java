@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
@@ -19,8 +20,8 @@ public class ExpertService {
     private final ExpertRepository repository;
 
     @Transactional
-    public Expert save(Expert expert) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
-
+    public Expert save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
+        Expert expert = user.convert2Expert();
         if (!Validation.isValid(expert))
             throw new UserNotValidException("User is not valid!");
         if (finalCheck(expert))

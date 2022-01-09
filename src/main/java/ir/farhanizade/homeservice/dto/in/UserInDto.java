@@ -4,13 +4,26 @@ import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import lombok.Data;
+import lombok.NonNull;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 @Data
 public class UserInDto {
+    @NonNull
     private String type;
+    @NonNull
+    @Size(min = 3, max = 20)
     private String firstname;
+    @NonNull
+    @Size(min = 3, max = 20)
     private String lastname;
+    @NonNull
     private String email;
+    @NonNull
+    @Size(min = 8, max = 20)
     private String password;
 
     public Expert convert2Expert() {

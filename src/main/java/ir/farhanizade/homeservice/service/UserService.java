@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
 
+import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.PasswordNotValidException;
 import ir.farhanizade.homeservice.exception.WrongPasswordException;
@@ -16,7 +17,10 @@ public class UserService {
     private final UserRepository repository;
 
     @Transactional
-    public int changePassword(Long id, String currentPassword, String newPassword) throws PasswordNotValidException, WrongPasswordException {
+    public int changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
+        String currentPassword = user.getCurrentPassword();
+        String newPassword = user.getNewPassword();
+        Long id = user.getId();
         if(currentPassword.equals(newPassword)){
             throw new PasswordNotValidException("The new password is the same as the current password!");
         }

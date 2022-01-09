@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
@@ -18,7 +19,8 @@ public class SubServiceService {
     private final MainServiceRepository parentRepository;
 
     @Transactional
-    public SubService save(SubService entity, Long parentId) throws DuplicateEntityException, EntityNotFoundException {
+    public SubService save(ServiceInDto service, Long parentId) throws DuplicateEntityException, EntityNotFoundException {
+        SubService entity = service.convert2SubService();
         MainService parent = parentRepository.getById(parentId);
         if (parent == null)
             throw new EntityNotFoundException("Parent Is Not Found!");

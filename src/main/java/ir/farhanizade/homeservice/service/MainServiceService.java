@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
@@ -16,9 +17,8 @@ public class MainServiceService {
     private final MainServiceRepository repository;
 
     @Transactional
-    public MainService save(MainService entity) throws DuplicateEntityException, NullFieldException {
-        if(entity.getName()==null) throw new NullFieldException("Name is null!");
-        if("".equals(entity.getName())) throw new NullFieldException("Name is empty!");
+    public MainService save(ServiceInDto service) throws DuplicateEntityException {
+        MainService entity = service.convert2MainService();
         MainService result = repository.findByName(entity.getName());
         if (result != null && entity.getId()==null) throw new DuplicateEntityException("MainService exists!");
         return repository.save(entity);

@@ -37,12 +37,10 @@ public class UserController {
                 .build();
         HttpStatus status = HttpStatus.CREATED;
         try {
-            if(user.getType()==null)
-                throw new Exception("Type is not specified!");
             if ("expert".equals(user.getType())) {
-                result = expertService.save(user.convert2Expert());
+                result = expertService.save(user);
             } else if ("customer".equals(user.getType())) {
-                result = customerService.save(user.convert2Customer());
+                result = customerService.save(user);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +62,7 @@ public class UserController {
                 .build();
         HttpStatus status = HttpStatus.ACCEPTED;
         try {
-            userService.changePassword(user.getId(), user.getCurrentPassword(), user.getNewPassword());
+            userService.changePassword(user);
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(-1);
