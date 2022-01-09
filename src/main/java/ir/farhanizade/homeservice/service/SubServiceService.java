@@ -37,7 +37,7 @@ public class SubServiceService {
             SubService saved = repository.save(entity);
             return new EntityOutDto(saved.getId());
         } else {
-            throw new DuplicateEntityException("");
+            throw new DuplicateEntityException("SubService exists!");
         }
     }
 
