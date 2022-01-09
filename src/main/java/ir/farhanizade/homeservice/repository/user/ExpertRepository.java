@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 
-public interface ExpertRepository extends BaseRepository<Expert> {
+public interface ExpertRepository extends BaseRepository<Expert>, CustomExpertRepository{
     Expert findByEmail(String email);
     List<Expert> findByCredit(BigDecimal credit);
     List<Expert> findByStatus(UserStatus status);
