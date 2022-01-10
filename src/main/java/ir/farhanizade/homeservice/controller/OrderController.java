@@ -56,7 +56,7 @@ public class OrderController {
     }
 
     @PostMapping("/suggest")
-    public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>> suggest(@RequestBody ExpertAddSuggestionInDto request) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException {
+    public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>> suggest(@RequestBody ExpertAddSuggestionInDto request) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException {
         ExpertAddSuggestionOutDto result = expertService.suggest(request);
         ResponseResult<ExpertAddSuggestionOutDto> response = ResponseResult.<ExpertAddSuggestionOutDto>builder()
                 .code(1)
