@@ -22,14 +22,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
+    public ResponseEntity<ResponseResult<EntityOutDto>> create(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("User saved successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
-        EntityOutDto result = userService.save(user);
+        EntityOutDto result = userService.save(user, type);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
