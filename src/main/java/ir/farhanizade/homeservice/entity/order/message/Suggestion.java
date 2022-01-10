@@ -15,6 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@EqualsAndHashCode(callSuper = false, of = {"owner", "order"})
 @Table(
         uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "owner_id"})}
 )
