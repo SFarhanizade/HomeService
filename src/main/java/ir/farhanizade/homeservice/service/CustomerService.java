@@ -1,9 +1,11 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
+import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
@@ -23,6 +25,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository repository;
+    private final OrderService orderRepository;
+    private final RequestService requestService;
+    private final SuggestionService suggestionService;
 
     @Transactional
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
@@ -74,9 +79,9 @@ public class CustomerService {
 
     public Customer findById(Long id) throws EntityNotFoundException {
         Optional<Customer> byId = repository.findById(id);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             return byId.get();
-        }else
+        } else
             throw new EntityNotFoundException("User doesn't exist!");
     }
 
@@ -94,4 +99,35 @@ public class CustomerService {
         return result;
     }
 
+    public OrderOutDto getOrder(Long id, Long orderId) throws EntityNotFoundException {
+        exists(id);
+        return orderRepository.findByIdAndCustomerId(id, orderId);
+    }
+
+    public EntityOutDto request(Long id, RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
+        return requestService.save(findById(id), request);
+    }
+
+    public boolean exists(Long id) throws EntityNotFoundException {
+        boolean exists = repository.existsById(id);
+        if (exists)
+            return true;
+        else
+            throw new EntityNotFoundException("User Doesn't Exist!");
+    }
+
+    public List<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
+        exists(id);
+        return suggestionService.findAllByOrderId(order);
+    }
+
+    public SuggestionOutDto getSuggestion(Long id, Long suggestion) throws EntityNotFoundException {
+        exists(id);
+        return suggestionService.findById(suggestion);
+    }
+
+    public List<SuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
+        exists(id);
+        return suggestionService.findAllByCustomerId(id);
+    }
 }
