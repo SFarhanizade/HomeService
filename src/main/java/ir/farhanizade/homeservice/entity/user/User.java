@@ -28,13 +28,15 @@ public class User extends BasePerson {
     @Builder.Default
     private Date dateTime = new Date(System.currentTimeMillis());
 
-    private BigDecimal credit;
+    @Column(nullable = false)
+    @Builder.Default
+    private BigDecimal credit = new BigDecimal(0);
 
     @Builder.Default
     @Column(nullable = false)
     private UserStatus status = UserStatus.NEW;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Transaction> transactions = new ArrayList<>();
 
