@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.exception.*;
@@ -17,11 +18,16 @@ public class SuggestionService {
     private final SuggestionRepository repository;
 
     @Transactional
-    public void save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
+    public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
         order.suggest(suggestion);
-        repository.save(suggestion);
+        Suggestion saved = repository.save(suggestion);
+        return ExpertAddSuggestionOutDto.builder()
+                .expertId(suggestion.getOwner().getId())
+                .orderId(order.getId())
+                .suggestionId(saved.getId())
+                .build();
     }
 
     @Transactional
