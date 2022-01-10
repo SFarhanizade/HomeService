@@ -97,8 +97,9 @@ public class Validation {
         Request request = order.getRequest();
         isValid(order);
         SubService service = order.getService();
-        if (!order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION)
-                || !request.getStatus().equals(BaseMessageStatus.WAITING))
+        if ((!(order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION) ||
+                order.getStatus().equals(OrderStatus.WAITING_FOR_SELECTION)))||
+                !request.getStatus().equals(BaseMessageStatus.WAITING))
             throw new BusyOrderException("The order is not open to suggest!");
         if (suggestion.getDuration() <= 0)
             throw new BadEntryException("The duration is 0 or less!");
