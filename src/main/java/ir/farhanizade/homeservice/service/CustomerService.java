@@ -3,9 +3,10 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -71,11 +72,26 @@ public class CustomerService {
         return result;
     }
 
-    public Customer loadById(Long id) throws EntityNotFoundException {
+    public Customer findById(Long id) throws EntityNotFoundException {
         Optional<Customer> byId = repository.findById(id);
         if(byId.isPresent()){
             return byId.get();
         }else
             throw new EntityNotFoundException("User doesn't exist!");
     }
+
+    public List<OrderOutDto> getOrders(Long id) throws EntityNotFoundException {
+        Customer customer = findById(id);
+        List<Order> orders = customer.getOrders();
+        List<OrderOutDto> result = orders.stream()
+                .map((Order o) -> OrderOutDto.builder()
+                        .id(o.getId())
+                        .service(o.getService().getName())
+                        .price(o.getRequest().getPrice())
+                        .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+                        .createdDateTime(o.getRequest().getDateTime())
+                        .build()).toList();
+        return result;
+    }
+
 }
