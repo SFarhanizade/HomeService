@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -68,5 +69,13 @@ public class CustomerService {
                 .peek(e -> e.setType("customer"))
                 .toList();
         return result;
+    }
+
+    public Customer loadById(Long id) throws EntityNotFoundException {
+        Optional<Customer> byId = repository.findById(id);
+        if(byId.isPresent()){
+            return byId.get();
+        }else
+            throw new EntityNotFoundException("User doesn't exist!");
     }
 }
