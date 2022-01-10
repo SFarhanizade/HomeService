@@ -18,7 +18,7 @@ public class SuggestionService {
     private final SuggestionRepository repository;
 
     @Transactional
-    public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
+    public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
         order.suggest(suggestion);
