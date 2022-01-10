@@ -1,9 +1,11 @@
 package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
+import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
 import ir.farhanizade.homeservice.dto.in.ExpertInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.ExpertService;
@@ -50,6 +52,18 @@ public class OrderController {
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @PostMapping("/suggest")
+    public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>> suggest(@RequestBody ExpertAddSuggestionInDto request) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException {
+        ExpertAddSuggestionOutDto result = expertService.suggest(request);
+        ResponseResult<ExpertAddSuggestionOutDto> response = ResponseResult.<ExpertAddSuggestionOutDto>builder()
+                .code(1)
+                .message("Suggestion added successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.CREATED;
         return ResponseEntity.status(status).body(response);
     }
 }
