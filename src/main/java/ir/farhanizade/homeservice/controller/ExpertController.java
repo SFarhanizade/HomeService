@@ -2,9 +2,11 @@ package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
+import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.ExpertAddServiceOutDto;
-import ir.farhanizade.homeservice.exception.DuplicateEntityException;
-import ir.farhanizade.homeservice.exception.EntityNotFoundException;
+import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.ExpertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ExpertController {
     private final ExpertService expertService;
+    private final UserController userController;
 
-
+    @PostMapping
+    public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
+        return userController.create(user, Expert.class);
+    }
 
     @PostMapping("/addService")
     public ResponseEntity<ResponseResult<ExpertAddServiceOutDto>> addService(@RequestBody ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException {
