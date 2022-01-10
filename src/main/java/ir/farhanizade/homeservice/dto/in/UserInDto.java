@@ -15,8 +15,6 @@ import javax.validation.constraints.Size;
 @Builder
 public class UserInDto {
     @NonNull
-    private String type;
-    @NonNull
     @Size(min = 3, max = 20)
     private String firstname;
     @NonNull
