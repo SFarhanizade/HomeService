@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-
+@EqualsAndHashCode(callSuper = false, of = {"order"})
 public class BaseMessage extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
