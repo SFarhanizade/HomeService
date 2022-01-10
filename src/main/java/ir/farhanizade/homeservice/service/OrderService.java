@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
@@ -38,5 +39,20 @@ public class OrderService {
         if(byId.isPresent()){
             return byId.get();
         } else throw new EntityNotFoundException("Order Doesn't Exist!");
+    }
+
+    public OrderOutDto findByIdAndCustomerId(Long id, Long orderId) throws EntityNotFoundException {
+        Optional<Order> byIdAndCustomerId = repository.findByIdAndCustomerId(id, orderId);
+        if(byIdAndCustomerId.isPresent()) {
+            Order result = byIdAndCustomerId.get();
+            return OrderOutDto.builder()
+                    .id(result.getId())
+                    .service(result.getService().getName())
+                    .price(result.getRequest().getPrice())
+                    .suggestedDateTime(result.getRequest().getSuggestedDateTime())
+                    .createdDateTime(result.getRequest().getDateTime())
+                    .build();
+        }
+        throw new EntityNotFoundException("Order Doesn't Exist!");
     }
 }
