@@ -48,6 +48,7 @@ public class ExpertService {
     public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
         Expert entity = findById(expert.getId());
         Set<SubService> expertises = entity.getExpertises();
+        if(expertises.size()==0) throw new EntityNotFoundException("No Expertises Found For This User!");
         List<Order> availableOrders = orderService.loadByExpertises(expertises, OrderStatus.WAITING_FOR_SUGGESTION);
         List<OrderOutDto> resultList = availableOrders.stream()
                 .map(o ->
@@ -65,7 +66,7 @@ public class ExpertService {
         Optional<Expert> byId = repository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
-        } else throw new EntityNotFoundException("User doesn't exist!");
+        } else throw new EntityNotFoundException("Expert doesn't exist!");
     }
 
     @Transactional(readOnly = true)
