@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -30,5 +31,12 @@ public class OrderService {
 
     public List<Order> loadAll(){
         return repository.findAll();
+    }
+
+    public Order findById(Long id) throws EntityNotFoundException {
+        Optional<Order> byId = repository.findById(id);
+        if(byId.isPresent()){
+            return byId.get();
+        } else throw new EntityNotFoundException("Order Doesn't Exist!");
     }
 }
