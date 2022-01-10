@@ -94,6 +94,8 @@ public class Validation {
         Expert owner = suggestion.getOwner();
         isValid(owner);
         Order order = suggestion.getOrder();
+        if(!owner.getExpertises().contains(order.getService()))
+            throw new BadEntryException("This Order Is Not Available For This Expert!");
         Request request = order.getRequest();
         isValid(order);
         SubService service = order.getService();
