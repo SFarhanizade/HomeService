@@ -1,15 +1,10 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
-import ir.farhanizade.homeservice.dto.in.ExpertInDto;
-import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertAddServiceOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOutDto;
-import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.dto.in.*;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -33,6 +28,7 @@ public class ExpertService {
     private final ExpertRepository repository;
     private final SubServiceService serviceManager;
     private final OrderService orderService;
+    private final SuggestionService suggestionService;
 
     @Transactional
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -48,7 +44,7 @@ public class ExpertService {
     public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
         Expert entity = findById(expert.getId());
         Set<SubService> expertises = entity.getExpertises();
-        if(expertises.size()==0) throw new EntityNotFoundException("No Expertises Found For This User!");
+        if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
         List<Order> availableOrders = orderService.loadByExpertises(expertises, OrderStatus.WAITING_FOR_SUGGESTION);
         List<OrderOutDto> resultList = availableOrders.stream()
                 .map(o ->
@@ -60,6 +56,21 @@ public class ExpertService {
                                 .createdDateTime(o.getRequest().getDateTime())
                                 .build()).toList();
         return resultList;
+    }
+
+    public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+        Expert expert = findById(request.getExpertId());
+        Order order = orderService.findById(request.getOrderId());
+        Suggestion suggestion = Suggestion.builder()
+                .owner(expert)
+                .order(order)
+                .price(new BigDecimal(request.getPrice()))
+                .suggestedDateTime(request.getDateTime())
+                .details(request.getDetails())
+                .duration(request.getDuration())
+                .build();
+        ExpertAddSuggestionOutDto result = suggestionService.save(suggestion);
+        return result;
     }
 
     public Expert findById(Long id) throws EntityNotFoundException {
