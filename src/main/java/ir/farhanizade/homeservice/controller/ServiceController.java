@@ -62,7 +62,7 @@ public class ServiceController {
                 .message("add successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
-        EntityOutDto result = new EntityOutDto();
+        EntityOutDto result;
             if (service.getParent() == 0) {
                 result = mainService.save(service);
                 response.setMessage("MainService " + response.getMessage());
