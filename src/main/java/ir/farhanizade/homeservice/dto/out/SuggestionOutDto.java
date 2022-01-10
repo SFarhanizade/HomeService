@@ -12,6 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 public class SuggestionOutDto {
     private Long id;
+    private String ownerName;
+    private Long ownerId;
+    private Integer ownerPoints;
     private BigDecimal price;
     private Double duration;
     private String details;
