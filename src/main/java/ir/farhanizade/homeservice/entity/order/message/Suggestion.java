@@ -16,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"order", "owner"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "owner_id"})}
 )
 public class Suggestion extends BaseMessage {
 
