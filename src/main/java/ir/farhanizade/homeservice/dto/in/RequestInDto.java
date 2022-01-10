@@ -14,8 +14,6 @@ public class RequestInDto {
     @NonNull
     private Long serviceId;
     @NonNull
-    private Long ownerId;
-    @NonNull
     private Long price;
     @NonNull
     private Date suggestedDateTime;
