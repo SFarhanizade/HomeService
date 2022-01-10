@@ -1,11 +1,15 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
+import ir.farhanizade.homeservice.dto.in.ExpertInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.ExpertAddServiceOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -20,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +32,7 @@ import java.util.stream.Collectors;
 public class ExpertService {
     private final ExpertRepository repository;
     private final SubServiceService serviceManager;
+    private final OrderService orderService;
 
     @Transactional
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -37,6 +43,29 @@ public class ExpertService {
             throw new DuplicateEntityException("User exists!");
         Expert result = repository.save(expert);
         return new EntityOutDto(result.getId());
+    }
+
+    public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
+        Expert entity = findById(expert.getId());
+        Set<SubService> expertises = entity.getExpertises();
+        List<Order> availableOrders = orderService.loadByExpertises(expertises, OrderStatus.WAITING_FOR_SUGGESTION);
+        List<OrderOutDto> resultList = availableOrders.stream()
+                .map(o ->
+                        OrderOutDto.builder()
+                                .id(o.getId())
+                                .service(o.getService().getName())
+                                .price(o.getRequest().getPrice())
+                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+                                .createdDateTime(o.getRequest().getDateTime())
+                                .build()).toList();
+        return resultList;
+    }
+
+    public Expert findById(Long id) throws EntityNotFoundException {
+        Optional<Expert> byId = repository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        } else throw new EntityNotFoundException("User doesn't exist!");
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +113,7 @@ public class ExpertService {
         }
         SubService service = serviceManager.loadById(request.getServiceId());
         boolean serviceExists = !expert.addService(service);
-        if(serviceExists){
+        if (serviceExists) {
             throw new DuplicateEntityException("The service exists for this expert!");
         }
         Expert saved = repository.save(expert);
