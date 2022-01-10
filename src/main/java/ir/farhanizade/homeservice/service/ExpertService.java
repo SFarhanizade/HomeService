@@ -58,7 +58,7 @@ public class ExpertService {
         return resultList;
     }
 
-    public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+    public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         Expert expert = findById(request.getExpertId());
         Order order = orderService.findById(request.getOrderId());
         Suggestion suggestion = Suggestion.builder()
