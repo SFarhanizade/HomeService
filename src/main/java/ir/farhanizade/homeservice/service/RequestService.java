@@ -22,29 +22,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RequestService {
     private final RequestRepository repository;
-    private final CustomerService customerService;
     private final SubServiceService subService;
 
     @Transactional
-    public EntityOutDto save(RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
-        Request entity = convert2Request(request);
+    public EntityOutDto save(Customer owner, RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
+        Request entity = convert2Request(owner,request);
         isValid(entity);
         Order order = entity.getOrder();
-        Customer owner = entity.getOwner();
         order.addRequest(entity);
         owner.addOrder(order);
         Request saved = repository.save(entity);
         return new EntityOutDto(saved.getId());
     }
 
-    private Request convert2Request(RequestInDto request) throws EntityNotFoundException {
-        Long ownerId = request.getOwnerId();
+    private Request convert2Request(Customer owner,RequestInDto request) throws EntityNotFoundException {
         Long serviceId = request.getServiceId();
         BigDecimal price = new BigDecimal(request.getPrice());
         Date suggestedDateTime = request.getSuggestedDateTime();
         String details = request.getDetails();
         String address = request.getAddress();
-        Customer owner = customerService.loadById(ownerId);
         SubService service = subService.loadById(serviceId);
         Request result = Request.builder()
                 .owner(owner)
