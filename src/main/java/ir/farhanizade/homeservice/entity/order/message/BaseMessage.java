@@ -21,7 +21,7 @@ import java.util.Date;
 public class BaseMessage extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Order order;
+    protected Order order;
 
 
     @Column(nullable = false)
