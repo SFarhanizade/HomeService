@@ -7,6 +7,7 @@ import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
@@ -46,12 +47,12 @@ public class UserService {
         return new EntityOutDto(id);
     }
 
-    public EntityOutDto save(UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
+    public EntityOutDto save(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
         EntityOutDto result = new EntityOutDto();
-        if ("expert".equals(user.getType())) {
+        if (type == Expert.class) {
             result = expertService.save(user);
 
-        } else if ("customer".equals(user.getType())) {
+        } else if (type == Customer.class) {
             result = customerService.save(user);
         }
         return result;
