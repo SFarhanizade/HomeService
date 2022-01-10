@@ -5,9 +5,7 @@ import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
@@ -17,6 +15,9 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Table(
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"order", "owner"})}
+)
 public class Suggestion extends BaseMessage {
 
     @ManyToOne
