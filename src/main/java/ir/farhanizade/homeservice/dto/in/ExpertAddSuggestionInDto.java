@@ -6,6 +6,7 @@ import java.util.Date;
 
 @Data
 public class ExpertAddSuggestionInDto {
+    private Long expertId;
     private Long orderId;
     private Long price;
     private Date dateTime;
