@@ -109,25 +109,33 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public Expert findByEmail(String email) {
+    public UserOutDto findByEmail(String email) throws EntityNotFoundException {
         if (email == null)
             throw new IllegalStateException("Null Email");
-        return repository.findByEmail(email);
+        Expert byEmail = repository.findByEmail(email);
+        if (byEmail == null) throw new EntityNotFoundException("No User Found!");
+        return convert2Dto(byEmail);
     }
 
     @Transactional(readOnly = true)
-    public List<Expert> findByCredit(BigDecimal credit) {
-        return repository.findByCredit(credit);
+    public List<UserOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
+        List<Expert> byCredit = repository.findByCredit(credit);
+        if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(byCredit);
     }
 
     @Transactional(readOnly = true)
-    public List<Expert> findByStatus(UserStatus status) {
-        return repository.findByStatus(status);
+    public List<UserOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
+        List<Expert> byStatus = repository.findByStatus(status);
+        if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(byStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<Expert> findByExpertise(SubService service) {
-        return repository.findByExpertise(service.getId());
+    public List<UserOutDto> findByExpertise(SubService service) throws EntityNotFoundException {
+        List<Expert> byExpertise = repository.findByExpertise(service.getId());
+        if (byExpertise.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(byExpertise);
     }
 
     @Transactional(readOnly = true)
@@ -145,5 +153,19 @@ public class ExpertService {
                 .peek(e -> e.setType("expert"))
                 .toList();
         return result;
+    }
+
+    private UserOutDto convert2Dto(Expert expert) {
+        return UserOutDto.builder()
+                .id(expert.getId())
+                .name(expert.getFName() + " " + expert.getLName())
+                .email(expert.getEmail())
+                .credit(expert.getCredit())
+                .build();
+    }
+
+    private List<UserOutDto> convert2Dto(List<Expert> expertList) {
+        return expertList.stream()
+                .map(this::convert2Dto).toList();
     }
 }
