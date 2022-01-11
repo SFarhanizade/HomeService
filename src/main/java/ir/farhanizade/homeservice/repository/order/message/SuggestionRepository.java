@@ -26,4 +26,7 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     @Modifying
     @Query("Update Suggestion s set s.suggestionStatus=:rejected where Not s.id=:suggestionId and s.order.id=:orderId")
     void rejectOtherSuggestions(Long suggestionId, Long orderId, SuggestionStatus rejected);
+
+    @Query("From Suggestion s where s.owner.id=:ownerId and s.status in :status")
+    List<Suggestion> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status);
 }
