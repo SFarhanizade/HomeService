@@ -42,25 +42,33 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public Customer findByEmail(String email) {
+    public CustomerOutDto findByEmail(String email) throws EntityNotFoundException {
         if (email == null)
             throw new IllegalStateException("Null Email");
-        return repository.findByEmail(email);
+        Customer byEmail = repository.findByEmail(email);
+        if (byEmail == null) throw new EntityNotFoundException("User Doesn't Exist!");
+        return convert2Dto(byEmail);
     }
 
     @Transactional(readOnly = true)
-    public List<Customer> findByCredit(BigDecimal credit) {
-        return repository.findByCredit(credit);
+    public List<CustomerOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
+        List<Customer> byCredit = repository.findByCredit(credit);
+        if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(byCredit);
     }
 
     @Transactional(readOnly = true)
-    public List<Customer> findByStatus(UserStatus status) {
-        return repository.findByStatus(status);
+    public List<CustomerOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
+        List<Customer> byStatus = repository.findByStatus(status);
+        if(byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(byStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<Customer> findAll() {
-        return repository.findAll();
+    public List<CustomerOutDto> findAll() throws EntityNotFoundException {
+        List<Customer> all = repository.findAll();
+        if(all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(all);
     }
 
     @Transactional(readOnly = true)
@@ -142,11 +150,17 @@ public class CustomerService {
         return suggestionService.findAllByCustomerId(id);
     }
 
-    private CustomerOutDto convert2Dto(Customer customer){
+    private CustomerOutDto convert2Dto(Customer customer) {
         return CustomerOutDto.builder()
-                .name(customer.getFName()+" "+customer.getLName())
+                .id(customer.getId())
+                .name(customer.getFName() + " " + customer.getLName())
                 .email(customer.getEmail())
                 .credit(customer.getCredit())
                 .build();
+    }
+
+    private List<CustomerOutDto> convert2Dto(List<Customer> customers) {
+        return customers.stream()
+                .map(this::convert2Dto).toList();
     }
 }
