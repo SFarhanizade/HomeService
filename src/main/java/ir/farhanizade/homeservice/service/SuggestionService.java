@@ -1,9 +1,11 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SuggestionService {
     private final SuggestionRepository repository;
+    private final OrderService orderService;
 
     @Transactional
     public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
@@ -33,13 +36,16 @@ public class SuggestionService {
     }
 
     @Transactional
-    public void acceptSuggestion(Suggestion suggestion) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException {
+        Optional<Suggestion> byId = repository.findById(id);
+        if(!byId.isPresent()) throw new EntityNotFoundException("Suggestion Not Found!");
+        Suggestion suggestion = byId.get();
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
-        if (order.getSuggestion() != null)
-            throw new BusyOrderException("The order has already had an accepted suggestion!");
-        order.acceptSuggestion(suggestion);
-        repository.save(suggestion);
+        repository.acceptSuggestion(suggestion.getId(), SuggestionStatus.ACCEPTED);
+        repository.rejectOtherSuggestions(suggestion.getId(),order.getId(), SuggestionStatus.REJECTED);
+        orderService.acceptSuggestion(order.getId());
+        return new EntityOutDto(id);
     }
 
     @Transactional(readOnly = true)
