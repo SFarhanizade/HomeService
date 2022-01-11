@@ -68,6 +68,18 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
+    @GetMapping("/{id}/orders/{order}/remove")
+    public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
+        EntityOutDto result = customerService.removeOrder(id, order);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Order removed successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
     @GetMapping("/{id}/orders/{order}/suggestions")
     public ResponseEntity<ResponseResult<List<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
         List<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order);
@@ -96,6 +108,18 @@ public class CustomerController {
     public ResponseEntity<ResponseResult<SuggestionOutDto>> showSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException {
         SuggestionOutDto result = customerService.getSuggestion(id,suggestion);
         ResponseResult<SuggestionOutDto> response = ResponseResult.<SuggestionOutDto>builder()
+                .code(1)
+                .message("List of suggestions loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/suggestions/{suggestion}/accept")
+    public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+        EntityOutDto result = customerService.acceptSuggestion(id,suggestion);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
                 .data(result)
