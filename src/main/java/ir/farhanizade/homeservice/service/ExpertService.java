@@ -156,10 +156,9 @@ public class ExpertService {
         return result;
     }
 
-    public List<ExpertSuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
+    public List<ExpertSuggestionOutDto> getSuggestions(Long id, SuggestionStatus...status) throws EntityNotFoundException {
         findById(id);
-        return suggestionService.findAllByOwnerIdAndStatus(id,
-                new SuggestionStatus[]{SuggestionStatus.PENDING, SuggestionStatus.ACCEPTED});
+        return suggestionService.findAllByOwnerIdAndStatus(id,status);
     }
 
     private UserOutDto convert2Dto(Expert expert) {
