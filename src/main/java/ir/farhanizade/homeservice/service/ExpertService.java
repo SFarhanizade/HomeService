@@ -42,8 +42,8 @@ public class ExpertService {
     }
 
     @Transactional
-    public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
-        Expert expert = findById(request.getExpertId());
+    public ExpertAddSuggestionOutDto suggest(Long expertId, ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
+        Expert expert = findById(expertId);
         Order order = orderService.findById(request.getOrderId());
         Suggestion suggestion = Suggestion.builder()
                 .owner(expert)
