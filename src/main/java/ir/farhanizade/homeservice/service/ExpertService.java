@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -153,6 +154,12 @@ public class ExpertService {
                 .peek(e -> e.setType("expert"))
                 .toList();
         return result;
+    }
+
+    public List<ExpertSuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
+        findById(id);
+        return suggestionService.findAllByOwnerIdAndStatus(id,
+                new SuggestionStatus[]{SuggestionStatus.PENDING, SuggestionStatus.ACCEPTED});
     }
 
     private UserOutDto convert2Dto(Expert expert) {
