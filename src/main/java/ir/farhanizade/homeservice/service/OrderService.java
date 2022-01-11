@@ -61,4 +61,8 @@ public class OrderService {
         }
         throw new EntityNotFoundException("Order Doesn't Exist!");
     }
+
+    public List<Order> findAllByCustomerId(Long ownerId) {
+        return repository.findAllByCustomerId(ownerId);
+    }
 }

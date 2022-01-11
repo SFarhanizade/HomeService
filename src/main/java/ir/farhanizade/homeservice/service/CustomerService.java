@@ -60,14 +60,14 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public List<UserOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
         List<Customer> byStatus = repository.findByStatus(status);
-        if(byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(byStatus);
     }
 
     @Transactional(readOnly = true)
     public List<UserOutDto> findAll() throws EntityNotFoundException {
         List<Customer> all = repository.findAll();
-        if(all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        if (all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(all);
     }
 
@@ -99,8 +99,8 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public List<OrderOutDto> getOrders(Long id) throws EntityNotFoundException {
-        Customer customer = findById(id);
-        List<Order> orders = customer.getOrders();
+        exists(id);
+        List<Order> orders = orderRepository.findAllByCustomerId(id);
         List<OrderOutDto> result = orders.stream()
                 .map((Order o) -> OrderOutDto.builder()
                         .id(o.getId())
@@ -118,7 +118,7 @@ public class CustomerService {
         return orderRepository.findByIdAndCustomerId(id, orderId);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public EntityOutDto request(Long id, RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
         return requestService.save(findById(id), request);
     }

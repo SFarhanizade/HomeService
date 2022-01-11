@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import lombok.*;
@@ -20,6 +21,10 @@ import javax.persistence.*;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "owner_id"})}
 )
 public class Suggestion extends BaseMessage {
+
+
+    @OneToOne(cascade = CascadeType.ALL)
+    protected Order order;
 
     @ManyToOne
     private Expert owner;

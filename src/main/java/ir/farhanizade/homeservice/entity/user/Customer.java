@@ -1,17 +1,16 @@
 package ir.farhanizade.homeservice.entity.user;
 
-import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.message.Request;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-//@EqualsAndHashCode(callSuper = true)
-//@Data
+
+@Data
 @Setter
 @Getter
 @Entity
@@ -20,12 +19,13 @@ import java.util.List;
 @SuperBuilder
 public class Customer extends User {
 
-    @OneToMany(cascade = CascadeType.ALL)
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     @Builder.Default
-    private List<Order> orders = new ArrayList<>();
+    private List<Request> requests = new ArrayList<>();
 
 
-    public void addOrder(Order order) {
-        orders.add(order);
+    public void addRequest(Request request) {
+        requests.add(request);
     }
 }

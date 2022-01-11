@@ -26,16 +26,16 @@ public class RequestService {
 
     @Transactional
     public EntityOutDto save(Customer owner, RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
-        Request entity = convert2Request(owner,request);
+        Request entity = convert2Request(owner, request);
         isValid(entity);
         Order order = entity.getOrder();
         order.addRequest(entity);
-        owner.addOrder(order);
+        owner.addRequest(entity);
         Request saved = repository.save(entity);
         return new EntityOutDto(saved.getId());
     }
 
-    private Request convert2Request(Customer owner,RequestInDto request) throws EntityNotFoundException {
+    private Request convert2Request(Customer owner, RequestInDto request) throws EntityNotFoundException {
         Long serviceId = request.getServiceId();
         BigDecimal price = new BigDecimal(request.getPrice());
         Date suggestedDateTime = request.getSuggestedDateTime();

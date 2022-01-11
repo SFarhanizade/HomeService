@@ -10,12 +10,14 @@ import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.*;
 
 //@EqualsAndHashCode(callSuper = true)
-//@Data
+@Data
 @Entity
 @Table(name = "MyOrder")
 @Setter
@@ -30,12 +32,13 @@ public class Order extends BaseEntity {
 
     private Date finishDateTime;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "order")
     private Request request;
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Suggestion> suggestions;
 
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToOne(cascade = CascadeType.ALL)
     private Suggestion suggestion;
 

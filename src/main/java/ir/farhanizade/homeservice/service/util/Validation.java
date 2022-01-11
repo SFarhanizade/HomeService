@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class Validation {
     static Pattern pattern;
     static Matcher matcher;
+
     public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
         if (user == null)
             throw new NullFieldException("User is null!");
@@ -53,10 +54,10 @@ public class Validation {
             throw new NullFieldException("The address is null");
 
         SubService service = order.getService();
-        if (service.getBasePrice().compareTo(request.getPrice()) > 0) {
-            throw new BadEntryException("The requested price is lower than the base price!");
+        if (request.getPrice().compareTo(service.getBasePrice()) == -1) {
+            throw new BadEntryException("The price show be equal or greater than the service base price!");
         }
-        if (request.getSuggestedDateTime().getTime() - request.getDateTime().getTime() > 0) {
+        if (request.getDateTime().getTime() - request.getSuggestedDateTime().getTime() > 0) {
             throw new BadEntryException("The requested time is sooner than the present time");
         }
         return true;
@@ -94,25 +95,25 @@ public class Validation {
         Expert owner = suggestion.getOwner();
         isValid(owner);
         Order order = suggestion.getOrder();
-        if(!owner.getExpertises().contains(order.getService()))
+        if (!owner.getExpertises().contains(order.getService()))
             throw new BadEntryException("This Order Is Not Available For This Expert!");
         Request request = order.getRequest();
         isValid(order);
         SubService service = order.getService();
         if ((!(order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION) ||
-                order.getStatus().equals(OrderStatus.WAITING_FOR_SELECTION)))||
-                !request.getStatus().equals(BaseMessageStatus.WAITING))
+                order.getStatus().equals(OrderStatus.WAITING_FOR_SELECTION))) ||
+            !request.getStatus().equals(BaseMessageStatus.WAITING))
             throw new BusyOrderException("The order is not open to suggest!");
         if (suggestion.getDuration() <= 0)
             throw new BadEntryException("The duration is 0 or less!");
-        if (suggestion.getSuggestedDateTime().getTime() - suggestion.getDateTime().getTime() > 0)
+        if (suggestion.getDateTime().getTime() - suggestion.getSuggestedDateTime().getTime() > 0)
             throw new BadEntryException("The suggested time is sooner than the present time");
         if (service.getBasePrice().compareTo(suggestion.getPrice()) > 0)
             throw new BadEntryException("The suggested price is lower than the base price!");
         return true;
     }
 
-    public static boolean passwordIsValid(String password){
+    public static boolean passwordIsValid(String password) {
         String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}$";
         pattern = Pattern.compile(passwordPattern);
         matcher = pattern.matcher(password);

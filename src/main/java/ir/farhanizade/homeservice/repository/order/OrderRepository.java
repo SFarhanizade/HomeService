@@ -18,4 +18,6 @@ public interface OrderRepository extends BaseRepository<Order> {
     @Query("From Order o where o.id=:orderId and o.request.owner.id=:ownerId")
     Optional<Order> findByIdAndCustomerId(Long ownerId, Long orderId);
 
+    @Query("From Order o where o.request.owner.id=:ownerId")
+    List<Order> findAllByCustomerId(Long ownerId);
 }

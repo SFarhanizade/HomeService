@@ -20,9 +20,6 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false, of = {"order"})
 public class BaseMessage extends BaseEntity {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    protected Order order;
-
 
     @Column(nullable = false)
     private BigDecimal price;
