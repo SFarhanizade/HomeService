@@ -75,6 +75,7 @@ public class OrderService {
     public void removeOrderByIdAndOwnerId(Long ownerId, Long orderId) throws EntityNotFoundException {
         exists(orderId);
         repository.removeOrderByIdAndOwnerId(orderId, ownerId, CANCELLED);
+        //TODO set the status of request and all/accepted suggestion(s) CANCELLED
     }
 
     @Transactional(readOnly = true)
