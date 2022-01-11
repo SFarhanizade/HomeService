@@ -164,12 +164,14 @@ public class CustomerService {
                 .map(this::convert2Dto).toList();
     }
 
+    @Transactional
     public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException {
         exists(id);
         orderRepository.removeOrderByIdAndOwnerId(id, orderId);
         return new EntityOutDto(orderId);
     }
 
+    @Transactional
     public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         exists(id);
         return suggestionService.acceptSuggestion(suggestion);

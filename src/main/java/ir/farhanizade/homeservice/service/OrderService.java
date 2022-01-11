@@ -85,6 +85,7 @@ public class OrderService {
         throw new EntityNotFoundException("Order Not Found!");
     }
 
+    @Transactional
     public void acceptSuggestion(Long id) {
         repository.acceptSuggestion(id, WAITING_FOR_EXPERT);
     }
