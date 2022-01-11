@@ -42,7 +42,7 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomerOutDto findByEmail(String email) throws EntityNotFoundException {
+    public UserOutDto findByEmail(String email) throws EntityNotFoundException {
         if (email == null)
             throw new IllegalStateException("Null Email");
         Customer byEmail = repository.findByEmail(email);
@@ -51,21 +51,21 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
+    public List<UserOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
         List<Customer> byCredit = repository.findByCredit(credit);
         if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(byCredit);
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
+    public List<UserOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
         List<Customer> byStatus = repository.findByStatus(status);
         if(byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(byStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<CustomerOutDto> findAll() throws EntityNotFoundException {
+    public List<UserOutDto> findAll() throws EntityNotFoundException {
         List<Customer> all = repository.findAll();
         if(all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(all);
@@ -150,8 +150,8 @@ public class CustomerService {
         return suggestionService.findAllByCustomerId(id);
     }
 
-    private CustomerOutDto convert2Dto(Customer customer) {
-        return CustomerOutDto.builder()
+    private UserOutDto convert2Dto(Customer customer) {
+        return UserOutDto.builder()
                 .id(customer.getId())
                 .name(customer.getFName() + " " + customer.getLName())
                 .email(customer.getEmail())
@@ -159,7 +159,7 @@ public class CustomerService {
                 .build();
     }
 
-    private List<CustomerOutDto> convert2Dto(List<Customer> customers) {
+    private List<UserOutDto> convert2Dto(List<Customer> customers) {
         return customers.stream()
                 .map(this::convert2Dto).toList();
     }
