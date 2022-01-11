@@ -41,23 +41,7 @@ public class ExpertService {
         return new EntityOutDto(result.getId());
     }
 
-    public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
-        Expert entity = findById(expert.getId());
-        Set<SubService> expertises = entity.getExpertises();
-        if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
-        List<Order> availableOrders = orderService.loadByExpertises(expertises, OrderStatus.WAITING_FOR_SUGGESTION);
-        List<OrderOutDto> resultList = availableOrders.stream()
-                .map(o ->
-                        OrderOutDto.builder()
-                                .id(o.getId())
-                                .service(o.getService().getName())
-                                .price(o.getRequest().getPrice())
-                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
-                                .createdDateTime(o.getRequest().getDateTime())
-                                .build()).toList();
-        return resultList;
-    }
-
+    @Transactional
     public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         Expert expert = findById(request.getExpertId());
         Order order = orderService.findById(request.getOrderId());
@@ -70,47 +54,6 @@ public class ExpertService {
                 .duration(request.getDuration())
                 .build();
         ExpertAddSuggestionOutDto result = suggestionService.save(suggestion);
-        return result;
-    }
-
-    public Expert findById(Long id) throws EntityNotFoundException {
-        Optional<Expert> byId = repository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        } else throw new EntityNotFoundException("Expert doesn't exist!");
-    }
-
-    @Transactional(readOnly = true)
-    public Expert findByEmail(String email) {
-        if (email == null)
-            throw new IllegalStateException("Null Email");
-        return repository.findByEmail(email);
-    }
-
-    public List<Expert> findByCredit(BigDecimal credit) {
-        return repository.findByCredit(credit);
-    }
-
-    public List<Expert> findByStatus(UserStatus status) {
-        return repository.findByStatus(status);
-    }
-
-    public List<Expert> findByExpertise(SubService service) {
-        return repository.findByExpertise(service.getId());
-    }
-
-    private boolean finalCheck(Expert expert) {
-        String email = expert.getEmail();
-        Expert byEmail = repository.findByEmail(email);
-        return byEmail != null && expert.getId() == null;
-    }
-
-    public List<UserSearchOutDto> search(UserSearchInDto user) {
-        List<Expert> searchResult = repository.search(user);
-        List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e))
-                .peek(e -> e.setType("expert"))
-                .toList();
         return result;
     }
 
@@ -136,6 +79,71 @@ public class ExpertService {
                         .collect(Collectors.toSet())
                 )
                 .build();
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
+        Expert entity = findById(expert.getId());
+        Set<SubService> expertises = entity.getExpertises();
+        if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
+        List<Order> availableOrders = orderService.loadByExpertises(expertises, OrderStatus.WAITING_FOR_SUGGESTION);
+        List<OrderOutDto> resultList = availableOrders.stream()
+                .map(o ->
+                        OrderOutDto.builder()
+                                .id(o.getId())
+                                .service(o.getService().getName())
+                                .price(o.getRequest().getPrice())
+                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+                                .createdDateTime(o.getRequest().getDateTime())
+                                .build()).toList();
+        return resultList;
+    }
+
+    @Transactional(readOnly = true)
+    public Expert findById(Long id) throws EntityNotFoundException {
+        Optional<Expert> byId = repository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        } else throw new EntityNotFoundException("Expert doesn't exist!");
+    }
+
+    @Transactional(readOnly = true)
+    public Expert findByEmail(String email) {
+        if (email == null)
+            throw new IllegalStateException("Null Email");
+        return repository.findByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Expert> findByCredit(BigDecimal credit) {
+        return repository.findByCredit(credit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Expert> findByStatus(UserStatus status) {
+        return repository.findByStatus(status);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Expert> findByExpertise(SubService service) {
+        return repository.findByExpertise(service.getId());
+    }
+
+    @Transactional(readOnly = true)
+    boolean finalCheck(Expert expert) {
+        String email = expert.getEmail();
+        Expert byEmail = repository.findByEmail(email);
+        return byEmail != null && expert.getId() == null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserSearchOutDto> search(UserSearchInDto user) {
+        List<Expert> searchResult = repository.search(user);
+        List<UserSearchOutDto> result = searchResult.stream()
+                .map(e -> new UserSearchOutDto().convert2Dto(e))
+                .peek(e -> e.setType("expert"))
+                .toList();
         return result;
     }
 }

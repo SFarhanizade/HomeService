@@ -58,6 +58,7 @@ public class UserService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public List<UserSearchOutDto> search(UserSearchInDto user) {
         List<UserSearchOutDto> result;
         if ("expert".equals(user.getType())) {
@@ -70,7 +71,8 @@ public class UserService {
         return result;
     }
 
-    private List<UserSearchOutDto> searchUser(UserSearchInDto user) {
+    @Transactional(readOnly = true)
+    List<UserSearchOutDto> searchUser(UserSearchInDto user) {
         List<User> searchResult = repository.search(user);
         List<UserSearchOutDto> result = searchResult.stream()
                 .map(e -> new UserSearchOutDto().convert2Dto(e))

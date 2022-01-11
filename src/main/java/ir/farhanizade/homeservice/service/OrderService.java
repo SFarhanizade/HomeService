@@ -8,6 +8,7 @@ import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +19,12 @@ import java.util.Set;
 public class OrderService {
     private final OrderRepository repository;
 
+    @Transactional
     public void save(Order order){
         repository.save(order);
     }
 
+    @Transactional(readOnly = true)
     public List<Order> loadByExpertises(Set<SubService> expertises, OrderStatus status) throws EntityNotFoundException {
         List<Order> orders = repository.loadByExpertises(expertises, status);
         if(orders.size() == 0){
@@ -30,10 +33,12 @@ public class OrderService {
         return orders;
     }
 
+    @Transactional(readOnly = true)
     public List<Order> loadAll(){
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Order findById(Long id) throws EntityNotFoundException {
         Optional<Order> byId = repository.findById(id);
         if(byId.isPresent()){
@@ -41,6 +46,7 @@ public class OrderService {
         } else throw new EntityNotFoundException("Order Doesn't Exist!");
     }
 
+    @Transactional(readOnly = true)
     public OrderOutDto findByIdAndCustomerId(Long id, Long orderId) throws EntityNotFoundException {
         Optional<Order> byIdAndCustomerId = repository.findByIdAndCustomerId(id, orderId);
         if(byIdAndCustomerId.isPresent()) {

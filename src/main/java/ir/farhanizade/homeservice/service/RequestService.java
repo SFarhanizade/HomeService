@@ -56,10 +56,12 @@ public class RequestService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public List<Request> loadAll() {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Request> loadWaitingRequests() {
         return repository.findByStatus(BaseMessageStatus.WAITING);
     }

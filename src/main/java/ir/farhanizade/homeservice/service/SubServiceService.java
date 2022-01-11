@@ -47,6 +47,7 @@ public class SubServiceService {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public SubService loadById(Long serviceId) throws EntityNotFoundException {
         Optional<SubService> byId = repository.findById(serviceId);
         if(byId.isPresent()){

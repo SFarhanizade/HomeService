@@ -44,30 +44,36 @@ public class CustomerService {
         return new EntityOutDto(result.getId());
     }
 
+    @Transactional(readOnly = true)
     public Customer findByEmail(String email) {
         if (email == null)
             throw new IllegalStateException("Null Email");
         return repository.findByEmail(email);
     }
 
+    @Transactional(readOnly = true)
     public List<Customer> findByCredit(BigDecimal credit) {
         return repository.findByCredit(credit);
     }
 
+    @Transactional(readOnly = true)
     public List<Customer> findByStatus(UserStatus status) {
         return repository.findByStatus(status);
     }
 
+    @Transactional(readOnly = true)
     public List<Customer> findAll() {
         return repository.findAll();
     }
 
-    private boolean finalCheck(Customer customer) {
+    @Transactional(readOnly = true)
+    boolean finalCheck(Customer customer) {
         String email = customer.getEmail();
         Customer byEmail = repository.findByEmail(email);
         return byEmail != null && customer.getId() == null;
     }
 
+    @Transactional(readOnly = true)
     public List<UserSearchOutDto> search(UserSearchInDto user) {
         List<Customer> searchResult = repository.search(user);
         List<UserSearchOutDto> result = searchResult.stream()
@@ -77,6 +83,7 @@ public class CustomerService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public Customer findById(Long id) throws EntityNotFoundException {
         Optional<Customer> byId = repository.findById(id);
         if (byId.isPresent()) {
@@ -85,6 +92,7 @@ public class CustomerService {
             throw new EntityNotFoundException("User doesn't exist!");
     }
 
+    @Transactional(readOnly = true)
     public List<OrderOutDto> getOrders(Long id) throws EntityNotFoundException {
         Customer customer = findById(id);
         List<Order> orders = customer.getOrders();
@@ -99,15 +107,18 @@ public class CustomerService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public OrderOutDto getOrder(Long id, Long orderId) throws EntityNotFoundException {
         exists(id);
         return orderRepository.findByIdAndCustomerId(id, orderId);
     }
 
+    @Transactional(readOnly = true)
     public EntityOutDto request(Long id, RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
         return requestService.save(findById(id), request);
     }
 
+    @Transactional(readOnly = true)
     public boolean exists(Long id) throws EntityNotFoundException {
         boolean exists = repository.existsById(id);
         if (exists)
@@ -116,16 +127,19 @@ public class CustomerService {
             throw new EntityNotFoundException("User Doesn't Exist!");
     }
 
+    @Transactional(readOnly = true)
     public List<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
         exists(id);
         return suggestionService.findAllByOrderId(order);
     }
 
+    @Transactional(readOnly = true)
     public SuggestionOutDto getSuggestion(Long id, Long suggestion) throws EntityNotFoundException {
         exists(id);
         return suggestionService.findById(suggestion);
     }
 
+    @Transactional(readOnly = true)
     public List<SuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
         exists(id);
         return suggestionService.findAllByCustomerId(id);

@@ -6,6 +6,7 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,6 +14,7 @@ public class CommentSevice {
 
     private final CommentRepository repository;
 
+    @Transactional
     public void save(Comment comment) {
         //Customer sender = comment.getSender();
         Order order = comment.getOrder();

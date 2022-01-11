@@ -42,10 +42,12 @@ public class SuggestionService {
         repository.save(suggestion);
     }
 
+    @Transactional(readOnly = true)
     public List<Suggestion> loadAll() {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<SuggestionOutDto> findAllByOrderId(Long order) throws EntityNotFoundException {
         List<Suggestion> suggestions = repository.findAllByOrderId(order);
         if (suggestions.size() == 0)
@@ -53,6 +55,7 @@ public class SuggestionService {
         return convert2Dto(suggestions);
     }
 
+    @Transactional(readOnly = true)
     public SuggestionOutDto findById(Long id) throws EntityNotFoundException {
         Optional<Suggestion> byId = repository.findById(id);
         if (byId.isPresent()) {
@@ -62,12 +65,14 @@ public class SuggestionService {
         throw new EntityNotFoundException("Suggestion Not Found!");
     }
 
+    @Transactional(readOnly = true)
     public List<SuggestionOutDto> findAllByOwnerId(Long id) throws EntityNotFoundException {
         List<Suggestion> suggestions = repository.findAllByOwnerId(id);
         if (suggestions.size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
         return convert2Dto(suggestions);
     }
 
+    @Transactional(readOnly = true)
     public List<SuggestionOutDto> findAllByCustomerId(Long id) throws EntityNotFoundException {
         List<Suggestion> suggestions = repository.findAllByCustomerId(id);
         if (suggestions.size() == 0) throw new EntityNotFoundException("No Suggestions Found!");

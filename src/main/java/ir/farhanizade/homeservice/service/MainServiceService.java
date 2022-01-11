@@ -27,6 +27,7 @@ public class MainServiceService {
         return new EntityOutDto(saved.getId());
     }
 
+    @Transactional(readOnly = true)
     public List<MainService> loadAll() throws EntityNotFoundException {
         List<MainService> result = repository.findAll();
         if (result.size() == 0)
