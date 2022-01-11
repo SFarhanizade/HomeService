@@ -35,12 +35,8 @@ public class Order extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "order")
     private Request request;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private Set<Suggestion> suggestions;
-
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToOne(cascade = CascadeType.ALL)
-    private Suggestion suggestion;
 
     @Builder.Default
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
@@ -61,16 +57,6 @@ public class Order extends BaseEntity {
         status = OrderStatus.WAITING_FOR_SELECTION;
     }
 
-    public void acceptSuggestion(Suggestion suggestion) {
-        this.suggestion = suggestion;
-        suggestion.setStatus(BaseMessageStatus.BUSY);
-        suggestion.setSuggestionStatus(SuggestionStatus.ACCEPTED);
-        suggestions.stream()
-                .filter(s -> !s.equals(suggestion))
-                .forEach(s -> s.setSuggestionStatus(SuggestionStatus.REJECTED));
-        request.setStatus(BaseMessageStatus.BUSY);
-        status = OrderStatus.WAITING_FOR_EXPERT;
-    }
 
     public void addRequest(Request request) {
         this.request = request;
