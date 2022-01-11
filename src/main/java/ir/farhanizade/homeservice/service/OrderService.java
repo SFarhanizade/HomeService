@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.*;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<Order> loadByExpertises(Set<SubService> expertises) throws EntityNotFoundException {
-        List<Order> orders = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION);
+        List<Order> orders = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION,CANCELLED,BUSY);
         if (orders.size() == 0) {
             throw new EntityNotFoundException("No Orders Found!");
         }
@@ -72,7 +74,7 @@ public class OrderService {
     @Transactional
     public void removeOrderByIdAndOwnerId(Long ownerId, Long orderId) throws EntityNotFoundException {
         exists(orderId);
-        repository.removeOrderByIdAndOwnerId(orderId, ownerId);
+        repository.removeOrderByIdAndOwnerId(orderId, ownerId, CANCELLED);
     }
 
     @Transactional(readOnly = true)
