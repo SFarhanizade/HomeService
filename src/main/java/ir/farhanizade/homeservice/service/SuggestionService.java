@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
+import ir.farhanizade.homeservice.dto.out.ExpertSuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
@@ -85,6 +86,24 @@ public class SuggestionService {
         return convert2Dto(suggestions);
     }
 
+    @Transactional(readOnly = true)
+    public List<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status) throws EntityNotFoundException {
+        List<Suggestion> allByOwnerIdAndStatus = repository.findAllByOwnerIdAndStatus(ownerId, status);
+        if(allByOwnerIdAndStatus.isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
+        return convert2DtoList(allByOwnerIdAndStatus);
+    }
+
+    private List<ExpertSuggestionOutDto> convert2DtoList(List<Suggestion> allByOwnerIdAndStatus) {
+        return allByOwnerIdAndStatus.stream().map(s ->
+                ExpertSuggestionOutDto.builder()
+                        .id(s.getId())
+                        .service(s.getOrder().getService().getName())
+                        .price(s.getPrice())
+                        .suggestedDateTime(s.getSuggestedDateTime())
+                        .status(s.getSuggestionStatus())
+                        .build()).toList();
+    }
+
     private SuggestionOutDto convert2Dto(Suggestion suggestion) {
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
@@ -103,5 +122,7 @@ public class SuggestionService {
         return suggestions.stream()
                 .map(this::convert2Dto).toList();
     }
+
+
 
 }
