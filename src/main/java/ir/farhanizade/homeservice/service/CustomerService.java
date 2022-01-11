@@ -3,10 +3,7 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOutDto;
-import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
-import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -143,5 +140,13 @@ public class CustomerService {
     public List<SuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
         exists(id);
         return suggestionService.findAllByCustomerId(id);
+    }
+
+    private CustomerOutDto convert2Dto(Customer customer){
+        return CustomerOutDto.builder()
+                .name(customer.getFName()+" "+customer.getLName())
+                .email(customer.getEmail())
+                .credit(customer.getCredit())
+                .build();
     }
 }
