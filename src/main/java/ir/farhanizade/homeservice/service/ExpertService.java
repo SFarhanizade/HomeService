@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
@@ -23,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+
 @Service
 @RequiredArgsConstructor
 public class ExpertService {
@@ -30,6 +33,7 @@ public class ExpertService {
     private final SubServiceService serviceManager;
     private final OrderService orderService;
     private final SuggestionService suggestionService;
+    private final RequestService requestService;
 
     @Transactional
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -97,6 +101,7 @@ public class ExpertService {
                                 .price(o.getRequest().getPrice())
                                 .suggestedDateTime(o.getRequest().getSuggestedDateTime())
                                 .createdDateTime(o.getRequest().getDateTime())
+                                .status(o.getStatus())
                                 .build()).toList();
         return resultList;
     }
@@ -156,9 +161,9 @@ public class ExpertService {
         return result;
     }
 
-    public List<ExpertSuggestionOutDto> getSuggestions(Long id, SuggestionStatus...status) throws EntityNotFoundException {
+    public List<ExpertSuggestionOutDto> getSuggestions(Long id, SuggestionStatus... status) throws EntityNotFoundException {
         findById(id);
-        return suggestionService.findAllByOwnerIdAndStatus(id,status);
+        return suggestionService.findAllByOwnerIdAndStatus(id, status);
     }
 
     private UserOutDto convert2Dto(Expert expert) {
@@ -173,5 +178,18 @@ public class ExpertService {
     private List<UserOutDto> convert2Dto(List<Expert> expertList) {
         return expertList.stream()
                 .map(this::convert2Dto).toList();
+    }
+
+    @Transactional
+    public SuggestionAnswerOutDto answerSuggestion(Long ownerId, Long suggestionId, BaseMessageStatus status) throws BadEntryException, EntityNotFoundException {
+        Suggestion suggestion = suggestionService.answer(ownerId, suggestionId, status);
+        if (status.equals(BUSY)) {
+            requestService.confirm(suggestion.getOrder().getRequest().getId());
+        }
+        return SuggestionAnswerOutDto.builder()
+                .suggestion(suggestionId)
+                .orderId(suggestion.getOrder().getId())
+                .answer(status)
+                .build();
     }
 }
