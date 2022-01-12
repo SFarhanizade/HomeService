@@ -39,6 +39,7 @@ public class Order extends BaseEntity {
     private Set<Suggestion> suggestions;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
 
     @OneToOne
