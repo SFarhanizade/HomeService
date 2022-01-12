@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.dto.out;
 
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,4 +15,5 @@ public class OrderOutDto {
     private BigDecimal price;
     private Date suggestedDateTime;
     private Date createdDateTime;
+    private OrderStatus status;
 }
