@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
+
 @Service
 @RequiredArgsConstructor
 public class RequestService {
@@ -68,5 +70,9 @@ public class RequestService {
 
     private boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
         return Validation.isValid(request);
+    }
+
+    public void cancel(Long orderId) {
+        repository.cancel(orderId, CANCELLED);
     }
 }
