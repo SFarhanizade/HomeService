@@ -185,15 +185,16 @@ public class ExpertService {
     @Transactional
     public SuggestionAnswerOutDto answerSuggestion(Long ownerId, Long suggestionId, BaseMessageStatus status) throws BadEntryException, EntityNotFoundException {
         Suggestion suggestion = suggestionService.answer(ownerId, suggestionId, status);
+        Long orderId = suggestion.getOrder().getId();
         if (status.equals(BUSY)) {
-            requestService.confirm(suggestion.getOrder().getRequest().getId());
-            orderService.changeStatus(suggestion.getOrder().getId(), WAITING_FOR_EXPERT);
+            requestService.changeStatus(orderId,status);
+            orderService.changeStatus(orderId, WAITING_FOR_EXPERT);
         } else {
-            orderService.changeStatus(suggestion.getOrder().getId(), WAITING_FOR_SELECTION);
+            orderService.changeStatus(orderId, WAITING_FOR_SELECTION);
         }
         return SuggestionAnswerOutDto.builder()
                 .suggestion(suggestionId)
-                .orderId(suggestion.getOrder().getId())
+                .orderId(orderId)
                 .answer(status)
                 .build();
     }
