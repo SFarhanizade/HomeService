@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
+
 @Service
 @RequiredArgsConstructor
 public class SuggestionService {
@@ -124,5 +126,8 @@ public class SuggestionService {
     }
 
 
-
+    @Transactional
+    public void cancel(Long orderId) {
+        repository.cancel(orderId, CANCELLED);
+    }
 }
