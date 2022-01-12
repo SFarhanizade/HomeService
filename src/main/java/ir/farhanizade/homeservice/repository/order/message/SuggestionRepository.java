@@ -32,8 +32,8 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     List<Suggestion> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status);
 
     @Modifying
-    @Query("Update Suggestion s set s.status=:cancelled where s.order.id=:orderId")
-    void cancel(Long orderId, BaseMessageStatus cancelled);
+    @Query("Update Suggestion s set s.status=:cancelled, s.suggestionStatus=:rejected where s.order.id=:orderId")
+    void cancel(Long orderId, BaseMessageStatus cancelled, SuggestionStatus rejected);
 
     @Modifying
     @Query("Update Suggestion s set s.status=:status where s.id=:suggestionId and s.owner.id=:ownerId")
