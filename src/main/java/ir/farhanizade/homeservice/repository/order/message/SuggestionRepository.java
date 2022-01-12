@@ -34,4 +34,8 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     @Modifying
     @Query("Update Suggestion s set s.status=:cancelled where s.order.id=:orderId")
     void cancel(Long orderId, BaseMessageStatus cancelled);
+
+    @Modifying
+    @Query("Update Suggestion s set s.status=:status where s.id=:suggestionId and s.owner.id=:ownerId")
+    void confirm(BaseMessageStatus status, Long suggestionId, Long ownerId);
 }
