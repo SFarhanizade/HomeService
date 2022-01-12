@@ -67,6 +67,7 @@ public class OrderService {
                     .price(result.getRequest().getPrice())
                     .suggestedDateTime(result.getRequest().getSuggestedDateTime())
                     .createdDateTime(result.getRequest().getDateTime())
+                    .status(result.getStatus())
                     .build();
         }
         throw new EntityNotFoundException("Order Doesn't Exist!");
