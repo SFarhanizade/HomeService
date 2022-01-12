@@ -21,8 +21,8 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     List<Suggestion> findAllByCustomerId(Long customerId);
 
     @Modifying
-    @Query("Update Suggestion s set s.suggestionStatus=:accepted where s.id=:suggestionId")
-    void acceptSuggestion(Long suggestionId, SuggestionStatus accepted);
+    @Query("Update Suggestion s set s.suggestionStatus=:accepted where s.id=:suggestionId and s.order.id=:orderId")
+    void acceptSuggestion(Long suggestionId, Long orderId, SuggestionStatus accepted);
 
     @Modifying
     @Query("Update Suggestion s set s.suggestionStatus=:rejected where Not s.id=:suggestionId and s.order.id=:orderId")
