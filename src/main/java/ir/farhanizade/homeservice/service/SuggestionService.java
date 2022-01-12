@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.ExpertSuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -133,5 +134,13 @@ public class SuggestionService {
     public void acceptSuggestion(Long id, Long orderId) {
         repository.acceptSuggestion(id, orderId, ACCEPTED);
         repository.rejectOtherSuggestions(id, orderId, REJECTED);
+    }
+
+    @Transactional
+    public Suggestion answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
+        Suggestion suggestion = loadById(suggestionId);
+        if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
+        repository.confirm(status, suggestionId, ownerId);
+        return suggestion;
     }
 }
