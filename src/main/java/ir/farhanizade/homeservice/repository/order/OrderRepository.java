@@ -34,9 +34,5 @@ public interface OrderRepository extends BaseRepository<Order> {
 
     @Modifying
     @Query("Update Order o set o.status=:status where o.id=:id")
-    void acceptSuggestion(Long id, OrderStatus status);
-
-    @Modifying
-    @Query("Update Order o set o.status=:status where o.id=:id")
     void changeStatus(Long id, OrderStatus status);
 }
