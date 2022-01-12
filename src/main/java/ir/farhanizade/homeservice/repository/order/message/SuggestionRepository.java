@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.repository.order.message;
 
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.repository.BaseRepository;
@@ -29,4 +30,8 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
     @Query("From Suggestion s where s.owner.id=:ownerId and s.suggestionStatus in :status")
     List<Suggestion> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status);
+
+    @Modifying
+    @Query("Update Suggestion s set s.status=:cancelled where s.order.id=:orderId")
+    void cancel(Long orderId, BaseMessageStatus cancelled);
 }
