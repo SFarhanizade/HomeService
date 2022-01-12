@@ -103,4 +103,9 @@ public class OrderService {
         suggestionService.acceptSuggestion(id,order.getId());
         return new EntityOutDto(id);
     }
+
+    public void changeStatus(Long id, OrderStatus status) throws EntityNotFoundException {
+        exists(id);
+        repository.changeStatus(id,status);
+    }
 }
