@@ -4,10 +4,8 @@ import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertAddServiceOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertSuggestionOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
@@ -18,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
 
 @RestController
 @RequestMapping("/experts")
@@ -76,6 +77,26 @@ public class ExpertController {
                 ResponseResult.<List<ExpertSuggestionOutDto>>builder()
                         .code(1)
                         .message("Suggestions loaded successfully.")
+                        .data(result)
+                        .build();
+        HttpStatus httpStatus = HttpStatus.CREATED;
+        return ResponseEntity.status(httpStatus).body(response);
+    }
+
+    @GetMapping("/{id}/suggestions/{suggestionId}/{answer}")
+    public ResponseEntity<ResponseResult<SuggestionAnswerOutDto>>
+    answerSuggestion(@PathVariable Long id, @PathVariable Long suggestionId, @PathVariable String answer)
+            throws EntityNotFoundException, BadEntryException {
+        SuggestionAnswerOutDto result;
+        switch (answer) {
+            case "accept" -> result = expertService.answerSuggestion(id, suggestionId, BUSY);
+            case "reject" -> result = expertService.answerSuggestion(id, suggestionId, CANCELLED);
+            default -> throw new BadEntryException("Status is Wrong!");
+        }
+        ResponseResult<SuggestionAnswerOutDto> response =
+                ResponseResult.<SuggestionAnswerOutDto>builder()
+                        .code(1)
+                        .message("Suggestions answer successfully.")
                         .data(result)
                         .build();
         HttpStatus httpStatus = HttpStatus.CREATED;
