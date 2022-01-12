@@ -12,12 +12,14 @@ import ir.farhanizade.homeservice.repository.order.message.RequestRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
 
 @Service
@@ -74,5 +76,10 @@ public class RequestService {
 
     public void cancel(Long orderId) {
         repository.cancel(orderId, CANCELLED);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void confirm(Long requestId) {
+        repository.confirm(requestId, BUSY);
     }
 }
