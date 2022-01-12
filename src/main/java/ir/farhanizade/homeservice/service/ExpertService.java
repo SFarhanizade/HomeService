@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
+import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 
 @Service
@@ -185,6 +187,9 @@ public class ExpertService {
         Suggestion suggestion = suggestionService.answer(ownerId, suggestionId, status);
         if (status.equals(BUSY)) {
             requestService.confirm(suggestion.getOrder().getRequest().getId());
+            orderService.changeStatus(suggestion.getOrder().getId(), WAITING_FOR_EXPERT);
+        } else {
+            orderService.changeStatus(suggestion.getOrder().getId(), WAITING_FOR_SELECTION);
         }
         return SuggestionAnswerOutDto.builder()
                 .suggestion(suggestionId)
