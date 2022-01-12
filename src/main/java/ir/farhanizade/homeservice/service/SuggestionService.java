@@ -65,6 +65,7 @@ public class SuggestionService {
         throw new EntityNotFoundException("Suggestion Not Found!");
     }
 
+    @Transactional(readOnly = true)
     public Suggestion loadById(Long id) throws EntityNotFoundException {
         Optional<Suggestion> byId = repository.findById(id);
         if (byId.isPresent()) {
