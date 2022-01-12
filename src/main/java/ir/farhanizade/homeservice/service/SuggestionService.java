@@ -127,7 +127,7 @@ public class SuggestionService {
 
     @Transactional
     public void cancel(Long orderId) {
-        repository.cancel(orderId, CANCELLED);
+        repository.cancel(orderId, CANCELLED, REJECTED);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -140,6 +140,9 @@ public class SuggestionService {
     public Suggestion answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
         Suggestion suggestion = loadById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
+        if(status.equals(CANCELLED))
+            repository.cancel(suggestion.getOrder().getId(),CANCELLED, REJECTED);
+        else
         repository.confirm(status, suggestionId, ownerId);
         return suggestion;
     }
