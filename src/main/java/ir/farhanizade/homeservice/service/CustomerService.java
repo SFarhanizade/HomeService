@@ -174,6 +174,6 @@ public class CustomerService {
     @Transactional
     public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         exists(id);
-        return suggestionService.acceptSuggestion(suggestion);
+        return orderRepository.acceptSuggestion(suggestion);
     }
 }
