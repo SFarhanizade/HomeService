@@ -37,5 +37,6 @@ public class Suggestion extends BaseMessage {
 
     @Builder.Default
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private SuggestionStatus suggestionStatus = SuggestionStatus.PENDING;
 }

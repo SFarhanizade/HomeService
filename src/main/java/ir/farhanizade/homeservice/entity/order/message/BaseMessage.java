@@ -35,5 +35,6 @@ public class BaseMessage extends BaseEntity {
 
     @Column(nullable = false)
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private BaseMessageStatus status = BaseMessageStatus.WAITING;
 }
