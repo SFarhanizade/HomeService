@@ -12,18 +12,20 @@ import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
+import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.ACCEPTED;
+import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
 public class SuggestionService {
     private final SuggestionRepository repository;
-    private final OrderService orderService;
 
     @Transactional
     public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
@@ -38,18 +40,6 @@ public class SuggestionService {
                 .build();
     }
 
-    @Transactional
-    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException {
-        Optional<Suggestion> byId = repository.findById(id);
-        if(!byId.isPresent()) throw new EntityNotFoundException("Suggestion Not Found!");
-        Suggestion suggestion = byId.get();
-        Validation.isValid(suggestion);
-        Order order = suggestion.getOrder();
-        repository.acceptSuggestion(suggestion.getId(), SuggestionStatus.ACCEPTED);
-        repository.rejectOtherSuggestions(suggestion.getId(),order.getId(), SuggestionStatus.REJECTED);
-        orderService.acceptSuggestion(order.getId());
-        return new EntityOutDto(id);
-    }
 
     @Transactional(readOnly = true)
     public List<Suggestion> loadAll() {
@@ -74,6 +64,14 @@ public class SuggestionService {
         throw new EntityNotFoundException("Suggestion Not Found!");
     }
 
+    public Suggestion loadById(Long id) throws EntityNotFoundException {
+        Optional<Suggestion> byId = repository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        }
+        throw new EntityNotFoundException("Suggestion Not Found!");
+    }
+
     @Transactional(readOnly = true)
     public List<SuggestionOutDto> findAllByOwnerId(Long id) throws EntityNotFoundException {
         List<Suggestion> suggestions = repository.findAllByOwnerId(id);
@@ -89,9 +87,9 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public List<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status) throws EntityNotFoundException {
+    public List<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status) throws EntityNotFoundException {
         List<Suggestion> allByOwnerIdAndStatus = repository.findAllByOwnerIdAndStatus(ownerId, status);
-        if(allByOwnerIdAndStatus.isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
+        if (allByOwnerIdAndStatus.isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
         return convert2DtoList(allByOwnerIdAndStatus);
     }
 
@@ -129,5 +127,11 @@ public class SuggestionService {
     @Transactional
     public void cancel(Long orderId) {
         repository.cancel(orderId, CANCELLED);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void acceptSuggestion(Long id, Long orderId) {
+        repository.acceptSuggestion(id, orderId, ACCEPTED);
+        repository.rejectOtherSuggestions(id, orderId, REJECTED);
     }
 }
