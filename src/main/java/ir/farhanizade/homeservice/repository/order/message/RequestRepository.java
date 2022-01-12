@@ -13,9 +13,5 @@ public interface RequestRepository extends BaseRepository<Request> {
 
     @Modifying
     @Query("Update Request r set r.status=:cancelled where r.order.id=:orderId")
-    void cancel(Long orderId, BaseMessageStatus cancelled);
-
-    @Modifying
-    @Query("Update Request r set r.status=:busy where r.id=:requestId")
-    void confirm(Long requestId, BaseMessageStatus busy);
+    void changeStatus(Long orderId, BaseMessageStatus cancelled);
 }
