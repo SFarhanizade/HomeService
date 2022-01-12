@@ -108,6 +108,7 @@ public class CustomerService {
                         .price(o.getRequest().getPrice())
                         .suggestedDateTime(o.getRequest().getSuggestedDateTime())
                         .createdDateTime(o.getRequest().getDateTime())
+                        .status(o.getStatus())
                         .build()).toList();
         return result;
     }
