@@ -80,9 +80,9 @@ public class OrderService {
 
     @Transactional
     public void removeOrderByIdAndOwnerId(Long ownerId, Long orderId) throws EntityNotFoundException {
-        exists(orderId);
+        findById(orderId);
         repository.removeOrderByIdAndOwnerId(orderId, ownerId, CANCELLED);
-        requestService.cancel(orderId);
+        requestService.changeStatus(orderId, CANCELLED);
         suggestionService.cancel(orderId);
     }
 
@@ -99,7 +99,7 @@ public class OrderService {
         Suggestion suggestion = suggestionService.loadById(id);
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
-        repository.acceptSuggestion(id, WAITING_FOR_EXPERT);
+        repository.changeStatus(id, WAITING_FOR_EXPERT);
         suggestionService.acceptSuggestion(id,order.getId());
         return new EntityOutDto(id);
     }
