@@ -22,6 +22,8 @@ import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository repository;
+    private final SuggestionService suggestionService;
+    private final RequestService requestService;
 
     @Transactional
     public void save(Order order) {
@@ -75,7 +77,8 @@ public class OrderService {
     public void removeOrderByIdAndOwnerId(Long ownerId, Long orderId) throws EntityNotFoundException {
         exists(orderId);
         repository.removeOrderByIdAndOwnerId(orderId, ownerId, CANCELLED);
-        //TODO set the status of request and all/accepted suggestion(s) CANCELLED
+        requestService.cancel(orderId);
+        suggestionService.cancel(orderId);
     }
 
     @Transactional(readOnly = true)
