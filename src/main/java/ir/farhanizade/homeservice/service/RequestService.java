@@ -74,12 +74,8 @@ public class RequestService {
         return Validation.isValid(request);
     }
 
-    public void cancel(Long orderId) {
-        repository.cancel(orderId, CANCELLED);
-    }
-
     @Transactional(propagation = Propagation.REQUIRED)
-    public void confirm(Long requestId) {
-        repository.confirm(requestId, BUSY);
+    public void changeStatus(Long orderId, BaseMessageStatus status) {
+        repository.changeStatus(orderId, status);
     }
 }
