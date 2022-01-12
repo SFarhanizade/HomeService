@@ -1,11 +1,15 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
-import ir.farhanizade.homeservice.exception.EntityNotFoundException;
+import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
+import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +94,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void acceptSuggestion(Long id) {
+    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException {
+        Suggestion suggestion = suggestionService.loadById(id);
+        Validation.isValid(suggestion);
+        Order order = suggestion.getOrder();
         repository.acceptSuggestion(id, WAITING_FOR_EXPERT);
+        suggestionService.acceptSuggestion(id,order.getId());
+        return new EntityOutDto(id);
     }
 }
