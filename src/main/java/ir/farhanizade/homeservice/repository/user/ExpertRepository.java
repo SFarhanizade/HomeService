@@ -16,6 +16,7 @@ public interface ExpertRepository extends BaseRepository<Expert>, CustomExpertRe
     List<Expert> findByCredit(BigDecimal credit);
     List<Expert> findByStatus(UserStatus status);
 
-    @Query(value = "select u.* From user_expertises e, user u where e.expertises_id = :service and e.expert_id = u.id", nativeQuery = true)
+    //@Query(value = "select u.* From user_expertises e, user u where e.expertises_id = :service and e.expert_id = u.id", nativeQuery = true)
+    @Query("From Expert e inner join e.expertises s where e.id=:service")
     List<Expert> findByExpertise(Long service);
 }
