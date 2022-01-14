@@ -8,11 +8,9 @@ import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admins")
@@ -25,5 +23,18 @@ public class AdminController {
     public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
         return userController.create(user, Admin.class);
     }
+
+    @GetMapping("/{id}/experts/{expertId}/accept")
+    public ResponseEntity<ResponseResult<EntityOutDto>> acceptExpert(@PathVariable Long id, @PathVariable Long expertId) throws UserNotValidException, EntityNotFoundException {
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("User accepted successfully!")
+                .build();
+        HttpStatus status = HttpStatus.CREATED;
+        EntityOutDto result = adminService.acceptExpert(id, expertId);
+        response.setData(result);
+        return ResponseEntity.status(status).body(response);
+    }
+
 
 }
