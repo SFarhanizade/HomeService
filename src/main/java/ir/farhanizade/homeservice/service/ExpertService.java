@@ -15,6 +15,7 @@ import ir.farhanizade.homeservice.repository.user.ExpertRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -71,7 +72,7 @@ public class ExpertService {
         Optional<Expert> byId = repository.findById(request.getExpertId());
         if (!byId.isPresent()) throw new EntityNotFoundException("User doesn't exist!");
         expert = byId.get();
-        if(!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
+        if (!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
         SubService service = serviceManager.loadById(request.getServiceId());
         boolean serviceExists = !expert.addService(service);
         if (serviceExists) {
@@ -186,7 +187,7 @@ public class ExpertService {
         Suggestion suggestion = suggestionService.answer(ownerId, suggestionId, status);
         Long orderId = suggestion.getOrder().getId();
         if (status.equals(BUSY)) {
-            requestService.changeStatus(orderId,status);
+            requestService.changeStatus(orderId, status);
             orderService.changeStatus(orderId, WAITING_FOR_EXPERT);
         } else {
             orderService.changeStatus(orderId, WAITING_FOR_SELECTION);
@@ -196,5 +197,12 @@ public class ExpertService {
                 .orderId(orderId)
                 .answer(status)
                 .build();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public EntityOutDto acceptExpert(Long expertId) throws EntityNotFoundException {
+        findById(expertId);
+        repository.acceptExpert(expertId, ACCEPTED);
+        return new EntityOutDto(expertId);
     }
 }
