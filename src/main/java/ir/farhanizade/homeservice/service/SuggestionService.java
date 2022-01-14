@@ -13,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
+
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
@@ -113,12 +115,6 @@ public class SuggestionService {
                 .map(this::convert2Dto).toList();
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void acceptSuggestion(Long id, Long orderId) {
-        repository.acceptSuggestion(id, orderId, ACCEPTED);
-        repository.rejectOtherSuggestions(id, orderId, REJECTED);
-    }
-
     @Transactional
     public SuggestionAnswerOutDto answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
         Suggestion suggestion = findById(suggestionId);
@@ -152,5 +148,11 @@ public class SuggestionService {
                 .suggestedDateTime(suggestion.getSuggestedDateTime())
                 .price(suggestion.getPrice())
                 .build();
+    }
+
+    public Suggestion findByIdAndOwnerId(Long id, Long ownerId) throws EntityNotFoundException {
+        findById(id);
+        Optional<Suggestion> byIdAndOwnerId = repository.findByIdAndOwnerId(id, ownerId);
+        return byIdAndOwnerId.orElseThrow(() -> new EntityNotFoundException("Suggestion Not Found!"));
     }
 }
