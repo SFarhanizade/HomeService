@@ -1,11 +1,9 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertAddSuggestionOutDto;
-import ir.farhanizade.homeservice.dto.out.ExpertSuggestionOutDto;
-import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
+import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -15,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
-
-import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
+import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
+import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.ACCEPTED;
 import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
 
@@ -48,25 +46,15 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionOutDto> findAllByOrderId(Long order) throws EntityNotFoundException {
+    public List<Suggestion> findAllByOrderId(Long order) throws EntityNotFoundException {
         List<Suggestion> suggestions = repository.findAllByOrderId(order);
         if (suggestions.size() == 0)
             throw new EntityNotFoundException("No Suggestions Found For This Order!");
-        return convert2Dto(suggestions);
+        return suggestions;
     }
 
     @Transactional(readOnly = true)
-    public SuggestionOutDto findById(Long id) throws EntityNotFoundException {
-        Optional<Suggestion> byId = repository.findById(id);
-        if (byId.isPresent()) {
-            Suggestion suggestion = byId.get();
-            return convert2Dto(suggestion);
-        }
-        throw new EntityNotFoundException("Suggestion Not Found!");
-    }
-
-    @Transactional(readOnly = true)
-    public Suggestion loadById(Long id) throws EntityNotFoundException {
+    public Suggestion findById(Long id) throws EntityNotFoundException {
         Optional<Suggestion> byId = repository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
@@ -106,7 +94,7 @@ public class SuggestionService {
                         .build()).toList();
     }
 
-    private SuggestionOutDto convert2Dto(Suggestion suggestion) {
+    public SuggestionOutDto convert2Dto(Suggestion suggestion) {
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
                 .ownerId(suggestion.getOwner().getId())
@@ -120,15 +108,9 @@ public class SuggestionService {
                 .build();
     }
 
-    private List<SuggestionOutDto> convert2Dto(List<Suggestion> suggestions) {
+    public List<SuggestionOutDto> convert2Dto(List<Suggestion> suggestions) {
         return suggestions.stream()
                 .map(this::convert2Dto).toList();
-    }
-
-
-    @Transactional
-    public void cancel(Long orderId) {
-        repository.cancel(orderId, CANCELLED, REJECTED);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -138,13 +120,37 @@ public class SuggestionService {
     }
 
     @Transactional
-    public Suggestion answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
-        Suggestion suggestion = loadById(suggestionId);
+    public SuggestionAnswerOutDto answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
+        Suggestion suggestion = findById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
-        if(status.equals(CANCELLED))
-            repository.cancel(suggestion.getOrder().getId(),CANCELLED, REJECTED);
-        else
-        repository.confirm(status, suggestionId, ownerId);
-        return suggestion;
+        Order order = suggestion.getOrder();
+        Request request = order.getRequest();
+        if (status.equals(BUSY)) {
+            suggestion.setStatus(status);
+            order.setStatus(WAITING_FOR_EXPERT);
+            request.setStatus(status);
+        } else {
+            suggestion.setStatus(status);
+            suggestion.setSuggestionStatus(REJECTED);
+            order.setStatus(WAITING_FOR_SELECTION);
+        }
+        repository.save(suggestion);
+        return SuggestionAnswerOutDto.builder()
+                .suggestion(suggestionId)
+                .orderId(order.getId())
+                .answer(status)
+                .build();
+    }
+
+    public SuggestionOutDto getById(Long id) throws EntityNotFoundException {
+        Suggestion suggestion = findById(id);
+        return SuggestionOutDto.builder()
+                .id(suggestion.getId())
+                .createdDateTime(suggestion.getCreatedTime())
+                .details(suggestion.getDetails())
+                .duration(suggestion.getDuration())
+                .suggestedDateTime(suggestion.getSuggestedDateTime())
+                .price(suggestion.getPrice())
+                .build();
     }
 }
