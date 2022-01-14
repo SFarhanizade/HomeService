@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.dto.in;
 
+import ir.farhanizade.homeservice.entity.user.Admin;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
@@ -37,6 +38,15 @@ public class UserInDto {
 
     public Customer convert2Customer() {
         return Customer.builder()
+                .fName(firstname)
+                .lName(lastname)
+                .email(email)
+                .password(password)
+                .build();
+    }
+
+    public Admin convert2Admin(){
+        return Admin.builder()
                 .fName(firstname)
                 .lName(lastname)
                 .email(email)
