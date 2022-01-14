@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 
 @Service
 @RequiredArgsConstructor
@@ -65,14 +66,12 @@ public class ExpertService {
     }
 
     @Transactional
-    public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException {
+    public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException {
         Expert expert;
         Optional<Expert> byId = repository.findById(request.getExpertId());
-        if (byId.isPresent()) {
-            expert = byId.get();
-        } else {
-            throw new EntityNotFoundException("User doesn't exist!");
-        }
+        if (!byId.isPresent()) throw new EntityNotFoundException("User doesn't exist!");
+        expert = byId.get();
+        if(!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
         SubService service = serviceManager.loadById(request.getServiceId());
         boolean serviceExists = !expert.addService(service);
         if (serviceExists) {
