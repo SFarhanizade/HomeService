@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
@@ -32,9 +33,6 @@ public class RequestService {
     public EntityOutDto save(Customer owner, RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
         Request entity = convert2Request(owner, request);
         isValid(entity);
-        Order order = entity.getOrder();
-        order.addRequest(entity);
-        owner.addRequest(entity);
         Request saved = repository.save(entity);
         return new EntityOutDto(saved.getId());
     }
@@ -72,10 +70,5 @@ public class RequestService {
 
     private boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
         return Validation.isValid(request);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void changeStatus(Long orderId, BaseMessageStatus status) {
-        repository.changeStatus(orderId, status);
     }
 }
