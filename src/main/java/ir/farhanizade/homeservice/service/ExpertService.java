@@ -5,7 +5,6 @@ import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
-import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
@@ -20,15 +19,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
-import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
-import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
+import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.PENDING;
+import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
 import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 
 @Service
@@ -190,5 +188,17 @@ public class ExpertService {
         expert.setStatus(ACCEPTED);
         repository.save(expert);
         return new EntityOutDto(expertId);
+    }
+
+    @Transactional
+    public EntityOutDto startToWork(Long expertId, Long suggestionId) throws EntityNotFoundException, BadEntryException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
+        findById(expertId);
+        Suggestion suggestion = suggestionService.findByIdAndOwnerId(suggestionId, expertId);
+        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED)) {
+            Order order = suggestion.getOrder();
+            order.setStatus(OrderStatus.STARTED);
+            suggestionService.save(suggestion);
+            return new EntityOutDto(suggestionId);
+        } else throw new BadEntryException("This order is not yours!");
     }
 }
