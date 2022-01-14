@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Data
@@ -16,11 +17,20 @@ import java.util.Objects;
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @CreatedDate
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date createdTime;
+
+    @LastModifiedDate
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private Date updatedTime;
 
     @Override
     public boolean equals(Object o) {
@@ -34,4 +44,5 @@ public class BaseEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }
