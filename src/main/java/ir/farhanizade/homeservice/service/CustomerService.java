@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -13,7 +14,6 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +29,7 @@ public class CustomerService {
     @Transactional
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         Customer customer = user.convert2Customer();
-        boolean isValid = false;
-        isValid = Validation.isValid(customer);
+        boolean isValid = Validation.isValid(customer);
 
         if (!isValid)
             throw new UserNotValidException("User is not valid!");
@@ -136,13 +135,14 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public List<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
         exists(id);
-        return suggestionService.findAllByOrderId(order);
+        List<Suggestion> suggestions = suggestionService.findAllByOrderId(order);
+        return suggestionService.convert2Dto(suggestions);
     }
 
     @Transactional(readOnly = true)
     public SuggestionOutDto getSuggestion(Long id, Long suggestion) throws EntityNotFoundException {
         exists(id);
-        return suggestionService.findById(suggestion);
+        return suggestionService.getById(suggestion);
     }
 
     @Transactional(readOnly = true)
@@ -168,12 +168,12 @@ public class CustomerService {
     @Transactional
     public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException {
         exists(id);
-        orderRepository.removeOrderByIdAndOwnerId(id, orderId);
+        orderRepository.removeOrderByIdAndOwnerId(orderId, id);
         return new EntityOutDto(orderId);
     }
 
     @Transactional
-    public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+    public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         exists(id);
         return orderRepository.acceptSuggestion(suggestion);
     }
