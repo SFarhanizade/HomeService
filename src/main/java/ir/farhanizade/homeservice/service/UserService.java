@@ -25,6 +25,7 @@ public class UserService {
     private final UserRepository repository;
     private final ExpertService expertService;
     private final CustomerService customerService;
+    private final AdminService adminService;
 
     @Transactional
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
@@ -54,6 +55,8 @@ public class UserService {
 
         } else if (type == Customer.class) {
             result = customerService.save(user);
+        } else{
+            result = adminService.save(user);
         }
         return result;
     }
