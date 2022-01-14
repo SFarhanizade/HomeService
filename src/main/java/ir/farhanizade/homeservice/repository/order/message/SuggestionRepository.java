@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
@@ -31,11 +32,6 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     @Query("From Suggestion s where s.owner.id=:ownerId and s.suggestionStatus in :status")
     List<Suggestion> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status);
 
-    @Modifying
-    @Query("Update Suggestion s set s.status=:cancelled, s.suggestionStatus=:rejected where s.order.id=:orderId")
-    void cancel(Long orderId, BaseMessageStatus cancelled, SuggestionStatus rejected);
-
-    @Modifying
-    @Query("Update Suggestion s set s.status=:status where s.id=:suggestionId and s.owner.id=:ownerId")
-    void confirm(BaseMessageStatus status, Long suggestionId, Long ownerId);
+    @Query("From Suggestion s where s.id=:id and s.owner.id=:ownerId")
+    Optional<Suggestion> findByIdAndOwnerId(Long id, Long ownerId);
 }
