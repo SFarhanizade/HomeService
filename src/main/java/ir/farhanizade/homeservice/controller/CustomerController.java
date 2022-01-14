@@ -10,7 +10,6 @@ import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.RequestService;
-import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,7 +116,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/suggestions/{suggestion}/accept")
-    public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+    public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         EntityOutDto result = customerService.acceptSuggestion(id,suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
