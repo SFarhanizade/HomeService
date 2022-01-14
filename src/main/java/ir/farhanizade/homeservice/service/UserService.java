@@ -15,9 +15,8 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,24 +31,25 @@ public class UserService {
         String currentPassword = user.getCurrentPassword();
         String newPassword = user.getNewPassword();
         Long id = user.getId();
+        Optional<User> byId = repository.findById(id);
+        User entity = byId.get();
         if (currentPassword.equals(newPassword)) {
             throw new PasswordNotValidException("The new password is the same as the current password!");
         }
         if (!Validation.passwordIsValid(newPassword)) {
             throw new PasswordNotValidException("The new password is not valid!");
         }
-        User byIdAndPass = repository.isCorrectByPassword(id, currentPassword);
-        if (byIdAndPass == null) {
+
+        if (currentPassword.equals(entity.getPassword())) {
             throw new WrongPasswordException("The current password is not correct!");
         }
-        repository.updatePassword(id, newPassword);
-
-
+        entity.setPassword(newPassword);
+        repository.save(entity);
         return new EntityOutDto(id);
     }
 
     public EntityOutDto save(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
-        EntityOutDto result = new EntityOutDto();
+        EntityOutDto result;
         if (type == Expert.class) {
             result = expertService.save(user);
 
