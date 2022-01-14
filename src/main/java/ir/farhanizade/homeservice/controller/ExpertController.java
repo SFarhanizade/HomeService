@@ -36,7 +36,7 @@ public class ExpertController {
     @PostMapping("/addService")
     public ResponseEntity<ResponseResult<ExpertAddServiceOutDto>>
     addService(@RequestBody ExpertAddServiceInDto request)
-            throws EntityNotFoundException, DuplicateEntityException {
+            throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException {
         HttpStatus status = HttpStatus.ACCEPTED;
         ExpertAddServiceOutDto result = expertService.addService(request);
         ResponseResult<ExpertAddServiceOutDto> response = ResponseResult.<ExpertAddServiceOutDto>builder()
