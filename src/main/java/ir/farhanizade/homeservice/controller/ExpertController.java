@@ -103,4 +103,16 @@ public class ExpertController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
+    @GetMapping("/{id}/suggestions/{suggestionId}/start")
+    public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
+        EntityOutDto result = expertService.startToWork(id,suggestionId);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Work started successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.CREATED;
+        return ResponseEntity.status(status).body(response);
+    }
+
 }
