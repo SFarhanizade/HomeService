@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
+import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
@@ -68,10 +69,7 @@ public class ExpertService {
 
     @Transactional
     public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException {
-        Expert expert;
-        Optional<Expert> byId = repository.findById(request.getExpertId());
-        if (!byId.isPresent()) throw new EntityNotFoundException("User doesn't exist!");
-        expert = byId.get();
+        Expert expert = findById(request.getExpertId());
         if (!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
         SubService service = serviceManager.loadById(request.getServiceId());
         boolean serviceExists = !expert.addService(service);
@@ -83,8 +81,7 @@ public class ExpertService {
                 .expertId(saved.getId())
                 .services(expert.getExpertises().stream()
                         .map(s -> new EntityOutDto(s.getId()))
-                        .collect(Collectors.toSet())
-                )
+                        .collect(Collectors.toSet()))
                 .build();
         return result;
     }
@@ -184,25 +181,14 @@ public class ExpertService {
 
     @Transactional
     public SuggestionAnswerOutDto answerSuggestion(Long ownerId, Long suggestionId, BaseMessageStatus status) throws BadEntryException, EntityNotFoundException {
-        Suggestion suggestion = suggestionService.answer(ownerId, suggestionId, status);
-        Long orderId = suggestion.getOrder().getId();
-        if (status.equals(BUSY)) {
-            requestService.changeStatus(orderId, status);
-            orderService.changeStatus(orderId, WAITING_FOR_EXPERT);
-        } else {
-            orderService.changeStatus(orderId, WAITING_FOR_SELECTION);
-        }
-        return SuggestionAnswerOutDto.builder()
-                .suggestion(suggestionId)
-                .orderId(orderId)
-                .answer(status)
-                .build();
+        return suggestionService.answer(ownerId, suggestionId, status);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public EntityOutDto acceptExpert(Long expertId) throws EntityNotFoundException {
-        findById(expertId);
-        repository.acceptExpert(expertId, ACCEPTED);
+        Expert expert = findById(expertId);
+        expert.setStatus(ACCEPTED);
+        repository.save(expert);
         return new EntityOutDto(expertId);
     }
 }
