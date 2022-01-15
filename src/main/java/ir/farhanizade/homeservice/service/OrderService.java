@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
@@ -10,6 +11,7 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -104,5 +106,32 @@ public class OrderService {
                 .forEach(s -> s.setSuggestionStatus(REJECTED));
         suggestionService.save(suggestion);
         return new EntityOutDto(id);
+    }
+
+    public CustomPage<OrderOutDto> findByExpertise(Set<SubService> expertises, Pageable pageable){
+        CustomPage<Order> byExpertises = repository.findByExpertises(expertises, pageable);
+        List<Order> data = byExpertises.getData();
+        List<OrderOutDto> orders = convert2Dto(data);
+        return CustomPage.<OrderOutDto>builder()
+                .data(orders)
+                .pageSize(byExpertises.getPageSize())
+                .lastPage(byExpertises.getLastPage())
+                .pageNumber(byExpertises.getPageNumber())
+                .build();
+    }
+
+    private List<OrderOutDto> convert2Dto(List<Order> data) {
+        return data.stream().map(o -> convert2Dto(o)).toList();
+    }
+
+    private OrderOutDto convert2Dto(Order o) {
+        return OrderOutDto.builder()
+                .id(o.getId())
+                .status(o.getStatus())
+                .service(o.getService().getName())
+                .createdDateTime(o.getCreatedTime())
+                .price(o.getRequest().getPrice())
+                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+                .build();
     }
 }
