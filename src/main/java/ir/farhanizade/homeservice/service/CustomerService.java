@@ -188,6 +188,7 @@ public class CustomerService {
     public EntityOutDto pay(Long id, Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         Customer customer = findById(id);
         Suggestion suggestion = suggestionService.findById(suggestionId);
+        if(suggestion.getStatus().equals(BaseMessageStatus.DONE)) throw new BadEntryException("You can't pay more than once!");
         Expert expert = suggestion.getOwner();
         BigDecimal price = suggestion.getPrice();
 
