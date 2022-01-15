@@ -23,10 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
-import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.PENDING;
-import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 
 @Service
@@ -197,6 +194,18 @@ public class ExpertService {
         if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED)) {
             Order order = suggestion.getOrder();
             order.setStatus(OrderStatus.STARTED);
+            suggestionService.save(suggestion);
+            return new EntityOutDto(suggestionId);
+        } else throw new BadEntryException("This order is not yours!");
+    }
+
+    public EntityOutDto finishWork(Long expertId, Long suggestionId) throws EntityNotFoundException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+        findById(expertId);
+        Suggestion suggestion = suggestionService.findByIdAndOwnerId(suggestionId, expertId);
+        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED) &&
+                suggestion.getStatus().equals(BUSY)) {
+            Order order = suggestion.getOrder();
+            order.setStatus(OrderStatus.DONE);
             suggestionService.save(suggestion);
             return new EntityOutDto(suggestionId);
         } else throw new BadEntryException("This order is not yours!");
