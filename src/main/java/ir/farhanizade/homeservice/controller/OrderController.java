@@ -23,8 +23,8 @@ public class OrderController {
     private final ExpertService expertService;
 
     @PostMapping
-    public ResponseEntity<ResponseResult<List<OrderOutDto>>> showList(@RequestBody ExpertInDto request) throws EntityNotFoundException {
-        List<OrderOutDto> result = expertService.loadAvailableOrders(request);
+    public ResponseEntity<ResponseResult<List<OrderOutDto>>> showList(@RequestBody ExpertInDto request, @RequestParam Integer page) throws EntityNotFoundException {
+        List<OrderOutDto> result = expertService.loadAvailableOrders(request, page);
         ResponseResult<List<OrderOutDto>> response = ResponseResult.<List<OrderOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
