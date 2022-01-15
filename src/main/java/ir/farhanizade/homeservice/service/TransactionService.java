@@ -21,7 +21,7 @@ public class TransactionService {
     private final CustomerRepository customerRepository;
     private final ExpertRepository expertRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void save(Transaction transaction) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
@@ -34,8 +34,6 @@ public class TransactionService {
         order.setTransaction(transaction);
         payer.setCredit(payer.getCredit().add(amount.multiply(new BigDecimal(-1))));
         recipient.setCredit(recipient.getCredit().add(amount));
-        /*payer.addTransaction(transaction);
-        recipient.addTransaction(transaction);*/
         repository.save(transaction);
     }
 }
