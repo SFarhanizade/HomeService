@@ -23,7 +23,7 @@ import java.util.Set;
 public class Expert extends User {
     private String picURL;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private Set<SubService> expertises = new HashSet<>();
 
