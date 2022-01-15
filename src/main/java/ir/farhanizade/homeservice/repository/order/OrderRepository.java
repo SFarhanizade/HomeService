@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface OrderRepository extends BaseRepository<Order> {
+public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepository {
 
     @Query("From Order o " +
             "where o.service in :expertises " +
