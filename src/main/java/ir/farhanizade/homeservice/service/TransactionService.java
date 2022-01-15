@@ -9,6 +9,7 @@ import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.repository.user.ExpertRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class TransactionService {
     private final CustomerRepository customerRepository;
     private final ExpertRepository expertRepository;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void save(Transaction transaction) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
