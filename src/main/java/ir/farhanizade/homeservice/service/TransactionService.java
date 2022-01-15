@@ -33,7 +33,7 @@ public class TransactionService {
         if (payerCredit.compareTo(amount) == -1)
             throw new NotEnoughMoneyException("");
         payer.setCredit(payerCredit.subtract(amount));
-        recipient.setCredit(recipientCredit.add(amount));
+        recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
         repository.save(transaction);
     }
 }
