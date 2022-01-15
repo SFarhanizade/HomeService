@@ -16,7 +16,7 @@ public class AdminService {
     private final AdminRepository repository;
     private final ExpertService expertService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, UserNotValidException, DuplicateEntityException {
         Admin admin = user.convert2Admin();
         if(!Validation.isValid(admin)) throw new UserNotValidException("User is not valid!");

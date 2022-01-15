@@ -28,8 +28,9 @@ import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.R
 public class SuggestionService {
     private final SuggestionRepository repository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
+        //TODO make a separate update method
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
         order.suggest(suggestion);
@@ -115,7 +116,7 @@ public class SuggestionService {
                 .map(this::convert2Dto).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public SuggestionAnswerOutDto answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
         Suggestion suggestion = findById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
@@ -142,6 +143,9 @@ public class SuggestionService {
         Suggestion suggestion = findById(id);
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
+                .ownerName(suggestion.getOwner().getFName() + " " + suggestion.getOwner().getLName())
+                .ownerId(suggestion.getOwner().getId())
+                .ownerPoints(suggestion.getOwner().getPoints())
                 .createdDateTime(suggestion.getCreatedTime())
                 .details(suggestion.getDetails())
                 .duration(suggestion.getDuration())

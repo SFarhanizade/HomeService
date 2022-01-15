@@ -27,7 +27,7 @@ public class OrderService {
     private final OrderRepository repository;
     private final SuggestionService suggestionService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void save(Order order) {
         repository.save(order);
     }
@@ -76,7 +76,7 @@ public class OrderService {
         return repository.findAllByCustomerId(ownerId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException {
         Order order = findById(orderId);
         Request request = order.getRequest();
@@ -91,7 +91,7 @@ public class OrderService {
         repository.save(order);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException {
         Suggestion suggestion = suggestionService.findById(id);
         Validation.isValid(suggestion);

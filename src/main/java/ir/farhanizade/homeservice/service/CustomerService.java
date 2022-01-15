@@ -26,7 +26,7 @@ public class CustomerService {
     private final RequestService requestService;
     private final SuggestionService suggestionService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         Customer customer = user.convert2Customer();
         boolean isValid = Validation.isValid(customer);
@@ -118,7 +118,7 @@ public class CustomerService {
         return orderRepository.findByIdAndCustomerId(id, orderId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto request(Long id, RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
         return requestService.save(findById(id), request);
     }
@@ -165,14 +165,14 @@ public class CustomerService {
                 .map(this::convert2Dto).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException {
         exists(id);
         orderRepository.removeOrderByIdAndOwnerId(orderId, id);
         return new EntityOutDto(orderId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         exists(id);
         return orderRepository.acceptSuggestion(suggestion);

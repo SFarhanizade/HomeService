@@ -26,7 +26,7 @@ public class UserService {
     private final CustomerService customerService;
     private final AdminService adminService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
         String currentPassword = user.getCurrentPassword();
         String newPassword = user.getNewPassword();

@@ -14,9 +14,8 @@ public class CommentSevice {
 
     private final CommentRepository repository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void save(Comment comment) {
-        //Customer sender = comment.getSender();
         Order order = comment.getOrder();
         Expert recipient = comment.getRecipient();
         recipient.addPoints(comment.getPoints());

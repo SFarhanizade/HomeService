@@ -38,7 +38,7 @@ public class ExpertService {
     private final SuggestionService suggestionService;
     private final RequestService requestService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
         Expert expert = user.convert2Expert();
         if (!Validation.isValid(expert))
@@ -49,7 +49,7 @@ public class ExpertService {
         return new EntityOutDto(result.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ExpertAddSuggestionOutDto suggest(Long expertId, ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         Expert expert = findById(expertId);
         Order order = orderService.findById(request.getOrderId());
@@ -65,7 +65,7 @@ public class ExpertService {
         return result;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException {
         Expert expert = findById(request.getExpertId());
         if (!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
@@ -177,7 +177,7 @@ public class ExpertService {
                 .map(this::convert2Dto).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public SuggestionAnswerOutDto answerSuggestion(Long ownerId, Long suggestionId, BaseMessageStatus status) throws BadEntryException, EntityNotFoundException {
         return suggestionService.answer(ownerId, suggestionId, status);
     }
@@ -190,7 +190,7 @@ public class ExpertService {
         return new EntityOutDto(expertId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto startToWork(Long expertId, Long suggestionId) throws EntityNotFoundException, BadEntryException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         findById(expertId);
         Suggestion suggestion = suggestionService.findByIdAndOwnerId(suggestionId, expertId);

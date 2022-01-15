@@ -21,7 +21,7 @@ public class SubServiceService {
     private final SubServiceRepository repository;
     private final MainServiceRepository parentRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(ServiceInDto service, Long parentId) throws DuplicateEntityException, EntityNotFoundException {
         SubService entity = service.convert2SubService();
         MainService parent = parentRepository.getById(parentId);

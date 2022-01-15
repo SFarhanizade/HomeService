@@ -18,7 +18,7 @@ import java.util.List;
 public class MainServiceService {
     private final MainServiceRepository repository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(ServiceInDto service) throws DuplicateEntityException {
         MainService entity = service.convert2MainService();
         MainService result = repository.findByName(entity.getName());

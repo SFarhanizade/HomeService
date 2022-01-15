@@ -29,7 +29,7 @@ public class RequestService {
     private final RequestRepository repository;
     private final SubServiceService subService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(Customer owner, RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
         Request entity = convert2Request(owner, request);
         isValid(entity);
