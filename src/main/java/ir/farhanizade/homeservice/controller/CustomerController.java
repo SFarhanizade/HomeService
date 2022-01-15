@@ -126,4 +126,17 @@ public class CustomerController {
         HttpStatus status = HttpStatus.OK;
         return ResponseEntity.status(status).body(response);
     }
+
+    @GetMapping("/{id}/suggestions/{suggestion}/pay")
+    public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        EntityOutDto result = customerService.pay(id,suggestion);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Payed successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
 }
