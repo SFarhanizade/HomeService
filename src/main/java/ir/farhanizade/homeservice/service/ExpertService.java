@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -206,6 +207,7 @@ public class ExpertService {
                 suggestion.getStatus().equals(BUSY)) {
             Order order = suggestion.getOrder();
             order.setStatus(OrderStatus.DONE);
+            order.setFinishDateTime(new Date(System.currentTimeMillis()));
             suggestionService.save(suggestion);
             return new EntityOutDto(suggestionId);
         } else throw new BadEntryException("This order is not yours!");
