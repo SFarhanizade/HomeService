@@ -5,7 +5,6 @@ import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.*;
-import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
@@ -109,6 +108,18 @@ public class ExpertController {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Work started successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.CREATED;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/suggestions/{suggestionId}/done")
+    public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
+        EntityOutDto result = expertService.finishWork(id,suggestionId);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Work finished successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.CREATED;
