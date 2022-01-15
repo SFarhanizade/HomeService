@@ -35,7 +35,7 @@ public class Order extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "order")
     private Request request;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", fetch = FetchType.EAGER)
     private Set<Suggestion> suggestions;
 
     @Builder.Default
