@@ -92,6 +92,7 @@ public class Validation {
     }
 
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
+        if(suggestion.getId()!=null) return true;
         Expert owner = suggestion.getOwner();
         isValid(owner);
         Order order = suggestion.getOrder();
