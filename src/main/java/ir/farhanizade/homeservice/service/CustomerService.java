@@ -4,9 +4,14 @@ import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
+import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.user.Customer;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -25,6 +30,7 @@ public class CustomerService {
     private final OrderService orderRepository;
     private final RequestService requestService;
     private final SuggestionService suggestionService;
+    private final TransactionService transactionService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
@@ -176,5 +182,32 @@ public class CustomerService {
     public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
         exists(id);
         return orderRepository.acceptSuggestion(suggestion);
+    }
+
+    @Transactional
+    public EntityOutDto pay(Long id, Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
+        Customer customer = findById(id);
+        Suggestion suggestion = suggestionService.findById(suggestionId);
+        Expert expert = suggestion.getOwner();
+        BigDecimal price = suggestion.getPrice();
+
+        Order order = suggestion.getOrder();
+        order.setStatus(OrderStatus.PAID);
+
+        Transaction transaction = Transaction.builder()
+                .payer(customer)
+                .recipient(expert)
+                .amount(price)
+                .order(order)
+                .build();
+
+        transactionService.save(transaction);
+
+        Request request = order.getRequest();
+        request.setStatus(BaseMessageStatus.DONE);
+        suggestion.setStatus(BaseMessageStatus.DONE);
+
+        suggestionService.save(suggestion);
+        return new EntityOutDto(null);
     }
 }
