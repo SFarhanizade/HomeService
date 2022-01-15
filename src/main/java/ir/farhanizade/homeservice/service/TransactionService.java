@@ -1,7 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.entity.Transaction;
-import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.NotEnoughMoneyException;
@@ -25,15 +24,15 @@ public class TransactionService {
     public void save(Transaction transaction) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
-        Order order = transaction.getOrder();
         Customer payer = transaction.getPayer();
         Expert recipient = transaction.getRecipient();
         BigDecimal amount = transaction.getAmount();
-        if (payer.getCredit().longValue() < amount.longValue())
+        BigDecimal payerCredit = payer.getCredit();
+        BigDecimal recipientCredit = recipient.getCredit();
+        if (payerCredit.compareTo(amount) == -1)
             throw new NotEnoughMoneyException("");
-        order.setTransaction(transaction);
-        payer.setCredit(payer.getCredit().add(amount.multiply(new BigDecimal(-1))));
-        recipient.setCredit(recipient.getCredit().add(amount));
+        payer.setCredit(payerCredit.subtract(amount));
+        recipient.setCredit(recipientCredit.add(amount));
         repository.save(transaction);
     }
 }
