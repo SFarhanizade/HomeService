@@ -33,7 +33,9 @@ public class SuggestionService {
         //TODO make a separate update method
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
-        order.suggest(suggestion);
+        if (suggestion.getId() == null) {
+            order.suggest(suggestion);
+        }
         Suggestion saved = repository.save(suggestion);
         return ExpertAddSuggestionOutDto.builder()
                 .expertId(suggestion.getOwner().getId())
