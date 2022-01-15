@@ -12,21 +12,20 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-//@EqualsAndHashCode(callSuper = true)
-//@Data
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Table(
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id"})}
+)
 public class Transaction extends BaseEntity {
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Order order;
-
     private BigDecimal amount;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Customer payer;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Expert recipient;
-    private Date dateTime;
 }
