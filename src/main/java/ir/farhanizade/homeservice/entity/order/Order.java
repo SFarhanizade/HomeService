@@ -42,7 +42,7 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
 
-    @OneToOne
+    @OneToOne(mappedBy = "order")
     private Transaction transaction;
 
     @OneToOne
