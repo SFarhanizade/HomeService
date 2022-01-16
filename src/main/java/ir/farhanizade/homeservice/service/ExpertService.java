@@ -39,7 +39,7 @@ public class ExpertService {
     private final SubServiceService serviceManager;
     private final OrderService orderService;
     private final SuggestionService suggestionService;
-    private final RequestService requestService;
+    private final CommentService commentService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -231,5 +231,20 @@ public class ExpertService {
             suggestionService.save(suggestion);
             return new EntityOutDto(suggestionId);
         } else throw new BadEntryException("This order is not yours!");
+    }
+
+    @Transactional(readOnly = true)
+    public boolean exists(Long id){
+        return repository.existsById(id);
+    }
+
+    public CommentOutDto getComment(Long id, Long comment) {
+        exists(id);
+        return commentService.findByIdAndExpertId(id,comment);
+    }
+
+    public CustomPage<OrderOutDto> getOrders(Long id, Pageable pageable) {
+        exists(id);
+        return orderService.findAllByExpertId(id,pageable);
     }
 }
