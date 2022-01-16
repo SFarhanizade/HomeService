@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
+import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
@@ -127,12 +128,24 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/suggestions/{suggestion}/pay")
+    @PostMapping("/{id}/suggestions/{suggestion}/pay")
     public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
         EntityOutDto result = customerService.pay(id, suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
-                .message("Payed successfully.")
+                .message("Paid successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @PostMapping("/{id}/suggestions/{suggestion}/comment")
+    public ResponseEntity<ResponseResult<EntityOutDto>> comment(@PathVariable Long id, @PathVariable Long suggestion, @RequestBody CommentInDto comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        EntityOutDto result = customerService.comment(id, suggestion, comment);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Commented successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;
