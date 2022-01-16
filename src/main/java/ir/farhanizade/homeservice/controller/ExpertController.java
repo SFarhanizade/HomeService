@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
@@ -184,6 +185,30 @@ public class ExpertController {
         ResponseResult<CustomPage<OrderFinishOutDto>> response = ResponseResult.<CustomPage<OrderFinishOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/credit")
+    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit(@PathVariable Long id) throws EntityNotFoundException {
+        UserCreditOutDto result = userService.loadCreditById(id);
+        ResponseResult<UserCreditOutDto> response = ResponseResult.<UserCreditOutDto>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @PostMapping("/{id}/credit")
+    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@PathVariable Long id, @RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException {
+        UserIncreaseCreditOutDto result = userService.increaseCredit(id, request);
+        ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
+                .code(1)
+                .message("Credit increased successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;

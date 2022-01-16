@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
@@ -178,7 +179,7 @@ public class CustomerController {
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CustomPage<CommentOutDto> result = customerService.getComments(id, pageable);
+        CustomPage<CommentOutDto> result = userService.getComments(id, pageable);
         ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -194,6 +195,30 @@ public class CustomerController {
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/credit")
+    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit(@PathVariable Long id) throws EntityNotFoundException {
+        UserCreditOutDto result = userService.loadCreditById(id);
+        ResponseResult<UserCreditOutDto> response = ResponseResult.<UserCreditOutDto>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @PostMapping("/{id}/credit")
+    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@PathVariable Long id, @RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException {
+        UserIncreaseCreditOutDto result = userService.increaseCredit(id, request);
+        ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
+                .code(1)
+                .message("Credit increased successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;
