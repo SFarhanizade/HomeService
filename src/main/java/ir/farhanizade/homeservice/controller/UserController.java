@@ -6,14 +6,14 @@ import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
-import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -46,12 +46,12 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseResult<List<UserSearchOutDto>>> search(@RequestBody UserSearchInDto user) {
-        ResponseResult<List<UserSearchOutDto>> response = ResponseResult.<List<UserSearchOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@RequestBody UserSearchInDto user, Pageable pageable) {
+        ResponseResult<CustomPage<UserSearchOutDto>> response = ResponseResult.<CustomPage<UserSearchOutDto>>builder()
                 .code(1)
                 .message("Done!")
                 .build();
-        List<UserSearchOutDto> result = userService.search(user);
+        CustomPage<UserSearchOutDto> result = userService.search(user, pageable);
 
         response.setData(result);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
