@@ -42,8 +42,8 @@ public class TransactionService {
         repository.save(transaction);
     }
 
-    public CustomPage<TransactionOutDto> findByCustomerId(Long id, Pageable pageable) {
-        Page<Transaction> page = repository.findByCustomerId(id, pageable);
+    public CustomPage<TransactionOutDto> findByUserId(Long id, Pageable pageable) {
+        Page<Transaction> page = repository.findByUserId(id, pageable);
         return convert2Dto(page);
     }
 
