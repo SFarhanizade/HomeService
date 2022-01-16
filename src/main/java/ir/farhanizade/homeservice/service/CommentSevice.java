@@ -6,6 +6,7 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -14,12 +15,10 @@ public class CommentSevice {
 
     private final CommentRepository repository;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void save(Comment comment) {
-        Order order = comment.getOrder();
-        Expert recipient = comment.getRecipient();
+        Expert recipient = comment.getExpert();
         recipient.addPoints(comment.getPoints());
-        order.setComment(comment);
         repository.save(comment);
     }
 }
