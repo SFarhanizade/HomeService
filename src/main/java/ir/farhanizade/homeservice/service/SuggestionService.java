@@ -176,4 +176,10 @@ public class SuggestionService {
         Optional<Suggestion> byIdAndOwnerId = repository.findByIdAndOwnerId(id, ownerId);
         return byIdAndOwnerId.orElseThrow(() -> new EntityNotFoundException("Suggestion Not Found!"));
     }
+
+    public Suggestion findByStatusAndOrderId(SuggestionStatus accepted, Long id) {
+        Optional<Suggestion> optional =repository.findByStatusAndOrderId(accepted,id);
+        Suggestion suggestion = optional.orElseGet(null);
+        return suggestion;
+    }
 }
