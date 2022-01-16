@@ -9,6 +9,7 @@ import java.util.Date;
 @Builder
 @Data
 public class TransactionOutDto {
+    private Long id;
     private Long expertId;
     private String expertName;
     private Long customerId;
