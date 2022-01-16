@@ -10,6 +10,7 @@ import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.ExpertService;
+import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.
 public class ExpertController {
     private final ExpertService expertService;
     private final UserController userController;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>>
@@ -128,4 +130,27 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CustomPage<TransactionOutDto> result = userService.getTransactions(id, pageable);
+        ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/transactions/{transaction}")
+    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        TransactionOutDto result = userService.getTransaction(id, transaction);
+        ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
 }
