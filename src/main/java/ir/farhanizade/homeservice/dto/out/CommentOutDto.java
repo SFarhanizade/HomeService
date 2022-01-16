@@ -13,6 +13,8 @@ public class CommentOutDto {
     private String customerName;
     private Long expertId;
     private String expertName;
+    private Integer points;
+    private String description;
     private Long orderId;
     private Date dateTime;
 }
