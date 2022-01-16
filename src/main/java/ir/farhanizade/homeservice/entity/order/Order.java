@@ -45,7 +45,7 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
 
-    @OneToOne
+    @OneToOne(mappedBy = "order")
     private Comment comment;
 
     public void suggest(Suggestion suggestion) throws DuplicateEntityException {
