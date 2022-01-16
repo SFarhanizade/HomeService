@@ -144,4 +144,9 @@ public class OrderService {
                 .suggestedDateTime(o.getRequest().getSuggestedDateTime())
                 .build();
     }
+
+    public CustomPage<OrderOutDto> findAllByExpertId(Long id, Pageable pageable) {
+        Page<Order> page = repository.findAllByExpertId(id, pageable);
+        return convert2Dto(page);
+    }
 }
