@@ -29,8 +29,8 @@ public class CommentService {
         return new EntityOutDto(saved.getId());
     }
 
-    public CustomPage<CommentOutDto> findAllByCustomerId(Long id, Pageable pageable) {
-        Page<Comment> page = repository.findAllByCustomerId(id, pageable);
+    public CustomPage<CommentOutDto> findAllByUserId(Long id, Pageable pageable) {
+        Page<Comment> page = repository.findAllByUserId(id, pageable);
         return convert2Dto(page);
     }
 
@@ -38,6 +38,12 @@ public class CommentService {
         Comment comment = repository.findByIdAndCustomerId(id, customerId);
         CommentOutDto result = convert2Dto(comment);
         result.setDescription(comment.getDescription());
+        return result;
+    }
+
+    public CommentOutDto findByIdAndExpertId(Long id, Long expertId) {
+        Comment comment = repository.findByIdAndCustomerId(id, expertId);
+        CommentOutDto result = convert2Dto(comment);
         return result;
     }
 
