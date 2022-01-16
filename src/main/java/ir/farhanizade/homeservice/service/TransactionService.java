@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.exception.NotEnoughMoneyException;
 import ir.farhanizade.homeservice.repository.TransactionRepository;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +71,11 @@ public class TransactionService {
                 .amount(transaction.getAmount())
                 .dateTime(transaction.getCreatedTime())
                 .build();
+    }
+
+    public TransactionOutDto findById(Long transaction) throws EntityNotFoundException {
+        Optional<Transaction> byId = repository.findById(transaction);
+        Transaction result = byId.orElseThrow(() -> new EntityNotFoundException("Transaction Not Found!"));
+        return convert2Dto(result);
     }
 }
