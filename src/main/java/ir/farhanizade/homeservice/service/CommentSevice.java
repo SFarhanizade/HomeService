@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Expert;
@@ -16,9 +17,10 @@ public class CommentSevice {
     private final CommentRepository repository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void save(Comment comment) {
+    public EntityOutDto save(Comment comment) {
         Expert recipient = comment.getExpert();
         recipient.addPoints(comment.getPoints());
-        repository.save(comment);
+        Comment saved = repository.save(comment);
+        return new EntityOutDto(saved.getId());
     }
 }
