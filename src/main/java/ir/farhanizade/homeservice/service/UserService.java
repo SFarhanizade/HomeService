@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
@@ -27,6 +28,7 @@ public class UserService {
     private final ExpertService expertService;
     private final CustomerService customerService;
     private final AdminService adminService;
+    private final TransactionService transactionService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
@@ -77,6 +79,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public CustomPage<TransactionOutDto> getTransactions(Long id, Pageable pageable) throws EntityNotFoundException {
+        exists(id);
+        return transactionService.findByUserId(id, pageable);
+    }
+
+    @Transactional(readOnly = true)
     CustomPage<UserSearchOutDto> searchUser(UserSearchInDto user, Pageable pageable) {
         CustomPage<User> searchResult = repository.search(user,pageable);
         return convert2Dto(searchResult);
@@ -92,5 +100,9 @@ public class UserService {
                 .pageNumber(list.getPageNumber())
                 .data(data)
                 .build();
+    }
+
+    public boolean exists(Long id){
+        return repository.existsById(id);
     }
 }

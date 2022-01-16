@@ -233,11 +233,7 @@ public class CustomerService {
         return new EntityOutDto(null);
     }
 
-    @Transactional(readOnly = true)
-    public CustomPage<TransactionOutDto> getTransactions(Long id, Pageable pageable) throws EntityNotFoundException {
-        exists(id);
-        return transactionService.findByCustomerId(id, pageable);
-    }
+
 
     @Transactional
     public EntityOutDto comment(Long id, Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException {
