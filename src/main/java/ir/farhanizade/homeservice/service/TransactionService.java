@@ -1,5 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
@@ -8,11 +10,14 @@ import ir.farhanizade.homeservice.repository.TransactionRepository;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.repository.user.ExpertRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +40,34 @@ public class TransactionService {
         payer.setCredit(payerCredit.subtract(amount));
         recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
         repository.save(transaction);
+    }
+
+    public CustomPage<TransactionOutDto> findByCustomerId(Long id, Pageable pageable) {
+        Page<Transaction> page = repository.findByCustomerId(id, pageable);
+        return convert2Dto(page);
+    }
+
+    private CustomPage<TransactionOutDto> convert2Dto(Page<Transaction> page) {
+        List<TransactionOutDto> data = page.getContent().stream()
+                .map(this::convert2Dto).toList();
+        return CustomPage.<TransactionOutDto>builder()
+                .data(data)
+                .pageNumber(page.getNumber())
+                .lastPage(page.getTotalPages())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build();
+    }
+
+    private TransactionOutDto convert2Dto(Transaction transaction) {
+        return TransactionOutDto.builder()
+                .id(transaction.getId())
+                .customerId(transaction.getPayer().getId())
+                .customerName(transaction.getPayer().getFName() + " " + transaction.getPayer().getLName())
+                .expertId(transaction.getRecipient().getId())
+                .expertName(transaction.getRecipient().getFName() + " " + transaction.getRecipient().getLName())
+                .amount(transaction.getAmount())
+                .dateTime(transaction.getCreatedTime())
+                .build();
     }
 }
