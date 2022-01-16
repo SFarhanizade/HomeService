@@ -1,14 +1,20 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.CommentOutDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +28,30 @@ public class CommentSevice {
         recipient.addPoints(comment.getPoints());
         Comment saved = repository.save(comment);
         return new EntityOutDto(saved.getId());
+    }
+
+    public CustomPage<CommentOutDto> findAllByCustomerId(Long id, Pageable pageable) {
+        Page<Comment> page = repository.findAllByCustomerId(id, pageable);
+        return convert2Dto(page);
+    }
+
+    private CustomPage<CommentOutDto> convert2Dto(Page<Comment> page) {
+        List<CommentOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
+        CustomPage<CommentOutDto> result = CustomPage.<CommentOutDto>builder().data(data).build();
+        return result.convert(page);
+    }
+
+    private CommentOutDto convert2Dto(Comment comment) {
+        return CommentOutDto.builder()
+                .id(comment.getId())
+                .customerId(comment.getCustomer().getId())
+                .customerName(comment.getCustomer().getFName() + " " + comment.getCustomer().getLName())
+                .expertId(comment.getExpert().getId())
+                .expertName(comment.getExpert().getFName() + " " + comment.getExpert().getLName())
+                .points(comment.getPoints())
+                .description(comment.getDescription())
+                .orderId(comment.getOrder().getId())
+                .dateTime(comment.getCreatedTime())
+                .build();
     }
 }
