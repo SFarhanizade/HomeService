@@ -105,4 +105,9 @@ public class UserService {
     public boolean exists(Long id){
         return repository.existsById(id);
     }
+
+    public TransactionOutDto getTransaction(Long id, Long transaction) throws EntityNotFoundException {
+        exists(id);
+        return transactionService.findById(transaction);
+    }
 }
