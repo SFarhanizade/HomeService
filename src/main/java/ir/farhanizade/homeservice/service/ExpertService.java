@@ -9,6 +9,7 @@ import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -152,13 +153,21 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSearchOutDto> search(UserSearchInDto user) {
-        List<Expert> searchResult = repository.search(user);
-        List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e))
-                .peek(e -> e.setType("expert"))
-                .toList();
-        return result;
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
+        CustomPage<Expert> searchResult = repository.search(user,pageable);
+        return convert2Dto(searchResult);
+    }
+
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<Expert> list) {
+        List<UserSearchOutDto> data = list.getData().stream()
+                .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
+        return CustomPage.<UserSearchOutDto>builder()
+                .pageSize(list.getPageSize())
+                .totalElements(list.getTotalElements())
+                .lastPage(list.getLastPage())
+                .pageNumber(list.getPageNumber())
+                .data(data)
+                .build();
     }
 
     public CustomPage<ExpertSuggestionOutDto> getSuggestions(Long id, Pageable pageable, SuggestionStatus... status) throws EntityNotFoundException {

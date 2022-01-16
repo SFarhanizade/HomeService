@@ -88,13 +88,21 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSearchOutDto> search(UserSearchInDto user) {
-        List<Customer> searchResult = repository.search(user);
-        List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e))
-                .peek(e -> e.setType("customer"))
-                .toList();
-        return result;
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
+        CustomPage<Customer> search = repository.search(user, pageable);
+        return convert2Dto(search);
+    }
+
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<Customer> list) {
+        List<UserSearchOutDto> data = list.getData().stream()
+                .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
+        return CustomPage.<UserSearchOutDto>builder()
+                .pageSize(list.getPageSize())
+                .totalElements(list.getTotalElements())
+                .lastPage(list.getLastPage())
+                .pageNumber(list.getPageNumber())
+                .data(data)
+                .build();
     }
 
     @Transactional(readOnly = true)

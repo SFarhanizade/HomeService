@@ -6,6 +6,7 @@ import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
@@ -13,6 +14,7 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -62,25 +64,33 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSearchOutDto> search(UserSearchInDto user) {
-        List<UserSearchOutDto> result;
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
+        CustomPage<UserSearchOutDto> result;
         if ("expert".equals(user.getType())) {
-            result = expertService.search(user);
+            result = expertService.search(user, pageable);
         } else if ("customer".equals(user.getType())) {
-            result = customerService.search(user);
+            result = customerService.search(user, pageable);
         } else {
-            result = searchUser(user);
+            result = searchUser(user, pageable);
         }
         return result;
     }
 
     @Transactional(readOnly = true)
-    List<UserSearchOutDto> searchUser(UserSearchInDto user) {
-        List<User> searchResult = repository.search(user);
-        List<UserSearchOutDto> result = searchResult.stream()
-                .map(e -> new UserSearchOutDto().convert2Dto(e))
-                .peek(e -> e.setType("user"))
-                .toList();
-        return result;
+    CustomPage<UserSearchOutDto> searchUser(UserSearchInDto user, Pageable pageable) {
+        CustomPage<User> searchResult = repository.search(user,pageable);
+        return convert2Dto(searchResult);
+    }
+
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<User> list){
+        List<UserSearchOutDto> data = list.getData().stream()
+                .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
+        return CustomPage.<UserSearchOutDto>builder()
+                .pageSize(list.getPageSize())
+                .totalElements(list.getTotalElements())
+                .lastPage(list.getLastPage())
+                .pageNumber(list.getPageNumber())
+                .data(data)
+                .build();
     }
 }
