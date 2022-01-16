@@ -187,4 +187,17 @@ public class CustomerController {
         HttpStatus status = HttpStatus.OK;
         return ResponseEntity.status(status).body(response);
     }
+
+    @GetMapping("/{id}/comments/{comment}")
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id,@PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CommentOutDto result = customerService.getComment(id,comment);
+        ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
 }
