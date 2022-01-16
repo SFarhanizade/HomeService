@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +61,7 @@ public class UserService {
 
         } else if (type == Customer.class) {
             result = customerService.save(user);
-        } else{
+        } else {
             result = adminService.save(user);
         }
         return result;
@@ -85,11 +88,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     CustomPage<UserSearchOutDto> searchUser(UserSearchInDto user, Pageable pageable) {
-        CustomPage<User> searchResult = repository.search(user,pageable);
+        CustomPage<User> searchResult = repository.search(user, pageable);
         return convert2Dto(searchResult);
     }
 
-    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<User> list){
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<User> list) {
         List<UserSearchOutDto> data = list.getData().stream()
                 .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
         return CustomPage.<UserSearchOutDto>builder()
@@ -101,7 +104,7 @@ public class UserService {
                 .build();
     }
 
-    public boolean exists(Long id){
+    public boolean exists(Long id) {
         return repository.existsById(id);
     }
 
@@ -118,8 +121,24 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserCreditOutDto loadCreditById(Long id) throws EntityNotFoundException {
+        User user = findById(id);
+        return new UserCreditOutDto(user.getId(), user.getCredit());
+    }
+
+    @Transactional
+    public UserIncreaseCreditOutDto increaseCredit(Long id, UserIncreaseCreditInDto request) throws EntityNotFoundException {
+        User user = findById(id);
+        user.setCredit(user.getCredit().add(new BigDecimal(request.getAmount())));
+        User saved = repository.save(user);
+        return UserIncreaseCreditOutDto.builder()
+                .id(saved.getId())
+                .amount(request.getAmount())
+                .balance(saved.getCredit())
+                .build();
+    }
+
+    public User findById(Long id) throws EntityNotFoundException {
         Optional<User> byId = repository.findById(id);
-        User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
-        return new UserCreditOutDto(user.getId(),user.getCredit());
+        return byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 }
