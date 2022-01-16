@@ -4,7 +4,6 @@ import ir.farhanizade.homeservice.dto.out.CommentOutDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Comment;
-import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CommentSevice {
+public class CommentService {
 
     private final CommentRepository repository;
 
@@ -35,6 +34,13 @@ public class CommentSevice {
         return convert2Dto(page);
     }
 
+    public CommentOutDto findByIdAndCustomerId(Long id, Long customerId) {
+        Comment comment = repository.findByIdAndCustomerId(id, customerId);
+        CommentOutDto result = convert2Dto(comment);
+        result.setDescription(comment.getDescription());
+        return result;
+    }
+
     private CustomPage<CommentOutDto> convert2Dto(Page<Comment> page) {
         List<CommentOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
         CustomPage<CommentOutDto> result = CustomPage.<CommentOutDto>builder().data(data).build();
@@ -49,7 +55,6 @@ public class CommentSevice {
                 .expertId(comment.getExpert().getId())
                 .expertName(comment.getExpert().getFName() + " " + comment.getExpert().getLName())
                 .points(comment.getPoints())
-                .description(comment.getDescription())
                 .orderId(comment.getOrder().getId())
                 .dateTime(comment.getCreatedTime())
                 .build();
