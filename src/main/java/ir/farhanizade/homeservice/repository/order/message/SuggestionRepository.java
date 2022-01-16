@@ -1,9 +1,10 @@
 package ir.farhanizade.homeservice.repository.order.message;
 
-import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.repository.BaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,13 +14,13 @@ import java.util.Optional;
 public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
     @Query("From Suggestion s where s.order.id=:orderId")
-    List<Suggestion> findAllByOrderId(Long orderId);
+    Page<Suggestion> findAllByOrderId(Long orderId, Pageable pageable);
 
     @Query("From Suggestion s where s.owner.id=:ownerId")
-    List<Suggestion> findAllByOwnerId(Long ownerId);
+    Page<Suggestion> findAllByOwnerId(Long ownerId, Pageable pageable);
 
     @Query("From Suggestion s where s.order.request.owner.id=:customerId")
-    List<Suggestion> findAllByCustomerId(Long customerId);
+    Page<Suggestion> findAllByCustomerId(Long customerId, Pageable pageable);
 
     @Modifying
     @Query("Update Suggestion s set s.suggestionStatus=:accepted where s.id=:suggestionId and s.order.id=:orderId")
@@ -30,7 +31,7 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     void rejectOtherSuggestions(Long suggestionId, Long orderId, SuggestionStatus rejected);
 
     @Query("From Suggestion s where s.owner.id=:ownerId and s.suggestionStatus in :status")
-    List<Suggestion> findAllByOwnerIdAndStatus(Long ownerId,SuggestionStatus[] status);
+    Page<Suggestion> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status, Pageable pageable);
 
     @Query("From Suggestion s where s.id=:id and s.owner.id=:ownerId")
     Optional<Suggestion> findByIdAndOwnerId(Long id, Long ownerId);
