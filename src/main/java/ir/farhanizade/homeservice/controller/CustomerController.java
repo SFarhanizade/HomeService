@@ -7,6 +7,7 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
+import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
@@ -132,6 +133,18 @@ public class CustomerController {
     public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
         EntityOutDto result = customerService.pay(id, suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("Paid successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CustomPage<TransactionOutDto> result = customerService.getTransactions(id, pageable);
+        ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
                 .code(1)
                 .message("Paid successfully.")
                 .data(result)
