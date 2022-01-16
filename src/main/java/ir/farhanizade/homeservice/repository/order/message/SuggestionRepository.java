@@ -22,14 +22,6 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
     @Query("From Suggestion s where s.order.request.owner.id=:customerId")
     Page<Suggestion> findAllByCustomerId(Long customerId, Pageable pageable);
 
-    @Modifying
-    @Query("Update Suggestion s set s.suggestionStatus=:accepted where s.id=:suggestionId and s.order.id=:orderId")
-    void acceptSuggestion(Long suggestionId, Long orderId, SuggestionStatus accepted);
-
-    @Modifying
-    @Query("Update Suggestion s set s.suggestionStatus=:rejected where Not s.id=:suggestionId and s.order.id=:orderId")
-    void rejectOtherSuggestions(Long suggestionId, Long orderId, SuggestionStatus rejected);
-
     @Query("From Suggestion s where s.owner.id=:ownerId and s.suggestionStatus in :status")
     Page<Suggestion> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status, Pageable pageable);
 

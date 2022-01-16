@@ -30,14 +30,6 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
     @Query("From Order o where o.request.owner.id=:ownerId")
     Page<Order> findAllByCustomerId(Long ownerId,Pageable pageable);
 
-    @Modifying
-    @Query("Update Request r set r.status=:cancelled where r.owner.id=:owner_id and r.order.id=:order_id")
-    void removeOrderByIdAndOwnerId(Long order_id, Long owner_id, BaseMessageStatus cancelled);
-
-    @Modifying
-    @Query("Update Order o set o.status=:status where o.id=:id")
-    void changeStatus(Long id, OrderStatus status);
-
     @Query("From Order o  inner join o.suggestions s where s.owner.id=:id")
     Page<Order> findAllByExpertId(Long id, Pageable pageable);
 }

@@ -23,8 +23,4 @@ public interface ExpertRepository extends BaseRepository<Expert>, CustomExpertRe
 
     @Query("From Expert e inner join e.expertises s where e.id=:service")
     Page<Expert> findByExpertise(Long service, Pageable pageable);
-
-    @Modifying
-    @Query("Update Expert e set e.status=:accepted where e.id=:id")
-    void acceptExpert(Long id, UserStatus accepted);
 }
