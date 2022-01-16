@@ -5,11 +5,13 @@ import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.ExpertService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,20 +62,20 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/suggestions/{status}")
-    public ResponseEntity<ResponseResult<List<ExpertSuggestionOutDto>>>
-    getSuggestions(@PathVariable Long id, @PathVariable String status)
+    public ResponseEntity<ResponseResult<CustomPage<ExpertSuggestionOutDto>>>
+    getSuggestions(@PathVariable Long id, @PathVariable String status, Pageable pageable)
             throws EntityNotFoundException, BadEntryException {
-        List<ExpertSuggestionOutDto> result;
+        CustomPage<ExpertSuggestionOutDto> result;
         switch (status) {
-            case "accepted" -> result = expertService.getSuggestions(id, SuggestionStatus.ACCEPTED);
-            case "pending" -> result = expertService.getSuggestions(id, SuggestionStatus.PENDING);
-            case "rejected" -> result = expertService.getSuggestions(id, SuggestionStatus.REJECTED);
-            case "all" -> result = expertService.getSuggestions(id, SuggestionStatus.ACCEPTED,
+            case "accepted" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.ACCEPTED);
+            case "pending" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.PENDING);
+            case "rejected" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.REJECTED);
+            case "all" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.ACCEPTED,
                     SuggestionStatus.PENDING, SuggestionStatus.REJECTED);
             default -> throw new BadEntryException("Status is Wrong!");
         }
-        ResponseResult<List<ExpertSuggestionOutDto>> response =
-                ResponseResult.<List<ExpertSuggestionOutDto>>builder()
+        ResponseResult<CustomPage<ExpertSuggestionOutDto>> response =
+                ResponseResult.<CustomPage<ExpertSuggestionOutDto>>builder()
                         .code(1)
                         .message("Suggestions loaded successfully.")
                         .data(result)
@@ -104,7 +106,7 @@ public class ExpertController {
 
     @GetMapping("/{id}/suggestions/{suggestionId}/start")
     public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
-        EntityOutDto result = expertService.startToWork(id,suggestionId);
+        EntityOutDto result = expertService.startToWork(id, suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Work started successfully.")
@@ -116,7 +118,7 @@ public class ExpertController {
 
     @GetMapping("/{id}/suggestions/{suggestionId}/done")
     public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
-        EntityOutDto result = expertService.finishWork(id,suggestionId);
+        EntityOutDto result = expertService.finishWork(id, suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Work finished successfully.")

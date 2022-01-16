@@ -6,16 +6,16 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.RequestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
@@ -32,9 +32,9 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<List<OrderOutDto>>> showOrders(@PathVariable Long id) throws EntityNotFoundException {
-        List<OrderOutDto> result = customerService.getOrders(id);
-        ResponseResult<List<OrderOutDto>> response = ResponseResult.<List<OrderOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        CustomPage<OrderOutDto> result = customerService.getOrders(id, pageable);
+        ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
                 .data(result)
@@ -80,9 +80,9 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/orders/{order}/suggestions")
-    public ResponseEntity<ResponseResult<List<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
-        List<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order);
-        ResponseResult<List<SuggestionOutDto>> response = ResponseResult.<List<SuggestionOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
+        CustomPage<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order);
+        ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
                 .data(result)
@@ -92,9 +92,9 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/suggestions")
-    public ResponseEntity<ResponseResult<List<SuggestionOutDto>>> showAllSuggestions(@PathVariable Long id) throws EntityNotFoundException {
-        List<SuggestionOutDto> result = customerService.getSuggestions(id);
-        ResponseResult<List<SuggestionOutDto>> response = ResponseResult.<List<SuggestionOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showAllSuggestions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        CustomPage<SuggestionOutDto> result = customerService.getSuggestions(id, pageable);
+        ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
                 .data(result)
@@ -105,7 +105,7 @@ public class CustomerController {
 
     @GetMapping("/{id}/suggestions/{suggestion}")
     public ResponseEntity<ResponseResult<SuggestionOutDto>> showSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException {
-        SuggestionOutDto result = customerService.getSuggestion(id,suggestion);
+        SuggestionOutDto result = customerService.getSuggestion(id, suggestion);
         ResponseResult<SuggestionOutDto> response = ResponseResult.<SuggestionOutDto>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -117,7 +117,7 @@ public class CustomerController {
 
     @GetMapping("/{id}/suggestions/{suggestion}/accept")
     public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
-        EntityOutDto result = customerService.acceptSuggestion(id,suggestion);
+        EntityOutDto result = customerService.acceptSuggestion(id, suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -129,7 +129,7 @@ public class CustomerController {
 
     @GetMapping("/{id}/suggestions/{suggestion}/pay")
     public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        EntityOutDto result = customerService.pay(id,suggestion);
+        EntityOutDto result = customerService.pay(id, suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Payed successfully.")
