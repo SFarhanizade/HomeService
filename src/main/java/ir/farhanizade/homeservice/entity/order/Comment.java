@@ -22,10 +22,10 @@ public class Comment extends BaseEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Customer sender;
+    private Customer customer;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Expert recipient;
+    private Expert expert;
 
     @OneToOne
     private Order order;
