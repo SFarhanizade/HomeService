@@ -4,10 +4,7 @@ import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOutDto;
-import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
-import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.exception.*;
@@ -148,7 +145,7 @@ public class CustomerController {
         CustomPage<TransactionOutDto> result = userService.getTransactions(id, pageable);
         ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
                 .code(1)
-                .message("Paid successfully.")
+                .message("Loaded successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;
@@ -156,11 +153,11 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/transactions/{transaction}")
-    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
         TransactionOutDto result = userService.getTransaction(id, transaction);
         ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
                 .code(1)
-                .message("Paid successfully.")
+                .message("Loaded successfully.")
                 .data(result)
                 .build();
         HttpStatus status = HttpStatus.OK;
@@ -179,4 +176,15 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CustomPage<CommentOutDto> result = customerService.getComments(id, pageable);
+        ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
 }
