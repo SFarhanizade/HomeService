@@ -4,6 +4,7 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
+import ir.farhanizade.homeservice.dto.out.CommentOutDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
@@ -29,6 +30,7 @@ public class UserService {
     private final CustomerService customerService;
     private final AdminService adminService;
     private final TransactionService transactionService;
+    private final CommentService commentService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
@@ -109,5 +111,11 @@ public class UserService {
     public TransactionOutDto getTransaction(Long id, Long transaction) throws EntityNotFoundException {
         exists(id);
         return transactionService.findById(transaction);
+    }
+
+    @Transactional(readOnly = true)
+    public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
+        exists(id);
+        return commentService.findAllByUserId(id, pageable);
     }
 }

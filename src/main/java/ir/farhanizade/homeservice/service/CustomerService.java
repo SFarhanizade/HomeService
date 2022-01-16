@@ -251,12 +251,6 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
-        exists(id);
-        return commentService.findAllByCustomerId(id, pageable);
-    }
-
-    @Transactional(readOnly = true)
     public CommentOutDto getComment(Long id, Long commentId) throws EntityNotFoundException {
         exists(id);
         return commentService.findByIdAndCustomerId(id, commentId);
