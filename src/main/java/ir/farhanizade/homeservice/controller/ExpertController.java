@@ -153,4 +153,40 @@ public class ExpertController {
         HttpStatus status = HttpStatus.OK;
         return ResponseEntity.status(status).body(response);
     }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CustomPage<CommentOutDto> result = userService.getComments(id, pageable);
+        ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/comments/{comment}")
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id,@PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CommentOutDto result = expertService.getComment(id,comment);
+        ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
+                .code(1)
+                .message("Loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        CustomPage<OrderOutDto> result = expertService.getOrders(id, pageable);
+        ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
+                .code(1)
+                .message("List of orders loaded successfully.")
+                .data(result)
+                .build();
+        HttpStatus status = HttpStatus.OK;
+        return ResponseEntity.status(status).body(response);
+    }
 }
