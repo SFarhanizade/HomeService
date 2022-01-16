@@ -4,10 +4,7 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.dto.out.CommentOutDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
-import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
@@ -117,5 +114,12 @@ public class UserService {
     public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
         exists(id);
         return commentService.findAllByUserId(id, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public UserCreditOutDto loadCreditById(Long id) throws EntityNotFoundException {
+        Optional<User> byId = repository.findById(id);
+        User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        return new UserCreditOutDto(user.getId(),user.getCredit());
     }
 }
