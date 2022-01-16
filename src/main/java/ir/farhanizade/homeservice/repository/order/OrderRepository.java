@@ -37,4 +37,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
     @Modifying
     @Query("Update Order o set o.status=:status where o.id=:id")
     void changeStatus(Long id, OrderStatus status);
+
+    @Query("From Order o  inner join o.suggestions s where s.owner.id=:id")
+    Page<Order> findAllByExpertId(Long id, Pageable pageable);
 }
