@@ -1,11 +1,13 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderFinishOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
@@ -15,9 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.*;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
@@ -145,8 +150,33 @@ public class OrderService {
                 .build();
     }
 
-    public CustomPage<OrderOutDto> findAllByExpertId(Long id, Pageable pageable) {
+    public CustomPage<OrderFinishOutDto> findAllByExpertId(Long id, Pageable pageable) {
         Page<Order> page = repository.findAllByExpertId(id, pageable);
-        return convert2Dto(page);
+        return convert2OutDto(page);
+    }
+
+    private CustomPage<OrderFinishOutDto> convert2OutDto(Page<Order> page) {
+        List<OrderFinishOutDto> data = page.getContent().stream().map(o -> convert2OutDto(o)).toList();
+        CustomPage<OrderFinishOutDto> result = CustomPage.<OrderFinishOutDto>builder()
+                .data(data)
+                .build();
+        return result.convert(page);
+    }
+
+    private OrderFinishOutDto convert2OutDto(Order o) {
+
+        Suggestion suggestion = suggestionService.findByStatusAndOrderId(ACCEPTED, o.getId());
+        Date startDateTime = null;
+        if (suggestion != null) {
+            startDateTime = suggestion.getSuggestedDateTime();
+        }
+        return OrderFinishOutDto.builder()
+                .id(o.getId())
+                .status(o.getStatus())
+                .service(o.getService().getName())
+                .price(o.getRequest().getPrice())
+                .startDateTime(startDateTime)
+                .finishDateTime(o.getFinishDateTime())
+                .build();
     }
 }
