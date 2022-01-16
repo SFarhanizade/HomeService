@@ -131,7 +131,7 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/transactions")
-    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
         CustomPage<TransactionOutDto> result = userService.getTransactions(id, pageable);
         ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
                 .code(1)
@@ -143,7 +143,7 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/transactions/{transaction}")
-    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException {
         TransactionOutDto result = userService.getTransaction(id, transaction);
         ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
                 .code(1)
@@ -155,7 +155,7 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
         CustomPage<CommentOutDto> result = userService.getComments(id, pageable);
         ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
                 .code(1)
@@ -167,8 +167,8 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/comments/{comment}")
-    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id,@PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CommentOutDto result = expertService.getComment(id,comment);
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id, @PathVariable Long comment) {
+        CommentOutDto result = expertService.getComment(id, comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -179,9 +179,9 @@ public class ExpertController {
     }
 
     @GetMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<OrderOutDto> result = expertService.getOrders(id, pageable);
-        ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<OrderFinishOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) {
+        CustomPage<OrderFinishOutDto> result = expertService.getOrders(id, pageable);
+        ResponseResult<CustomPage<OrderFinishOutDto>> response = ResponseResult.<CustomPage<OrderFinishOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
                 .data(result)
