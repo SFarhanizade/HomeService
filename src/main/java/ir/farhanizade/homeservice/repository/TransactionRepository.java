@@ -6,6 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TransactionRepository extends BaseRepository<Transaction>{
-    @Query("From Transaction t where t.payer.id=:id")
-    Page<Transaction> findByCustomerId(Long id, Pageable pageable);
+    @Query("From Transaction t where t.payer.id=:id or t.recipient.id=:id")
+    Page<Transaction> findByUserId(Long id, Pageable pageable);
 }
