@@ -37,7 +37,7 @@ public class CustomerService {
     private final RequestService requestService;
     private final SuggestionService suggestionService;
     private final TransactionService transactionService;
-    private final CommentSevice commentService;
+    private final CommentService commentService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
@@ -250,8 +250,15 @@ public class CustomerService {
         return commentService.save(comment);
     }
 
+    @Transactional(readOnly = true)
     public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
         exists(id);
         return commentService.findAllByCustomerId(id, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public CommentOutDto getComment(Long id, Long commentId) throws EntityNotFoundException {
+        exists(id);
+        return commentService.findByIdAndCustomerId(id, commentId);
     }
 }
