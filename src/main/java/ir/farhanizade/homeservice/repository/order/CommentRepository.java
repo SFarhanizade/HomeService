@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CommentRepository extends BaseRepository<Comment> {
 
-    @Query("From Comment c where c.customer.id=:id")
-    Page<Comment> findAllByCustomerId(Long id, Pageable pageable);
+    @Query("From Comment c where c.customer.id=:id or c.expert.id=:id")
+    Page<Comment> findAllByUserId(Long id, Pageable pageable);
 
     @Query("From Comment c where c.id=:id and c.customer.id=:customerId")
     Comment findByIdAndCustomerId(Long id, Long customerId);
