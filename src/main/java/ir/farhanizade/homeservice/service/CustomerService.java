@@ -234,7 +234,6 @@ public class CustomerService {
     }
 
 
-
     @Transactional
     public EntityOutDto comment(Long id, Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException {
         Customer customer = findById(id);
@@ -249,5 +248,10 @@ public class CustomerService {
                 .description(commentDto.getDescription())
                 .build();
         return commentService.save(comment);
+    }
+
+    public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
+        exists(id);
+        return commentService.findAllByCustomerId(id, pageable);
     }
 }
