@@ -1,11 +1,13 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
+import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
@@ -35,6 +37,7 @@ public class CustomerService {
     private final RequestService requestService;
     private final SuggestionService suggestionService;
     private final TransactionService transactionService;
+    private final CommentSevice commentService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
@@ -228,5 +231,21 @@ public class CustomerService {
 
         suggestionService.save(suggestion);
         return new EntityOutDto(null);
+    }
+
+    @Transactional
+    public EntityOutDto comment(Long id, Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException {
+        Customer customer = findById(id);
+        Suggestion suggestion = suggestionService.findById(suggestionId);
+        Expert expert = suggestion.getOwner();
+        Order order = suggestion.getOrder();
+        Comment comment = Comment.builder()
+                .customer(customer)
+                .expert(expert)
+                .order(order)
+                .points(commentDto.getPoints())
+                .description(commentDto.getDescription())
+                .build();
+        return commentService.save(comment);
     }
 }
