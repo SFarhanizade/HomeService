@@ -12,4 +12,5 @@ public class CustomPage<T> {
     private List<T> data;
     private Integer lastPage;
     private Integer pageSize;
+    private Long totalElements;
 }
