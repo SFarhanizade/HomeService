@@ -243,7 +243,7 @@ public class ExpertService {
         return commentService.findByIdAndExpertId(id,comment);
     }
 
-    public CustomPage<OrderOutDto> getOrders(Long id, Pageable pageable) {
+    public CustomPage<OrderFinishOutDto> getOrders(Long id, Pageable pageable) {
         exists(id);
         return orderService.findAllByExpertId(id,pageable);
     }
