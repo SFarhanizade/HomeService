@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
@@ -14,6 +15,8 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.ExpertRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 
@@ -83,22 +87,23 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderOutDto> loadAvailableOrders(ExpertInDto expert) throws EntityNotFoundException {
+    public CustomPage<OrderOutDto> loadAvailableOrders(ExpertInDto expert, Pageable pageable) throws EntityNotFoundException {
         Expert entity = findById(expert.getId());
         Set<SubService> expertises = entity.getExpertises();
         if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
-        List<Order> availableOrders = orderService.loadByExpertises(expertises);
-        List<OrderOutDto> resultList = availableOrders.stream()
-                .map(o ->
-                        OrderOutDto.builder()
-                                .id(o.getId())
-                                .service(o.getService().getName())
-                                .price(o.getRequest().getPrice())
-                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
-                                .createdDateTime(o.getRequest().getDateTime())
-                                .status(o.getStatus())
-                                .build()).toList();
-        return resultList;
+//        Pageable pageable = Pageable.unpaged();
+//        return orderService.findByExpertise(expertises,page);
+        return orderService.loadByExpertises(expertises, pageable);
+//        List<OrderOutDto> resultList = availableOrders.stream()
+//                .map(o ->
+//                        OrderOutDto.builder()
+//                                .id(o.getId())
+//                                .service(o.getService().getName())
+//                                .price(o.getRequest().getPrice())
+//                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+//                                .createdDateTime(o.getRequest().getDateTime())
+//                                .status(o.getStatus())
+//                                .build()).toList();
     }
 
     @Transactional(readOnly = true)
@@ -119,24 +124,24 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
-        List<Expert> byCredit = repository.findByCredit(credit);
-        if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(byCredit);
+    public CustomPage<UserOutDto> findByCredit(BigDecimal credit, Pageable pageable) throws EntityNotFoundException {
+        Page<Expert> page = repository.findByCredit(credit, pageable);
+        //if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
-        List<Expert> byStatus = repository.findByStatus(status);
-        if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(byStatus);
+    public CustomPage<UserOutDto> findByStatus(UserStatus status, Pageable pageable) throws EntityNotFoundException {
+        Page<Expert> page = repository.findByStatus(status, pageable);
+        //if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findByExpertise(SubService service) throws EntityNotFoundException {
-        List<Expert> byExpertise = repository.findByExpertise(service.getId());
-        if (byExpertise.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(byExpertise);
+    public CustomPage<UserOutDto> findByExpertise(SubService service, Pageable pageable) throws EntityNotFoundException {
+        Page<Expert> page = repository.findByExpertise(service.getId(), pageable);
+        //if (byExpertise.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
@@ -156,9 +161,9 @@ public class ExpertService {
         return result;
     }
 
-    public List<ExpertSuggestionOutDto> getSuggestions(Long id, SuggestionStatus... status) throws EntityNotFoundException {
+    public CustomPage<ExpertSuggestionOutDto> getSuggestions(Long id, Pageable pageable, SuggestionStatus... status) throws EntityNotFoundException {
         findById(id);
-        return suggestionService.findAllByOwnerIdAndStatus(id, status);
+        return suggestionService.findAllByOwnerIdAndStatus(id, status, pageable);
     }
 
     private UserOutDto convert2Dto(Expert expert) {
@@ -170,9 +175,15 @@ public class ExpertService {
                 .build();
     }
 
-    private List<UserOutDto> convert2Dto(List<Expert> expertList) {
-        return expertList.stream()
-                .map(this::convert2Dto).toList();
+    private CustomPage<UserOutDto> convert2Dto(Page<Expert> page) {
+        List<UserOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
+        return CustomPage.<UserOutDto>builder()
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .lastPage(page.getTotalPages())
+                .pageNumber(page.getNumber())
+                .data(data)
+                .build();
     }
 
     @Transactional(rollbackFor = Exception.class)

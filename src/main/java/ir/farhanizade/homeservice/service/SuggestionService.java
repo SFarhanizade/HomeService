@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
@@ -10,8 +11,9 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,7 +22,6 @@ import java.util.Optional;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
-import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.ACCEPTED;
 import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
 
 @Service
@@ -30,7 +31,6 @@ public class SuggestionService {
 
     @Transactional(rollbackFor = Exception.class)
     public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
-        //TODO make a separate update method
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
         if (suggestion.getId() == null) {
@@ -51,11 +51,11 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Suggestion> findAllByOrderId(Long order) throws EntityNotFoundException {
-        List<Suggestion> suggestions = repository.findAllByOrderId(order);
-        if (suggestions.size() == 0)
-            throw new EntityNotFoundException("No Suggestions Found For This Order!");
-        return suggestions;
+    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order) throws EntityNotFoundException {
+        Page<Suggestion> suggestions = repository.findAllByOrderId(order, Pageable.ofSize(10));
+//        if (suggestions.size() == 0)
+//            throw new EntityNotFoundException("No Suggestions Found For This Order!");
+        return convert2Dto(suggestions);
     }
 
     @Transactional(readOnly = true)
@@ -68,28 +68,28 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionOutDto> findAllByOwnerId(Long id) throws EntityNotFoundException {
-        List<Suggestion> suggestions = repository.findAllByOwnerId(id);
-        if (suggestions.size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
-        return convert2Dto(suggestions);
+    public CustomPage<SuggestionOutDto> findAllByOwnerId(Long id, Pageable pageable) throws EntityNotFoundException {
+        Page<Suggestion> page = repository.findAllByOwnerId(id, pageable);
+        if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionOutDto> findAllByCustomerId(Long id) throws EntityNotFoundException {
-        List<Suggestion> suggestions = repository.findAllByCustomerId(id);
-        if (suggestions.size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
-        return convert2Dto(suggestions);
+    public CustomPage<SuggestionOutDto> findAllByCustomerId(Long id, Pageable pageable) throws EntityNotFoundException {
+        Page<Suggestion> page = repository.findAllByCustomerId(id, pageable);
+        if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status) throws EntityNotFoundException {
-        List<Suggestion> allByOwnerIdAndStatus = repository.findAllByOwnerIdAndStatus(ownerId, status);
-        if (allByOwnerIdAndStatus.isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
-        return convert2DtoList(allByOwnerIdAndStatus);
+    public CustomPage<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status, Pageable pageable) throws EntityNotFoundException {
+        Page<Suggestion> page = repository.findAllByOwnerIdAndStatus(ownerId, status, pageable);
+        if (page.getContent().isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
+        return convert2DtoList(page);
     }
 
-    private List<ExpertSuggestionOutDto> convert2DtoList(List<Suggestion> allByOwnerIdAndStatus) {
-        return allByOwnerIdAndStatus.stream().map(s ->
+    private CustomPage<ExpertSuggestionOutDto> convert2DtoList(Page<Suggestion> page) {
+        List<ExpertSuggestionOutDto> data = page.getContent().stream().map(s ->
                 ExpertSuggestionOutDto.builder()
                         .id(s.getId())
                         .service(s.getOrder().getService().getName())
@@ -97,6 +97,13 @@ public class SuggestionService {
                         .suggestedDateTime(s.getSuggestedDateTime())
                         .status(s.getSuggestionStatus())
                         .build()).toList();
+        return CustomPage.<ExpertSuggestionOutDto>builder()
+                .data(data)
+                .pageSize(page.getSize())
+                .pageNumber(page.getNumber())
+                .lastPage(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .build();
     }
 
     public SuggestionOutDto convert2Dto(Suggestion suggestion) {
@@ -113,9 +120,17 @@ public class SuggestionService {
                 .build();
     }
 
-    public List<SuggestionOutDto> convert2Dto(List<Suggestion> suggestions) {
-        return suggestions.stream()
+    public CustomPage<SuggestionOutDto> convert2Dto(Page<Suggestion> suggestions) {
+        List<Suggestion> content = suggestions.getContent();
+        List<SuggestionOutDto> suggestionOutDtos = content.stream()
                 .map(this::convert2Dto).toList();
+        return CustomPage.<SuggestionOutDto>builder()
+                .pageNumber(suggestions.getNumber())
+                .lastPage(suggestions.getTotalPages())
+                .pageSize(suggestions.getSize())
+                .totalElements(suggestions.getTotalElements())
+                .data(suggestionOutDtos)
+                .build();
     }
 
     @Transactional(rollbackFor = Exception.class)

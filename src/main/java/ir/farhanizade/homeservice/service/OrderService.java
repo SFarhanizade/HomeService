@@ -11,6 +11,7 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,12 +36,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> loadByExpertises(Set<SubService> expertises) throws EntityNotFoundException {
-        List<Order> orders = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION, CANCELLED, BUSY);
-        if (orders.size() == 0) {
-            throw new EntityNotFoundException("No Orders Found!");
-        }
-        return orders;
+    public CustomPage<OrderOutDto> loadByExpertises(Set<SubService> expertises, Pageable pageable) throws EntityNotFoundException {
+        Page<Order> page = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION, CANCELLED, BUSY, pageable);
+        return convert2Dto(page);
+//        if (orders.size() == 0) {
+//            throw new EntityNotFoundException("No Orders Found!");
+//        }
+//        return orders;
     }
 
     @Transactional(readOnly = true)
@@ -74,8 +76,9 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> findAllByCustomerId(Long ownerId) {
-        return repository.findAllByCustomerId(ownerId);
+    public CustomPage<OrderOutDto> findAllByCustomerId(Long ownerId, Pageable pageable) {
+        Page<Order> page = repository.findAllByCustomerId(ownerId, pageable);
+        return convert2Dto(page);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -108,20 +111,27 @@ public class OrderService {
         return new EntityOutDto(id);
     }
 
-    public CustomPage<OrderOutDto> findByExpertise(Set<SubService> expertises, Pageable pageable){
-        CustomPage<Order> byExpertises = repository.findByExpertises(expertises, pageable);
-        List<Order> data = byExpertises.getData();
-        List<OrderOutDto> orders = convert2Dto(data);
-        return CustomPage.<OrderOutDto>builder()
-                .data(orders)
-                .pageSize(byExpertises.getPageSize())
-                .lastPage(byExpertises.getLastPage())
-                .pageNumber(byExpertises.getPageNumber())
-                .build();
-    }
+//    public CustomPage<OrderOutDto> findByExpertise(Set<SubService> expertises, Pageable pageable){
+//        CustomPage<Order> byExpertises = repository.findByExpertises(expertises, pageable);
+//        List<Order> data = byExpertises.getData();
+//        List<OrderOutDto> orders = convert2Dto(data);
+//        return CustomPage.<OrderOutDto>builder()
+//                .data(orders)
+//                .pageSize(byExpertises.getPageSize())
+//                .lastPage(byExpertises.getLastPage())
+//                .pageNumber(byExpertises.getPageNumber())
+//                .build();
+//    }
 
-    private List<OrderOutDto> convert2Dto(List<Order> data) {
-        return data.stream().map(o -> convert2Dto(o)).toList();
+    private CustomPage<OrderOutDto> convert2Dto(Page<Order> page) {
+        List<OrderOutDto> data = page.getContent().stream().map(o -> convert2Dto(o)).toList();
+        return CustomPage.<OrderOutDto>builder()
+                .data(data)
+                .pageSize(page.getSize())
+                .pageNumber(page.getNumber())
+                .lastPage(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .build();
     }
 
     private OrderOutDto convert2Dto(Order o) {

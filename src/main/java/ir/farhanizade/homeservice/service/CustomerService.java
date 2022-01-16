@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
@@ -17,8 +18,11 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -56,24 +60,24 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findByCredit(BigDecimal credit) throws EntityNotFoundException {
-        List<Customer> byCredit = repository.findByCredit(credit);
-        if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(byCredit);
+    public CustomPage<UserOutDto> findByCredit(BigDecimal credit, Pageable pageable) throws EntityNotFoundException {
+        Page<Customer> page = repository.findByCredit(credit, pageable);
+        //if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findByStatus(UserStatus status) throws EntityNotFoundException {
-        List<Customer> byStatus = repository.findByStatus(status);
-        if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(byStatus);
+    public CustomPage<UserOutDto> findByStatus(UserStatus status, Pageable pageable) throws EntityNotFoundException {
+        Page<Customer> page = repository.findByStatus(status, pageable);
+        //if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public List<UserOutDto> findAll() throws EntityNotFoundException {
-        List<Customer> all = repository.findAll();
-        if (all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
-        return convert2Dto(all);
+    public CustomPage<UserOutDto> findAll(Pageable pageable) throws EntityNotFoundException {
+        Page<Customer> page = repository.findAll(pageable);
+        //if (all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
@@ -103,19 +107,19 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderOutDto> getOrders(Long id) throws EntityNotFoundException {
+    public CustomPage<OrderOutDto> getOrders(Long id, Pageable pageable) throws EntityNotFoundException {
         exists(id);
-        List<Order> orders = orderRepository.findAllByCustomerId(id);
-        List<OrderOutDto> result = orders.stream()
-                .map((Order o) -> OrderOutDto.builder()
-                        .id(o.getId())
-                        .service(o.getService().getName())
-                        .price(o.getRequest().getPrice())
-                        .suggestedDateTime(o.getRequest().getSuggestedDateTime())
-                        .createdDateTime(o.getRequest().getDateTime())
-                        .status(o.getStatus())
-                        .build()).toList();
-        return result;
+        return orderRepository.findAllByCustomerId(id, pageable);
+//        List<OrderOutDto> result = orders.stream()
+//                .map((Order o) -> OrderOutDto.builder()
+//                        .id(o.getId())
+//                        .service(o.getService().getName())
+//                        .price(o.getRequest().getPrice())
+//                        .suggestedDateTime(o.getRequest().getSuggestedDateTime())
+//                        .createdDateTime(o.getRequest().getDateTime())
+//                        .status(o.getStatus())
+//                        .build()).toList();
+//        return result;
     }
 
     @Transactional(readOnly = true)
@@ -139,10 +143,9 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
+    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
         exists(id);
-        List<Suggestion> suggestions = suggestionService.findAllByOrderId(order);
-        return suggestionService.convert2Dto(suggestions);
+        return suggestionService.findAllByOrderId(order);
     }
 
     @Transactional(readOnly = true)
@@ -152,9 +155,9 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<SuggestionOutDto> getSuggestions(Long id) throws EntityNotFoundException {
+    public CustomPage<SuggestionOutDto> getSuggestions(Long id, Pageable pageable) throws EntityNotFoundException {
         exists(id);
-        return suggestionService.findAllByCustomerId(id);
+        return suggestionService.findAllByCustomerId(id, pageable);
     }
 
     private UserOutDto convert2Dto(Customer customer) {
@@ -166,9 +169,15 @@ public class CustomerService {
                 .build();
     }
 
-    private List<UserOutDto> convert2Dto(List<Customer> customers) {
-        return customers.stream()
-                .map(this::convert2Dto).toList();
+    private CustomPage<UserOutDto> convert2Dto(Page<Customer> page) {
+        List<UserOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
+        return CustomPage.<UserOutDto>builder()
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .lastPage(page.getTotalPages())
+                .pageNumber(page.getNumber())
+                .data(data)
+                .build();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -188,7 +197,8 @@ public class CustomerService {
     public EntityOutDto pay(Long id, Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         Customer customer = findById(id);
         Suggestion suggestion = suggestionService.findById(suggestionId);
-        if(suggestion.getStatus().equals(BaseMessageStatus.DONE)) throw new BadEntryException("You can't pay more than once!");
+        if (suggestion.getStatus().equals(BaseMessageStatus.DONE))
+            throw new BadEntryException("You can't pay more than once!");
         Expert expert = suggestion.getOwner();
         BigDecimal price = suggestion.getPrice();
 
