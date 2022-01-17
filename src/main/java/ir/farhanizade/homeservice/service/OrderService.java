@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.out.OrderFinishOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Date;
 import java.util.List;
@@ -73,7 +75,7 @@ public class OrderService {
                     .service(result.getService().getName())
                     .price(result.getRequest().getPrice())
                     .suggestedDateTime(result.getRequest().getSuggestedDateTime())
-                    .createdDateTime(result.getRequest().getDateTime())
+                    .createdDateTime(result.getRequest().getCreatedTime())
                     .status(result.getStatus())
                     .build();
         }
@@ -87,10 +89,11 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException {
+    public void removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException, BadEntryException {
         Order order = findById(orderId);
         Request request = order.getRequest();
         if (!request.getOwner().getId().equals(ownerId)) throw new EntityNotFoundException("This order is not yours!");
+        if(request.getStatus().equals(BaseMessageStatus.DONE)) throw new BadEntryException("You can't cancel this order!");
         request.setStatus(CANCELLED);
         Set<Suggestion> suggestions = order.getSuggestions();
         suggestions.stream()
@@ -106,6 +109,8 @@ public class OrderService {
         Suggestion suggestion = suggestionService.findById(id);
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
+        if(!(order.getStatus().equals(WAITING_FOR_SELECTION)||
+                order.getStatus().equals(WAITING_FOR_SUGGESTION))) throw new BusyOrderException("The order is busy!");
         order.setStatus(WAITING_FOR_EXPERT);
         suggestion.setSuggestionStatus(ACCEPTED);
         Set<Suggestion> suggestions = order.getSuggestions();

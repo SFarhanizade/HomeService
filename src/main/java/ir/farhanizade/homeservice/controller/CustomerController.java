@@ -70,7 +70,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/orders/{order}/remove")
-    public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
+    public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException, BadEntryException {
         EntityOutDto result = customerService.removeOrder(id, order);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
@@ -82,8 +82,8 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/orders/{order}/suggestions")
-    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
-        CustomPage<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order);
+    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order, Pageable pageable) throws EntityNotFoundException {
+        CustomPage<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order, pageable);
         ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")

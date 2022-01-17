@@ -156,9 +156,9 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order) throws EntityNotFoundException {
+    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order, Pageable pageable) throws EntityNotFoundException {
         exists(id);
-        return suggestionService.findAllByOrderId(order);
+        return suggestionService.findAllByOrderId(order,pageable);
     }
 
     @Transactional(readOnly = true)

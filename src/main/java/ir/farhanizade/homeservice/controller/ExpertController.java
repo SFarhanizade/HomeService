@@ -73,8 +73,7 @@ public class ExpertController {
             case "accepted" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.ACCEPTED);
             case "pending" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.PENDING);
             case "rejected" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.REJECTED);
-            case "all" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.ACCEPTED,
-                    SuggestionStatus.PENDING, SuggestionStatus.REJECTED);
+            case "all" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.values());
             default -> throw new BadEntryException("Status is Wrong!");
         }
         ResponseResult<CustomPage<ExpertSuggestionOutDto>> response =
@@ -100,7 +99,7 @@ public class ExpertController {
         ResponseResult<SuggestionAnswerOutDto> response =
                 ResponseResult.<SuggestionAnswerOutDto>builder()
                         .code(1)
-                        .message("Suggestions answer successfully.")
+                        .message("Suggestions answered successfully.")
                         .data(result)
                         .build();
         HttpStatus httpStatus = HttpStatus.CREATED;
