@@ -35,22 +35,25 @@ public class ServiceController {
                 .build();
         HttpStatus status = HttpStatus.OK;
         List<MainService> mainServices = null;
+        List<MainServiceOutDto> result;
         try {
             mainServices = mainService.loadAll();
+            result = mainServices.stream()
+                    .map(m -> MainServiceOutDto.builder()
+                            .id(m.getId())
+                            .name(m.getName())
+                            .subServices(m.getSubServices().stream()
+                                    .map(s -> new ServiceOutDto(s.getId(), s.getName()))
+                                    .collect(Collectors.toList())
+                            )
+                            .build()).toList();
         } catch (EntityNotFoundException e) {
             e.printStackTrace();
             status = HttpStatus.NOT_FOUND;
             response.setMessage(e.getMessage());
+            result = null;
         }
-        List<MainServiceOutDto> result = mainServices.stream()
-                .map(m -> MainServiceOutDto.builder()
-                        .id(m.getId())
-                        .name(m.getName())
-                        .subServices(m.getSubServices().stream()
-                                .map(s -> new ServiceOutDto(s.getId(), s.getName()))
-                                .collect(Collectors.toList())
-                        )
-                        .build()).toList();
+
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
