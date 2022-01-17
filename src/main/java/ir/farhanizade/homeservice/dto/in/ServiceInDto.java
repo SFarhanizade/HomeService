@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ServiceInDto {
+    @NonNull
     private Long parent;
     @NonNull
     @Size(min = 3, max = 20)
