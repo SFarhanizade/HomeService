@@ -35,15 +35,4 @@ public class User extends BasePerson {
     @Builder.Default
     @Column(nullable = false)
     private UserStatus status = UserStatus.NEW;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Transaction> transactions = new ArrayList<>();
-
-    public void addTransaction(Transaction transaction){
-        if(transaction==null)
-            throw new IllegalStateException("Null Transaction!");
-        transactions.add(transaction);
-
-    }
 }
