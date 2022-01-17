@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.entity.service.MainService;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.service.MainServiceService;
 import ir.farhanizade.homeservice.service.SubServiceService;
 import org.junit.Test;
@@ -57,6 +58,16 @@ public class ServiceControllerTest extends AbstractRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", hasSize(1)));
+    }
+
+    @Test
+    public void test_load_main_service_throwException() throws Exception {
+        String message = "Not Found!";
+        Mockito.when(service.loadAll()).thenThrow(new EntityNotFoundException(message));
+
+        mvc.perform(post("/services/"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(message));
     }
 
 }
