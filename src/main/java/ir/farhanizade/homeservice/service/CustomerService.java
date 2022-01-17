@@ -29,6 +29,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static ir.farhanizade.homeservice.entity.order.OrderStatus.PAID;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -192,7 +194,7 @@ public class CustomerService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException {
+    public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException, BadEntryException {
         exists(id);
         orderRepository.removeOrderByIdAndOwnerId(orderId, id);
         return new EntityOutDto(orderId);
@@ -208,13 +210,13 @@ public class CustomerService {
     public EntityOutDto pay(Long id, Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
         Customer customer = findById(id);
         Suggestion suggestion = suggestionService.findById(suggestionId);
-        if (suggestion.getStatus().equals(BaseMessageStatus.DONE))
+        if (suggestion.getOrder().getStatus().equals(PAID))
             throw new BadEntryException("You can't pay more than once!");
         Expert expert = suggestion.getOwner();
         BigDecimal price = suggestion.getPrice();
 
         Order order = suggestion.getOrder();
-        order.setStatus(OrderStatus.PAID);
+        order.setStatus(PAID);
 
         Transaction transaction = Transaction.builder()
                 .payer(customer)
