@@ -51,8 +51,8 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order) throws EntityNotFoundException {
-        Page<Suggestion> suggestions = repository.findAllByOrderId(order, Pageable.ofSize(10));
+    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order,Pageable pageable) throws EntityNotFoundException {
+        Page<Suggestion> suggestions = repository.findAllByOrderId(order, pageable);
 //        if (suggestions.size() == 0)
 //            throw new EntityNotFoundException("No Suggestions Found For This Order!");
         return convert2Dto(suggestions);
@@ -112,7 +112,7 @@ public class SuggestionService {
                 .ownerId(suggestion.getOwner().getId())
                 .ownerName(suggestion.getOwner().getFName() + " " + suggestion.getOwner().getLName())
                 .ownerPoints(suggestion.getOwner().getPoints())
-                .createdDateTime(suggestion.getDateTime())
+                .createdDateTime(suggestion.getCreatedTime())
                 .details(suggestion.getDetails())
                 .duration(suggestion.getDuration())
                 .price(suggestion.getPrice())
@@ -137,6 +137,7 @@ public class SuggestionService {
     public SuggestionAnswerOutDto answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
         Suggestion suggestion = findById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
+        if(!suggestion.getStatus().equals(BaseMessageStatus.WAITING)) throw new BadEntryException("This suggestion is done!");
         Order order = suggestion.getOrder();
         Request request = order.getRequest();
         if (status.equals(BUSY)) {
