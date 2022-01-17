@@ -57,7 +57,7 @@ public class Validation {
         if (request.getPrice().compareTo(service.getBasePrice()) == -1) {
             throw new BadEntryException("The price show be equal or greater than the service base price!");
         }
-        if (request.getDateTime().getTime() - request.getSuggestedDateTime().getTime() > 0) {
+        if (System.currentTimeMillis() - request.getSuggestedDateTime().getTime() > 0) {
             throw new BadEntryException("The requested time is sooner than the present time");
         }
         return true;
@@ -107,7 +107,7 @@ public class Validation {
             throw new BusyOrderException("The order is not open to suggest!");
         if (suggestion.getDuration() <= 0)
             throw new BadEntryException("The duration is 0 or less!");
-        if (suggestion.getDateTime().getTime() - suggestion.getSuggestedDateTime().getTime() > 0)
+        if (System.currentTimeMillis() - suggestion.getSuggestedDateTime().getTime() > 0)
             throw new BadEntryException("The suggested time is sooner than the present time");
         if (service.getBasePrice().compareTo(suggestion.getPrice()) > 0)
             throw new BadEntryException("The suggested price is lower than the base price!");
