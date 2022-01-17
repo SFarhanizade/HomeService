@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.DONE;
 import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 
 @Service
@@ -154,7 +155,7 @@ public class ExpertService {
 
     @Transactional(readOnly = true)
     public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
-        CustomPage<Expert> searchResult = repository.search(user,pageable);
+        CustomPage<Expert> searchResult = repository.search(user, pageable);
         return convert2Dto(searchResult);
     }
 
@@ -227,6 +228,8 @@ public class ExpertService {
                 suggestion.getStatus().equals(BUSY)) {
             Order order = suggestion.getOrder();
             order.setStatus(OrderStatus.DONE);
+            order.getRequest().setStatus(DONE);
+            suggestion.setStatus(DONE);
             order.setFinishDateTime(new Date(System.currentTimeMillis()));
             suggestionService.save(suggestion);
             return new EntityOutDto(suggestionId);
@@ -234,17 +237,17 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public boolean exists(Long id){
+    public boolean exists(Long id) {
         return repository.existsById(id);
     }
 
     public CommentOutDto getComment(Long id, Long comment) {
         exists(id);
-        return commentService.findByIdAndExpertId(id,comment);
+        return commentService.findByIdAndExpertId(id, comment);
     }
 
     public CustomPage<OrderFinishOutDto> getOrders(Long id, Pageable pageable) {
         exists(id);
-        return orderService.findAllByExpertId(id,pageable);
+        return orderService.findAllByExpertId(id, pageable);
     }
 }
