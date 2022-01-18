@@ -1,12 +1,17 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Admin;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.AdminRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
     private final AdminRepository repository;
     private final ExpertService expertService;
+    private final CustomerService customerService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, UserNotValidException, DuplicateEntityException {
         Admin admin = user.convert2Admin();
-        if(!Validation.isValid(admin)) throw new UserNotValidException("User is not valid!");
-        if(finalCheck(admin)) throw new DuplicateEntityException("User exists!");
+        if (!Validation.isValid(admin)) throw new UserNotValidException("User is not valid!");
+        if (finalCheck(admin)) throw new DuplicateEntityException("User exists!");
         Admin result = repository.save(admin);
         return new EntityOutDto(result.getId());
     }
@@ -38,7 +44,17 @@ public class AdminService {
     }
 
     public boolean exists(Long id) throws UserNotValidException {
-        if(!repository.existsById(id)) throw new UserNotValidException("User doesn't exist!");
+        if (!repository.existsById(id)) throw new UserNotValidException("User doesn't exist!");
         return true;
+    }
+
+    @Transactional(readOnly = true)
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
+        if (user.getType().equals("expert"))
+            return expertService.search(user, pageable);
+        else if (user.getType().equals("customer")) {
+            return customerService.search(user, pageable);
+        }
+        return null;
     }
 }
