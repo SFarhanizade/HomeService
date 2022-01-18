@@ -23,16 +23,7 @@ public class Validation {
     public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
         if (user == null)
             throw new NullFieldException("User is null!");
-        String email = user.getEmail();
-        String emailPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        pattern = Pattern.compile(emailPattern);
-        matcher = pattern.matcher(email);
-        boolean emailIsValid = matcher.matches();
-        if (!emailIsValid) {
-            throw new EmailNotValidException("Email is not valid!");
-        }
-
+        isEmailValid(user.getEmail());
         String password = user.getPassword();
         if (!passwordIsValid(password))
             throw new PasswordNotValidException("Password is not valid!");
@@ -92,7 +83,7 @@ public class Validation {
     }
 
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
-        if(suggestion.getId()!=null) return true;
+        if (suggestion.getId() != null) return true;
         Expert owner = suggestion.getOwner();
         isValid(owner);
         Order order = suggestion.getOrder();
@@ -103,7 +94,7 @@ public class Validation {
         SubService service = order.getService();
         if ((!(order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION) ||
                 order.getStatus().equals(OrderStatus.WAITING_FOR_SELECTION))) ||
-            !request.getStatus().equals(BaseMessageStatus.WAITING))
+                !request.getStatus().equals(BaseMessageStatus.WAITING))
             throw new BusyOrderException("The order is not open to suggest!");
         if (suggestion.getDuration() <= 0)
             throw new BadEntryException("The duration is 0 or less!");
@@ -120,5 +111,19 @@ public class Validation {
         matcher = pattern.matcher(password);
         boolean passwordIsValid = matcher.matches();
         return passwordIsValid;
+    }
+
+    public static boolean isEmailValid(String email) throws EmailNotValidException, NullFieldException {
+        if (email.isEmpty()) throw new NullFieldException("Email is Empty!");
+
+        String emailPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        pattern = Pattern.compile(emailPattern);
+        matcher = pattern.matcher(email);
+        boolean emailIsValid = matcher.matches();
+        if (!emailIsValid) {
+            throw new EmailNotValidException("Email is not valid!");
+        }
+        return true;
     }
 }
