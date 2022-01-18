@@ -1,8 +1,12 @@
 package ir.farhanizade.homeservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
+import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Admin;
 import ir.farhanizade.homeservice.service.AdminService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,5 +79,22 @@ class AdminControllerTest extends AbstractRestControllerTest {
         mvc.perform(get("/admins/1/experts/1/accept"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void test_search_is_ok() throws Exception {
+        UserSearchInDto request = new UserSearchInDto();
+
+        CustomPage<UserSearchOutDto> result = CustomPage.<UserSearchOutDto>builder()
+                .data(List.of(new UserSearchOutDto()))
+                .build();
+
+        Mockito.when(adminService.search(notNull(), notNull()))
+                .thenReturn(result);
+
+        mvc.perform(post("/admins/1/search")
+                        .content(toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data.data", hasSize(1)));
     }
 }
