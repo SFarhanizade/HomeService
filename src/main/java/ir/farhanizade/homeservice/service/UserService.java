@@ -33,12 +33,11 @@ public class UserService {
     private final CommentService commentService;
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
+    public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException {
         String currentPassword = user.getCurrentPassword();
         String newPassword = user.getNewPassword();
         Long id = user.getId();
-        Optional<User> byId = repository.findById(id);
-        User entity = byId.get();
+        User entity = findById(id);
         if (currentPassword.equals(newPassword)) {
             throw new PasswordNotValidException("The new password is the same as the current password!");
         }
@@ -46,7 +45,7 @@ public class UserService {
             throw new PasswordNotValidException("The new password is not valid!");
         }
 
-        if (currentPassword.equals(entity.getPassword())) {
+        if (!currentPassword.equals(entity.getPassword())) {
             throw new WrongPasswordException("The current password is not correct!");
         }
         entity.setPassword(newPassword);
@@ -68,7 +67,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
         CustomPage<UserSearchOutDto> result;
         if ("expert".equals(user.getType())) {
             result = expertService.search(user, pageable);
@@ -114,7 +113,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) throws EntityNotFoundException {
+    public CustomPage<CommentOutDto> getComments(Long id, Pageable pageable) {
         exists(id);
         return commentService.findAllByUserId(id, pageable);
     }

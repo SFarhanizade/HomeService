@@ -89,7 +89,7 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException, BadEntryException {
+    public EntityOutDto removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException, BadEntryException {
         Order order = findById(orderId);
         Request request = order.getRequest();
         if (!request.getOwner().getId().equals(ownerId)) throw new EntityNotFoundException("This order is not yours!");
@@ -102,6 +102,7 @@ public class OrderService {
                     s.setStatus(CANCELLED);
                 });
         repository.save(order);
+        return new EntityOutDto(orderId);
     }
 
     @Transactional(rollbackFor = Exception.class)

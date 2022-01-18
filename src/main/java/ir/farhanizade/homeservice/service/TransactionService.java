@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
@@ -29,7 +30,7 @@ public class TransactionService {
     private final ExpertRepository expertRepository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void save(Transaction transaction) throws NotEnoughMoneyException {
+    public EntityOutDto save(Transaction transaction) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
         Customer payer = transaction.getPayer();
@@ -41,7 +42,8 @@ public class TransactionService {
             throw new NotEnoughMoneyException("");
         payer.setCredit(payerCredit.subtract(amount));
         recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
-        repository.save(transaction);
+        Transaction saved = repository.save(transaction);
+        return new EntityOutDto(saved.getId());
     }
 
     public CustomPage<TransactionOutDto> findByUserId(Long id, Pageable pageable) {

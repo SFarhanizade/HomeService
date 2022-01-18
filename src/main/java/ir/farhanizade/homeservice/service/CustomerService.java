@@ -56,9 +56,8 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public UserOutDto findByEmail(String email) throws EntityNotFoundException {
-        if (email == null)
-            throw new IllegalStateException("Null Email");
+    public UserOutDto findByEmail(String email) throws EntityNotFoundException, EmailNotValidException, NullFieldException {
+        Validation.isEmailValid(email);
         Customer byEmail = repository.findByEmail(email);
         if (byEmail == null) throw new EntityNotFoundException("User Doesn't Exist!");
         return convert2Dto(byEmail);
@@ -81,7 +80,7 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findAll(Pageable pageable) throws EntityNotFoundException {
         Page<Customer> page = repository.findAll(pageable);
-        //if (all.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+        if (page.getContent().isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
@@ -93,8 +92,9 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
         CustomPage<Customer> search = repository.search(user, pageable);
+        if (search.getData().isEmpty()) throw new EntityNotFoundException("Nothing Found!");
         return convert2Dto(search);
     }
 
@@ -123,16 +123,6 @@ public class CustomerService {
     public CustomPage<OrderOutDto> getOrders(Long id, Pageable pageable) throws EntityNotFoundException {
         exists(id);
         return orderRepository.findAllByCustomerId(id, pageable);
-//        List<OrderOutDto> result = orders.stream()
-//                .map((Order o) -> OrderOutDto.builder()
-//                        .id(o.getId())
-//                        .service(o.getService().getName())
-//                        .price(o.getRequest().getPrice())
-//                        .suggestedDateTime(o.getRequest().getSuggestedDateTime())
-//                        .createdDateTime(o.getRequest().getDateTime())
-//                        .status(o.getStatus())
-//                        .build()).toList();
-//        return result;
     }
 
     @Transactional(readOnly = true)
@@ -158,7 +148,7 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order, Pageable pageable) throws EntityNotFoundException {
         exists(id);
-        return suggestionService.findAllByOrderId(order,pageable);
+        return suggestionService.findAllByOrderId(order, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -196,8 +186,7 @@ public class CustomerService {
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException, BadEntryException {
         exists(id);
-        orderRepository.removeOrderByIdAndOwnerId(orderId, id);
-        return new EntityOutDto(orderId);
+        return orderRepository.removeOrderByIdAndOwnerId(orderId, id);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -225,14 +214,14 @@ public class CustomerService {
                 .order(order)
                 .build();
 
-        transactionService.save(transaction);
+        EntityOutDto result = transactionService.save(transaction);
 
         Request request = order.getRequest();
         request.setStatus(BaseMessageStatus.DONE);
         suggestion.setStatus(BaseMessageStatus.DONE);
 
         suggestionService.save(suggestion);
-        return new EntityOutDto(null);
+        return result;
     }
 
 
