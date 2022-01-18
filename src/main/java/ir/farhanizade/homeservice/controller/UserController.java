@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException {
+    public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Password changed successfully!")
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@RequestBody UserSearchInDto user, Pageable pageable) {
+    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@RequestBody UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
         ResponseResult<CustomPage<UserSearchOutDto>> response = ResponseResult.<CustomPage<UserSearchOutDto>>builder()
                 .code(1)
                 .message("Done!")
