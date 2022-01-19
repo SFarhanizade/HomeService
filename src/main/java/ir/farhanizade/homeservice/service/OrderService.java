@@ -190,21 +190,29 @@ public class OrderService {
 
     public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Long id, Pageable pageable) {
         Page<Order> page = repository.findAllByCustomerId(id, pageable);
-        return convert2CustomPage(page,id);
+        return convert2CustomPage(page, id);
     }
 
     public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Long id, Pageable pageable) {
-        Page<Order> page = repository.findAllByExpertId(id,pageable);
-        return convert2CustomPage(page,id);
+        Page<Order> page = repository.findAllByExpertId(id, pageable);
+        return convert2CustomPage(page, 0L);
     }
 
-    private CustomPage<OrderOfUserOutDto> convert2CustomPage(Page<Order> page, Long userId){
+    public CustomPage<OrderOfUserOutDto> getOrdersByRangeOfTime(Date time1, Date time2, Pageable pageable) {
+        Page<Order> page = repository.findOrdersByRangeOfTime(time1, time2, pageable);
+        return convert2CustomPage(page, 0L);
+    }
+
+    private CustomPage<OrderOfUserOutDto> convert2CustomPage(Page<Order> page, Long userId) {
         List<Order> orders = page.getContent();
         List<OrderOfUserOutDto> data = orders.stream()
                 .map(o -> {
+                    Long id = userId;
+                    if (userId == 0L)
+                        id = o.getRequest().getOwner().getId();
                     Suggestion suggestion = suggestionService.findAcceptedByOrderId(o.getId());
                     return OrderOfUserOutDto.builder()
-                            .customerId(userId)
+                            .customerId(id)
                             .requestId(o.getRequest().getId())
                             .orderId(o.getId())
                             .expertId(suggestion.getOwner().getId())
