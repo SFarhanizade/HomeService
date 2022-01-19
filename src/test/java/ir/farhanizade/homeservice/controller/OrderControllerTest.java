@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.dto.in.ExpertInDto;
 import ir.farhanizade.homeservice.dto.in.TimeRangeInDto;
 import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
+import ir.farhanizade.homeservice.dto.out.RequestAndSuggestionReportOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.OrderService;
@@ -121,5 +122,15 @@ class OrderControllerTest extends AbstractRestControllerTest {
         mvc.perform(get("/orders/subService/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.data", hasSize(2)));
+    }
+
+    @Test
+    void test_get_number_of_requests_and_suggestions_is_ok() throws Exception {
+        Mockito.when(orderService.getNumberOfRequestsAndSuggestions())
+                .thenReturn(new RequestAndSuggestionReportOutDto(5L, 5L));
+
+        mvc.perform(get("/orders/report/messages"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.requests").value(5L));
     }
 }
