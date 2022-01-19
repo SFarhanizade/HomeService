@@ -44,5 +44,15 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/status/{status}")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Integer status, Pageable pageable) throws EntityNotFoundException {
+        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByStatus(status, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
 
 }
