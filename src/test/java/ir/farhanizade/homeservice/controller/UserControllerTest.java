@@ -4,6 +4,7 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.service.MainService;
@@ -20,6 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -80,5 +83,18 @@ public class UserControllerTest extends AbstractRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.pageSize").value(10));
+    }
+
+    @Test
+    public void test_get_orders_is_ok() throws Exception {
+        CustomPage<OrderOfUserOutDto> result = CustomPage.<OrderOfUserOutDto>builder()
+                .data(List.of(new OrderOfUserOutDto())).build();
+
+        Mockito.when(userService.getOrders(notNull(), notNull()))
+                .thenReturn(result);
+
+        mvc.perform(get("/users/1/orders"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.data", hasSize(1)));
     }
 }
