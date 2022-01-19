@@ -91,4 +91,20 @@ class OrderControllerTest extends AbstractRestControllerTest {
                 .andExpect(jsonPath("$.data.data", hasSize(2)));
     }
 
+    @Test
+    void test_get_orders_by_main_service_is_ok() throws Exception {
+
+        CustomPage<OrderOfUserOutDto> result = CustomPage.<OrderOfUserOutDto>builder()
+                .data(List.of(new OrderOfUserOutDto(),
+                        new OrderOfUserOutDto()))
+                .build();
+
+        Mockito.when(orderService.getOrdersByMainService(notNull(), notNull()))
+                .thenReturn(result);
+
+        mvc.perform(get("/orders/mainService/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.data", hasSize(2)));
+    }
+
 }
