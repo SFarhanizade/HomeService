@@ -31,6 +31,7 @@ public class UserService {
     private final AdminService adminService;
     private final TransactionService transactionService;
     private final CommentService commentService;
+    private final OrderService orderService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException {
@@ -139,5 +140,12 @@ public class UserService {
     public User findById(Long id) throws EntityNotFoundException {
         Optional<User> byId = repository.findById(id);
         return byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    }
+
+    public CustomPage<OrderOfUserOutDto> getOrders(Long id, Pageable pageable) throws EntityNotFoundException {
+        if (customerService.exists(id))
+            return orderService.findOrdersByCustomer(id,pageable);
+        else
+            return orderService.getOrdersOfExpert(id,pageable);
     }
 }
