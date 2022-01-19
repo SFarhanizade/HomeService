@@ -1,11 +1,13 @@
 package ir.farhanizade.homeservice.controller;
 
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
+import ir.farhanizade.homeservice.dto.in.TimeRangeInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
+import ir.farhanizade.homeservice.dto.out.ReportRegisterTimeUsersOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
@@ -68,6 +70,18 @@ public class UserController {
         response.setData(data);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/report/registerTime")
+    public ResponseEntity<ResponseResult<ReportRegisterTimeUsersOutDto>> getNumberOfUsersByRegisterTime(@RequestBody TimeRangeInDto timeRange, Pageable pageable){
+        ResponseResult<ReportRegisterTimeUsersOutDto> response = ResponseResult.<ReportRegisterTimeUsersOutDto>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        ReportRegisterTimeUsersOutDto data = userService.getNumberOfUsersByRegisterTime(timeRange, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
+
 }
 
 
