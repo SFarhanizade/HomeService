@@ -30,4 +30,7 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
     @Query("From Suggestion s where s.suggestionStatus=:accepted and s.order.id=:id")
     Optional<Suggestion> findByStatusAndOrderId(SuggestionStatus accepted, Long id);
+
+    @Query("From Suggestion s where s.order.id=:id and s.suggestionStatus='ACCEPTED'")
+    Optional<Suggestion> findAcceptedByOrderId(Long id);
 }
