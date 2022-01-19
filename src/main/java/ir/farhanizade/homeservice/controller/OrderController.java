@@ -55,4 +55,15 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/mainService/{id}")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByMainService(id, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
+
 }
