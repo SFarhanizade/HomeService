@@ -9,6 +9,8 @@ import java.util.Date;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExpertAddSuggestionInDto {
     private Long orderId;
     private Long price;
