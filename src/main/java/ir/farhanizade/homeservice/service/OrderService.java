@@ -241,4 +241,9 @@ public class OrderService {
         Page<Order> page = repository.findByMainService(id, pageable);
         return convert2CustomPage(page, 0L);
     }
+
+    public CustomPage<OrderOfUserOutDto> getOrdersBySubService(Long id, Pageable pageable) {
+        Page<Order> page = repository.findBySubService(id, pageable);
+        return convert2CustomPage(page, 0L);
+    }
 }
