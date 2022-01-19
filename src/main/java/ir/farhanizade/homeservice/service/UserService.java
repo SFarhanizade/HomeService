@@ -1,12 +1,10 @@
 package ir.farhanizade.homeservice.service;
 
 
-import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
-import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
-import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
+import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
+import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
@@ -14,11 +12,13 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -144,8 +144,14 @@ public class UserService {
 
     public CustomPage<OrderOfUserOutDto> getOrders(Long id, Pageable pageable) throws EntityNotFoundException {
         if (customerService.exists(id))
-            return orderService.findOrdersByCustomer(id,pageable);
+            return orderService.findOrdersByCustomer(id, pageable);
         else
-            return orderService.getOrdersOfExpert(id,pageable);
+            return orderService.getOrdersOfExpert(id, pageable);
+    }
+
+    public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange, Pageable pageable) {
+        Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getTime1(), timeRange.getTime2(), pageable);
+        Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getTime1(), timeRange.getTime2(), pageable);
+        return new ReportRegisterTimeUsersOutDto(expert, customer);
     }
 }
