@@ -66,4 +66,15 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/subService/{id}")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrdersBySubService(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersBySubService(id, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
+
 }
