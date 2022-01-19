@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,4 +33,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
 
     @Query("From Order o  inner join o.suggestions s where s.owner.id=:id")
     Page<Order> findAllByExpertId(Long id, Pageable pageable);
+
+    @Query("From Order o where o.createdTime between :time1 and :time2")
+    Page<Order> findOrdersByRangeOfTime(Date time1, Date time2, Pageable pageable);
 }
