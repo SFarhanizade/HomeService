@@ -89,4 +89,15 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/report/done")
+    public ResponseEntity<ResponseResult<Long>> getNumberOfDoneOrders() {
+        ResponseResult<Long> response = ResponseResult.<Long>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        Long data = orderService.getNumberOfDoneOrders();
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
+
 }
