@@ -1,10 +1,12 @@
 package ir.farhanizade.homeservice.controller;
 
+import ir.farhanizade.homeservice.dto.in.TimeRangeInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
+import ir.farhanizade.homeservice.dto.out.ReportRegisterTimeUsersOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.service.MainService;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -96,5 +99,21 @@ public class UserControllerTest extends AbstractRestControllerTest {
         mvc.perform(get("/users/1/orders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.data", hasSize(1)));
+    }
+
+    @Test
+    public void test_get_number_of_users_by_register_time_is_ok() throws Exception {
+        TimeRangeInDto request = new TimeRangeInDto(new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()));
+
+        Mockito.when(userService.getNumberOfUsersByRegisterTime(notNull(), notNull()))
+                .thenReturn(new ReportRegisterTimeUsersOutDto(5l, 5l));
+
+        mvc.perform(get("/users/report/registerTime")
+                        .content(toJson(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.experts").value(5L));
+
     }
 }
