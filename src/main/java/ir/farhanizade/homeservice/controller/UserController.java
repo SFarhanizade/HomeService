@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
@@ -55,6 +56,17 @@ public class UserController {
 
         response.setData(result);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        CustomPage<OrderOfUserOutDto> data = userService.getOrders(id, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
     }
 }
 
