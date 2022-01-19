@@ -6,6 +6,7 @@ import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
@@ -229,5 +230,10 @@ public class OrderService {
         CustomPage<OrderOfUserOutDto> result = new CustomPage().convert(page);
         result.setData(data);
         return result;
+    }
+
+    public CustomPage<OrderOfUserOutDto> getOrdersByStatus(Integer status, Pageable pageable) {
+        Page<Order> page = repository.findByStatus(OrderStatus.values()[status], pageable);
+        return convert2CustomPage(page, 0L);
     }
 }
