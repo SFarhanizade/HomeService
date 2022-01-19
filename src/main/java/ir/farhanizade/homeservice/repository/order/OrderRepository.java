@@ -28,7 +28,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
     Optional<Order> findByIdAndCustomerId(Long ownerId, Long orderId);
 
     @Query("From Order o where o.request.owner.id=:ownerId")
-    Page<Order> findAllByCustomerId(Long ownerId,Pageable pageable);
+    Page<Order> findAllByCustomerId(Long ownerId, Pageable pageable);
 
     @Query("From Order o  inner join o.suggestions s where s.owner.id=:id")
     Page<Order> findAllByExpertId(Long id, Pageable pageable);
