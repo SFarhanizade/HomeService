@@ -248,6 +248,10 @@ public class OrderService {
     public RequestAndSuggestionReportOutDto getNumberOfRequestsAndSuggestions() {
         Long requests = requestService.countNumberOfRequests();
         Long suggestions = suggestionService.countNumberOfSuggestions();
-        return new RequestAndSuggestionReportOutDto(requests,suggestions);
+        return new RequestAndSuggestionReportOutDto(requests, suggestions);
+    }
+
+    public Long getNumberOfDoneOrders() {
+        return repository.countDoneOrders();
     }
 }
