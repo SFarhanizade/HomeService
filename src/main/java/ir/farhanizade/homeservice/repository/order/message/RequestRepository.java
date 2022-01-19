@@ -15,4 +15,7 @@ public interface RequestRepository extends BaseRepository<Request> {
 
     @Query("From Request r where r.order.id=:orderId")
     Optional<Request> findByOrderId(Long orderId);
+
+    @Query("Select Count(r) From Request r")
+    Long countNumberOfRequests();
 }
