@@ -1,9 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderFinishOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
@@ -38,6 +35,7 @@ import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.R
 public class OrderService {
     private final OrderRepository repository;
     private final SuggestionService suggestionService;
+    private final RequestService requestService;
 
     @Transactional(rollbackFor = Exception.class)
     public void save(Order order) {
@@ -245,5 +243,11 @@ public class OrderService {
     public CustomPage<OrderOfUserOutDto> getOrdersBySubService(Long id, Pageable pageable) {
         Page<Order> page = repository.findBySubService(id, pageable);
         return convert2CustomPage(page, 0L);
+    }
+
+    public RequestAndSuggestionReportOutDto getNumberOfRequestsAndSuggestions() {
+        Long requests = requestService.countNumberOfRequests();
+        Long suggestions = suggestionService.countNumberOfSuggestions();
+        return new RequestAndSuggestionReportOutDto(requests,suggestions);
     }
 }
