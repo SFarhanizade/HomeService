@@ -236,4 +236,9 @@ public class OrderService {
         Page<Order> page = repository.findByStatus(OrderStatus.values()[status], pageable);
         return convert2CustomPage(page, 0L);
     }
+
+    public CustomPage<OrderOfUserOutDto> getOrdersByMainService(Long id, Pageable pageable) {
+        Page<Order> page = repository.findByMainService(id, pageable);
+        return convert2CustomPage(page, 0L);
+    }
 }
