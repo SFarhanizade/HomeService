@@ -2,6 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderFinishOutDto;
+import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
@@ -93,7 +94,8 @@ public class OrderService {
         Order order = findById(orderId);
         Request request = order.getRequest();
         if (!request.getOwner().getId().equals(ownerId)) throw new EntityNotFoundException("This order is not yours!");
-        if(request.getStatus().equals(BaseMessageStatus.DONE)) throw new BadEntryException("You can't cancel this order!");
+        if (request.getStatus().equals(BaseMessageStatus.DONE))
+            throw new BadEntryException("You can't cancel this order!");
         request.setStatus(CANCELLED);
         Set<Suggestion> suggestions = order.getSuggestions();
         suggestions.stream()
@@ -110,7 +112,7 @@ public class OrderService {
         Suggestion suggestion = suggestionService.findById(id);
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
-        if(!(order.getStatus().equals(WAITING_FOR_SELECTION)||
+        if (!(order.getStatus().equals(WAITING_FOR_SELECTION) ||
                 order.getStatus().equals(WAITING_FOR_SUGGESTION))) throw new BusyOrderException("The order is busy!");
         order.setStatus(WAITING_FOR_EXPERT);
         suggestion.setSuggestionStatus(ACCEPTED);
@@ -184,5 +186,40 @@ public class OrderService {
                 .startDateTime(startDateTime)
                 .finishDateTime(o.getFinishDateTime())
                 .build();
+    }
+
+    public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Long id, Pageable pageable) {
+        Page<Order> page = repository.findAllByCustomerId(id, pageable);
+        return convert2CustomPage(page,id);
+    }
+
+    public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Long id, Pageable pageable) {
+        Page<Order> page = repository.findAllByExpertId(id,pageable);
+        return convert2CustomPage(page,id);
+    }
+
+    private CustomPage<OrderOfUserOutDto> convert2CustomPage(Page<Order> page, Long userId){
+        List<Order> orders = page.getContent();
+        List<OrderOfUserOutDto> data = orders.stream()
+                .map(o -> {
+                    Suggestion suggestion = suggestionService.findAcceptedByOrderId(o.getId());
+                    return OrderOfUserOutDto.builder()
+                            .customerId(userId)
+                            .requestId(o.getRequest().getId())
+                            .orderId(o.getId())
+                            .expertId(suggestion.getOwner().getId())
+                            .suggestionId(suggestion.getId())
+                            .mainService(o.getService().getParent().getName())
+                            .subService(o.getService().getName())
+                            .status(o.getStatus())
+                            .suggestionStatus(suggestion.getSuggestionStatus())
+                            .price(suggestion.getPrice())
+                            .createdTime(o.getCreatedTime())
+                            .finishTime(o.getFinishDateTime())
+                            .build();
+                }).toList();
+        CustomPage<OrderOfUserOutDto> result = new CustomPage().convert(page);
+        result.setData(data);
+        return result;
     }
 }
