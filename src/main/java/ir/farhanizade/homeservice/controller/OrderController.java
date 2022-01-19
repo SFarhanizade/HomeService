@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.in.ExpertInDto;
 import ir.farhanizade.homeservice.dto.in.TimeRangeInDto;
 import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
 import ir.farhanizade.homeservice.dto.out.OrderOutDto;
+import ir.farhanizade.homeservice.dto.out.RequestAndSuggestionReportOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.*;
@@ -73,6 +74,17 @@ public class OrderController {
                 .message("Loaded successfully!")
                 .build();
         CustomPage<OrderOfUserOutDto> data = orderService.getOrdersBySubService(id, pageable);
+        response.setData(data);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/report/messages")
+    public ResponseEntity<ResponseResult<RequestAndSuggestionReportOutDto>> getNumberOfRequestsAndSuggestions() {
+        ResponseResult<RequestAndSuggestionReportOutDto> response = ResponseResult.<RequestAndSuggestionReportOutDto>builder()
+                .code(1)
+                .message("Loaded successfully!")
+                .build();
+        RequestAndSuggestionReportOutDto data = orderService.getNumberOfRequestsAndSuggestions();
         response.setData(data);
         return ResponseEntity.ok(response);
     }
