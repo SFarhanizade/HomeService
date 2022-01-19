@@ -188,4 +188,8 @@ public class SuggestionService {
         Optional<Suggestion> suggestion = repository.findAcceptedByOrderId(id);
         return suggestion.orElseGet(Suggestion::new);
     }
+
+    public Long countNumberOfSuggestions() {
+        return repository.countNumberOfSuggestions();
+    }
 }
