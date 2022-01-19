@@ -55,7 +55,7 @@ class OrderControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void test_get_orders_by_range_of_time() throws Exception {
+    void test_get_orders_by_range_of_time_is_ok() throws Exception {
 
         TimeRangeInDto request = new TimeRangeInDto(new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()));
@@ -71,6 +71,22 @@ class OrderControllerTest extends AbstractRestControllerTest {
         mvc.perform(get("/orders/time")
                         .content(toJson(request))
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.data", hasSize(2)));
+    }
+
+    @Test
+    void test_get_orders_by_status_is_ok() throws Exception {
+
+        CustomPage<OrderOfUserOutDto> result = CustomPage.<OrderOfUserOutDto>builder()
+                .data(List.of(new OrderOfUserOutDto(),
+                        new OrderOfUserOutDto()))
+                .build();
+
+        Mockito.when(orderService.getOrdersByStatus(notNull(), notNull()))
+                .thenReturn(result);
+
+        mvc.perform(get("/orders/status/0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.data", hasSize(2)));
     }
