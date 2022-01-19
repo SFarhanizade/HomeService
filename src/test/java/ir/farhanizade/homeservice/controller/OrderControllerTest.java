@@ -133,4 +133,12 @@ class OrderControllerTest extends AbstractRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.requests").value(5L));
     }
+
+    @Test
+    void test_get_number_of_done_orders_is_ok() throws Exception {
+        Mockito.when(orderService.getNumberOfDoneOrders())
+                .thenReturn(5L);
+        mvc.perform(get("/orders/report/done"))
+                .andExpect(jsonPath("$.data").value(5L));
+    }
 }
