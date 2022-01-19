@@ -33,4 +33,7 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
     @Query("From Suggestion s where s.order.id=:id and s.suggestionStatus='ACCEPTED'")
     Optional<Suggestion> findAcceptedByOrderId(Long id);
+
+    @Query("Select Count(s) From Suggestion s")
+    Long countNumberOfSuggestions();
 }
