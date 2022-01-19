@@ -183,4 +183,9 @@ public class SuggestionService {
         Suggestion suggestion = optional.orElseGet(null);
         return suggestion;
     }
+
+    public Suggestion findAcceptedByOrderId(Long id) {
+        Optional<Suggestion> suggestion = repository.findAcceptedByOrderId(id);
+        return suggestion.orElseGet(Suggestion::new);
+    }
 }
