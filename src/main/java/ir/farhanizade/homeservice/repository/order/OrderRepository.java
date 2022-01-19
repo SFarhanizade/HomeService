@@ -45,4 +45,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
 
     @Query("From Order o where o.service.id=:id")
     Page<Order> findBySubService(Long id, Pageable pageable);
+
+    @Query("Select Count(o) From Order o where o.status='DONE' or o.status='PAID'")
+    Long countDoneOrders();
 }
