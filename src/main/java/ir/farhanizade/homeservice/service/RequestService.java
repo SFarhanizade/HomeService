@@ -93,4 +93,8 @@ public class RequestService {
                 .pageSize(page.getSize())
                 .build();
     }
+
+    public Long countNumberOfRequests() {
+        return repository.countNumberOfRequests();
+    }
 }
