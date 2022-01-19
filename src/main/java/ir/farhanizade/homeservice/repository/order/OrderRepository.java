@@ -36,4 +36,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
 
     @Query("From Order o where o.createdTime between :time1 and :time2")
     Page<Order> findOrdersByRangeOfTime(Date time1, Date time2, Pageable pageable);
+
+    @Query("From Order o where o.status=:status")
+    Page<Order> findByStatus(OrderStatus status, Pageable pageable);
 }
