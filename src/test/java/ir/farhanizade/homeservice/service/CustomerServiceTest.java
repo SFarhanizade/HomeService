@@ -96,7 +96,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void test_save__customer_with_not_valid_firstname_throws_exception() {
+    void test_save_customer_with_not_valid_firstname_throws_exception() {
         UserInDto customer = getValidCustomer();
         customer.setFirstname("a");
         assertThrows(NameNotValidException.class,
@@ -104,7 +104,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void test_save__customer_with_not_valid_lastname_throws_exception() {
+    void test_save_customer_with_not_valid_lastname_throws_exception() {
         UserInDto customer = getValidCustomer();
         customer.setLastname("a");
         assertThrows(NameNotValidException.class,
@@ -112,7 +112,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void test_save__customer_with_not_valid_email_throws_exception() {
+    void test_save_customer_with_not_valid_email_throws_exception() {
         UserInDto customer = getValidCustomer();
         customer.setEmail("123456789");
         assertThrows(EmailNotValidException.class,
@@ -120,7 +120,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void test_save__customer_with_not_valid_password_throws_exception() {
+    void test_save_customer_with_not_valid_password_throws_exception() {
         UserInDto customer = getValidCustomer();
         customer.setPassword("123");
         assertThrows(PasswordNotValidException.class,

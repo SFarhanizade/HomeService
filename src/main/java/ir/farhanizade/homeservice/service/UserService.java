@@ -149,9 +149,9 @@ public class UserService {
             return orderService.getOrdersOfExpert(id, pageable);
     }
 
-    public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange, Pageable pageable) {
-        Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getTime1(), timeRange.getTime2(), pageable);
-        Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getTime1(), timeRange.getTime2(), pageable);
+    public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange) {
+        Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getTime1(), timeRange.getTime2());
+        Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getTime1(), timeRange.getTime2());
         return new ReportRegisterTimeUsersOutDto(expert, customer);
     }
 }

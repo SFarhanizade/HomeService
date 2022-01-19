@@ -72,12 +72,12 @@ public class UserController {
     }
 
     @GetMapping("/report/registerTime")
-    public ResponseEntity<ResponseResult<ReportRegisterTimeUsersOutDto>> getNumberOfUsersByRegisterTime(@RequestBody TimeRangeInDto timeRange, Pageable pageable){
+    public ResponseEntity<ResponseResult<ReportRegisterTimeUsersOutDto>> getNumberOfUsersByRegisterTime(@RequestBody TimeRangeInDto timeRange) {
         ResponseResult<ReportRegisterTimeUsersOutDto> response = ResponseResult.<ReportRegisterTimeUsersOutDto>builder()
                 .code(1)
                 .message("Loaded successfully!")
                 .build();
-        ReportRegisterTimeUsersOutDto data = userService.getNumberOfUsersByRegisterTime(timeRange, pageable);
+        ReportRegisterTimeUsersOutDto data = userService.getNumberOfUsersByRegisterTime(timeRange);
         response.setData(data);
         return ResponseEntity.ok(response);
     }

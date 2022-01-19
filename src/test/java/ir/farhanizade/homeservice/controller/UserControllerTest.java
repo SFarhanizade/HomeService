@@ -106,7 +106,7 @@ public class UserControllerTest extends AbstractRestControllerTest {
         TimeRangeInDto request = new TimeRangeInDto(new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()));
 
-        Mockito.when(userService.getNumberOfUsersByRegisterTime(notNull(), notNull()))
+        Mockito.when(userService.getNumberOfUsersByRegisterTime(notNull()))
                 .thenReturn(new ReportRegisterTimeUsersOutDto(5l, 5l));
 
         mvc.perform(get("/users/report/registerTime")
@@ -114,6 +114,5 @@ public class UserControllerTest extends AbstractRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.experts").value(5L));
-
     }
 }

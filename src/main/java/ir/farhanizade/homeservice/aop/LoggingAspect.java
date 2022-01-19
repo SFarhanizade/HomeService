@@ -21,16 +21,23 @@ public class LoggingAspect {
     public void springBeanPointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
+
     @Around("springBeanPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         log.info("Params: ");
-        for(Object arg : args) {
-            log.info(arg.toString());
+        for (Object arg : args) {
+            if (arg == null)
+                log.info(null);
+            else log.info(arg.toString());
         }
         Object result = joinPoint.proceed();
         Object target = joinPoint.getTarget();
-        log.debug("Return value: "+target.toString());
+        String value = "";
+        if (target == null)
+            value = null;
+        else value = target.toString();
+        log.debug("Return value: " + value);
         return result;
     }
 }
