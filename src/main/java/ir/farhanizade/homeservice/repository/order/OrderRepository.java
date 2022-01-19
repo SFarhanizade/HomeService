@@ -39,4 +39,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
 
     @Query("From Order o where o.status=:status")
     Page<Order> findByStatus(OrderStatus status, Pageable pageable);
+
+    @Query("From Order o where o.service.parent.id=:id")
+    Page<Order> findByMainService(Long id, Pageable pageable);
 }
