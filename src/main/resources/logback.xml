@@ -13,7 +13,7 @@
     </appender>
     <logger name="ir.farhanizade.homeservice.service" level="Debug" />
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
