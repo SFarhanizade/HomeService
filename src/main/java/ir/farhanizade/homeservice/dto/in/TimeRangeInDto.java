@@ -10,6 +10,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimeRangeInDto {
-    private Date time1;
-    private Date time2;
+    private Date startTime;
+    private Date endTime;
 }
