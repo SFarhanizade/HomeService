@@ -179,7 +179,7 @@ public class ExpertService {
     private UserOutDto convert2Dto(Expert expert) {
         return UserOutDto.builder()
                 .id(expert.getId())
-                .name(expert.getFName() + " " + expert.getLName())
+                .name(expert.getName())
                 .email(expert.getEmail())
                 .credit(expert.getCredit())
                 .build();

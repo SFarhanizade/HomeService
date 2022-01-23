@@ -150,8 +150,8 @@ public class UserService {
     }
 
     public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange) {
-        Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getTime1(), timeRange.getTime2());
-        Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getTime1(), timeRange.getTime2());
+        Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getStartTime(), timeRange.getEndTime());
+        Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getStartTime(), timeRange.getEndTime());
         return new ReportRegisterTimeUsersOutDto(expert, customer);
     }
 }

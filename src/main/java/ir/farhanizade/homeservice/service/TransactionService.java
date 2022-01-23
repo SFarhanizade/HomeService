@@ -67,9 +67,9 @@ public class TransactionService {
         return TransactionOutDto.builder()
                 .id(transaction.getId())
                 .customerId(transaction.getPayer().getId())
-                .customerName(transaction.getPayer().getFName() + " " + transaction.getPayer().getLName())
+                .customerName(transaction.getPayer().getName())
                 .expertId(transaction.getRecipient().getId())
-                .expertName(transaction.getRecipient().getFName() + " " + transaction.getRecipient().getLName())
+                .expertName(transaction.getRecipient().getName())
                 .amount(transaction.getAmount())
                 .dateTime(transaction.getCreatedTime())
                 .build();

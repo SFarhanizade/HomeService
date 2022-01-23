@@ -110,7 +110,7 @@ public class SuggestionService {
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
                 .ownerId(suggestion.getOwner().getId())
-                .ownerName(suggestion.getOwner().getFName() + " " + suggestion.getOwner().getLName())
+                .ownerName(suggestion.getOwner().getName())
                 .ownerPoints(suggestion.getOwner().getPoints())
                 .createdDateTime(suggestion.getCreatedTime())
                 .details(suggestion.getDetails())
@@ -161,7 +161,7 @@ public class SuggestionService {
         Suggestion suggestion = findById(id);
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
-                .ownerName(suggestion.getOwner().getFName() + " " + suggestion.getOwner().getLName())
+                .ownerName(suggestion.getOwner().getName())
                 .ownerId(suggestion.getOwner().getId())
                 .ownerPoints(suggestion.getOwner().getPoints())
                 .createdDateTime(suggestion.getCreatedTime())

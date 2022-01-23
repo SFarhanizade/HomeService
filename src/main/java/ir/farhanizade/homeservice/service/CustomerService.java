@@ -166,7 +166,7 @@ public class CustomerService {
     private UserOutDto convert2Dto(Customer customer) {
         return UserOutDto.builder()
                 .id(customer.getId())
-                .name(customer.getFName() + " " + customer.getLName())
+                .name(customer.getName())
                 .email(customer.getEmail())
                 .credit(customer.getCredit())
                 .build();
