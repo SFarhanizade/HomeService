@@ -17,12 +17,6 @@ public class RestExceptionHandler {
 
 
 
-
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(Exception ex){
-        return buildResponseEntity(ex);
-    }
-
     @ExceptionHandler(BusyOrderException.class)
     protected ResponseEntity<ResponseResult<Void>> handleBadRequest(BusyOrderException ex){
         return buildResponseEntity(ex);
