@@ -24,4 +24,8 @@ public class BasePerson extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private String password;
+
+    public String getName() {
+        return String.format("%s %s", fName, lName);
+    }
 }
