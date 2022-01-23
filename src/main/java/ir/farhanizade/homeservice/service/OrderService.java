@@ -7,8 +7,8 @@ import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import ir.farhanizade.homeservice.service.util.Validation;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Date;
 import java.util.List;
@@ -68,22 +67,30 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderOutDto findByIdAndCustomerId(Long id, Long orderId) throws EntityNotFoundException {
         Optional<Order> byIdAndCustomerId = repository.findByIdAndCustomerId(id, orderId);
-        if (byIdAndCustomerId.isPresent()) {
-            Order result = byIdAndCustomerId.get();
-            return OrderOutDto.builder()
-                    .id(result.getId())
-                    .service(result.getService().getName())
-                    .price(result.getRequest().getPrice())
-                    .suggestedDateTime(result.getRequest().getSuggestedDateTime())
-                    .createdDateTime(result.getRequest().getCreatedTime())
-                    .status(result.getStatus())
-                    .build();
+        Order result = byIdAndCustomerId.orElseThrow(() -> new EntityNotFoundException("Order Doesn't Exist!"));
+        Request request = result.getRequest();
+        OrderStatus status = result.getStatus();
+        Expert expert = new Expert();
+        Suggestion suggestion = new Suggestion();
+        if (!(status.equals(WAITING_FOR_SUGGESTION) || status.equals(WAITING_FOR_SELECTION))) {
+            suggestion = suggestionService.findAcceptedByOrderId(orderId);
+            expert = suggestion.getOwner();
         }
-        throw new EntityNotFoundException("Order Doesn't Exist!");
+        return OrderOutDto.builder()
+                .id(result.getId())
+                .service(result.getService().getName())
+                .price(request.getPrice())
+                .suggestedDateTime(request.getSuggestedDateTime())
+                .createdDateTime(request.getCreatedTime())
+                .status(result.getStatus())
+                .expertId(expert.getId())
+                .expertName(expert.getName())
+                .suggestionStatus(suggestion.getSuggestionStatus())
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> findAllByCustomerId(Long ownerId, Pageable pageable) {
+    public CustomPage<OrderOutDto> findAllByCustomerId(Long ownerId, Pageable pageable) throws EntityNotFoundException {
         Page<Order> page = repository.findAllByCustomerId(ownerId, pageable);
         return convert2Dto(page);
     }
@@ -135,7 +142,8 @@ public class OrderService {
 //                .build();
 //    }
 
-    private CustomPage<OrderOutDto> convert2Dto(Page<Order> page) {
+    private CustomPage<OrderOutDto> convert2Dto(Page<Order> page) throws EntityNotFoundException {
+        if (page.getContent().size() == 0) throw new EntityNotFoundException("No Orders Found!");
         List<OrderOutDto> data = page.getContent().stream().map(o -> convert2Dto(o)).toList();
         return CustomPage.<OrderOutDto>builder()
                 .data(data)
