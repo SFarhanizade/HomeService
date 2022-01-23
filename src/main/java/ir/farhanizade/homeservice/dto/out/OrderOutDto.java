@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.dto.out;
 
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,7 @@ public class OrderOutDto {
     private Date suggestedDateTime;
     private Date createdDateTime;
     private OrderStatus status;
+    private Long expertId;
+    private String expertName;
+    private SuggestionStatus suggestionStatus;
 }
