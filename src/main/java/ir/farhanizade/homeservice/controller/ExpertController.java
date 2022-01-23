@@ -86,7 +86,7 @@ public class ExpertController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    @GetMapping("/{id}/suggestions/{suggestionId}/{answer}")
+    @PostMapping("/{id}/suggestions/{suggestionId}/{answer}")
     public ResponseEntity<ResponseResult<SuggestionAnswerOutDto>>
     answerSuggestion(@PathVariable Long id, @PathVariable Long suggestionId, @PathVariable String answer)
             throws EntityNotFoundException, BadEntryException {
@@ -106,7 +106,7 @@ public class ExpertController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    @GetMapping("/{id}/suggestions/{suggestionId}/start")
+    @PostMapping("/{id}/suggestions/{suggestionId}/start")
     public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
         EntityOutDto result = expertService.startToWork(id, suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -117,8 +117,8 @@ public class ExpertController {
         HttpStatus status = HttpStatus.CREATED;
         return ResponseEntity.status(status).body(response);
     }
-
-    @GetMapping("/{id}/suggestions/{suggestionId}/done")
+    
+    @PostMapping("/{id}/suggestions/{suggestionId}/done")
     public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
         EntityOutDto result = expertService.finishWork(id, suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()

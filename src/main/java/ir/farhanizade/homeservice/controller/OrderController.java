@@ -22,7 +22,7 @@ public class OrderController {
     private final ExpertService expertService;
     private final OrderService orderService;
 
-    @PostMapping
+    @GetMapping
     public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showList(@RequestBody ExpertInDto request, Pageable pageable) throws EntityNotFoundException {
         CustomPage<OrderOutDto> result = expertService.loadAvailableOrders(request, pageable);
         ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
@@ -40,7 +40,7 @@ public class OrderController {
                 .code(1)
                 .message("Loaded successfully!")
                 .build();
-        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByRangeOfTime(timeRange.getTime1(), timeRange.getTime2(), pageable);
+        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByRangeOfTime(timeRange.getStartTime(), timeRange.getEndTime(), pageable);
         response.setData(data);
         return ResponseEntity.ok(response);
     }

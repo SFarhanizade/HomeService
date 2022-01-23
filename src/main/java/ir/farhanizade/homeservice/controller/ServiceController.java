@@ -27,7 +27,7 @@ public class ServiceController {
     private final MainServiceService mainService;
     private final SubServiceService subService;
 
-    @PostMapping
+    @GetMapping
     public ResponseEntity<ResponseResult<List<MainServiceOutDto>>> show() {
         ResponseResult<List<MainServiceOutDto>> response = ResponseResult.<List<MainServiceOutDto>>builder()
                 .code(1)
@@ -58,7 +58,7 @@ public class ServiceController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> save(@RequestBody ServiceInDto service) throws DuplicateEntityException, EntityNotFoundException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)

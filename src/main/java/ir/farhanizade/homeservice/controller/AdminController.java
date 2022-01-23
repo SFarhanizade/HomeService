@@ -28,7 +28,7 @@ public class AdminController {
         return userController.create(user, Admin.class);
     }
 
-    @GetMapping("/{id}/experts/{expertId}/accept")
+    @PostMapping("/{id}/experts/{expertId}/accept")
     public ResponseEntity<ResponseResult<EntityOutDto>> acceptExpert(@PathVariable Long id, @PathVariable Long expertId) throws UserNotValidException, EntityNotFoundException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
@@ -40,7 +40,7 @@ public class AdminController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/search")
+    @GetMapping("/{id}/search")
     public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@PathVariable Long id, @RequestBody UserSearchInDto param, Pageable pageable) throws EntityNotFoundException {
         CustomPage<UserSearchOutDto> result = adminService.search(param, pageable);
 
