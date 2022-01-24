@@ -17,6 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
+        name = "comments",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "customer_id", "expert_id"})}
 )
 public class Comment extends BaseEntity {
