@@ -5,6 +5,8 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
@@ -14,7 +16,8 @@ import javax.persistence.MappedSuperclass;
 @NoArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public class BaseService extends BaseEntity{
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
+public class BaseService extends BaseEntity {
     @Column(nullable = false)
     private String name;
 }
