@@ -18,6 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
+        name = "transactions",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id"})}
 )
 public class Transaction extends BaseEntity {
