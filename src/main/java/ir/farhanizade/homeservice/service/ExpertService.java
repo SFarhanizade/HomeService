@@ -89,8 +89,8 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> loadAvailableOrders(ExpertInDto expert, Pageable pageable) throws EntityNotFoundException {
-        Expert entity = findById(expert.getId());
+    public CustomPage<OrderOutDto> loadAvailableOrders(Long id, Pageable pageable) throws EntityNotFoundException {
+        Expert entity = findById(id);
         Set<SubService> expertises = entity.getExpertises();
         if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
 //        Pageable pageable = Pageable.unpaged();
@@ -243,7 +243,7 @@ public class ExpertService {
 
     public CommentOutDto getComment(Long id, Long comment) {
         exists(id);
-        return commentService.findByIdAndExpertId(id, comment);
+        return commentService.findByIdAndExpertId(comment, id);
     }
 
     public CustomPage<OrderFinishOutDto> getOrders(Long id, Pageable pageable) {
