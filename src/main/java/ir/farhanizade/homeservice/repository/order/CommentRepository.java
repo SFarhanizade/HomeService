@@ -14,4 +14,7 @@ public interface CommentRepository extends BaseRepository<Comment> {
 
     @Query("From Comment c where c.id=:id and c.customer.id=:customerId")
     Comment findByIdAndCustomerId(Long id, Long customerId);
+
+    @Query("From Comment c where c.id=:id and c.expert.id=:expertId")
+    Comment findByIdAndExpertId(Long id, Long expertId);
 }
