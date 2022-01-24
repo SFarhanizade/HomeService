@@ -42,7 +42,7 @@ public class CommentService {
     }
 
     public CommentOutDto findByIdAndExpertId(Long id, Long expertId) {
-        Comment comment = repository.findByIdAndCustomerId(id, expertId);
+        Comment comment = repository.findByIdAndExpertId(id, expertId);
         CommentOutDto result = convert2Dto(comment);
         return result;
     }
