@@ -17,5 +17,5 @@ public class UserSearchInDto {
     protected String lastname;
     protected String email;
     private List<Long> expertises;
-    private int points;
+    private Integer points;
 }
