@@ -1,11 +1,10 @@
 package ir.farhanizade.homeservice.service;
 
 
+import ir.farhanizade.homeservice.controller.api.filter.UserSpecification;
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
@@ -14,11 +13,11 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ public class UserService {
     private final UserRepository repository;
     private final ExpertService expertService;
     private final CustomerService customerService;
-    private final AdminService adminService;
+    // private final AdminService adminService;
     private final TransactionService transactionService;
     private final CommentService commentService;
     private final OrderService orderService;
@@ -59,25 +58,36 @@ public class UserService {
         if (type == Expert.class) {
             result = expertService.save(user);
 
-        } else if (type == Customer.class) {
+        } else /*if (type == Customer.class)*/ {
             result = customerService.save(user);
-        } else {
+        } /*else {
             result = adminService.save(user);
-        }
+        }*/
         return result;
     }
 
     @Transactional(readOnly = true)
     public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<UserSearchOutDto> result;
-        if ("expert".equals(user.getType())) {
-            result = expertService.search(user, pageable);
-        } else if ("customer".equals(user.getType())) {
-            result = customerService.search(user, pageable);
-        } else {
-            result = searchUser(user, pageable);
+        if (isExpert(user)) {
+            return expertService.search(user, pageable);
         }
-        return result;
+        UserSpecification<User> specification = new UserSpecification<>();
+        Specification<User> filter = specification.getUsers(user);
+        Page<User> all = repository.findAll(filter, pageable);
+        CustomPage<User> result = new CustomPage<>();
+        result.setPageSize(all.getSize());
+        result.setLastPage(all.getTotalPages());
+        result.setPageNumber(all.getNumber());
+        result.setTotalElements(all.getTotalElements());
+        result.setData(all.getContent());
+        return convert2Dto(result);
+    }
+
+    private boolean isExpert(UserSearchInDto user) {
+        boolean hasExpertises = user.getExpertises() != null;
+        boolean isExpert = "expert".equals(user.getType());
+        boolean hasPoints = user.getPoints() != null;
+        return hasPoints || hasExpertises || isExpert;
     }
 
     @Transactional(readOnly = true)
