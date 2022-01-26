@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.controller.api.filter.UserSpecification;
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
@@ -9,7 +10,6 @@ import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
-import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -18,6 +18,7 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -155,8 +156,16 @@ public class ExpertService {
 
     @Transactional(readOnly = true)
     public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) {
-        CustomPage<Expert> searchResult = repository.search(user, pageable);
-        return convert2Dto(searchResult);
+        UserSpecification<Expert> specification = new UserSpecification<>();
+        Specification<Expert> filter = specification.getUsers(user);
+        Page<Expert> all = repository.findAll(filter, pageable);
+        CustomPage<Expert> result = new CustomPage<>();
+        result.setPageSize(all.getSize());
+        result.setLastPage(all.getTotalPages());
+        result.setPageNumber(all.getNumber());
+        result.setTotalElements(all.getTotalElements());
+        result.setData(all.getContent());
+        return convert2Dto(result);
     }
 
     private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<Expert> list) {
