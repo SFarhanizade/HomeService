@@ -21,6 +21,7 @@ public class AdminService {
     private final AdminRepository repository;
     private final ExpertService expertService;
     private final CustomerService customerService;
+    private final UserService userService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, UserNotValidException, DuplicateEntityException {
@@ -49,12 +50,8 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
-        if (user.getType().equals("expert"))
-            return expertService.search(user, pageable);
-        else if (user.getType().equals("customer")) {
-            return customerService.search(user, pageable);
-        }
-        return null;
+    public CustomPage<UserSearchOutDto> search(Long id, UserSearchInDto user, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
+        exists(id);
+        return userService.search(user, pageable);
     }
 }
