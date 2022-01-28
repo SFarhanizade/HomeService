@@ -14,11 +14,13 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.ExpertRepository;
+import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,8 @@ public class ExpertService {
     private final OrderService orderService;
     private final SuggestionService suggestionService;
     private final CommentService commentService;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
@@ -50,6 +54,9 @@ public class ExpertService {
             throw new UserNotValidException("User is not valid!");
         if (finalCheck(expert))
             throw new DuplicateEntityException("User exists!");
+        expert.setRoles(Set.of(ApplicationUserRole.EXPERT));
+        expert.setPassword(passwordEncoder.encode(expert.getPassword()));
+        Validation.enableUser(expert);
         Expert result = repository.save(expert);
         return new EntityOutDto(result.getId());
     }

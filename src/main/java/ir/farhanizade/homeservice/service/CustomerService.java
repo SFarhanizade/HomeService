@@ -18,16 +18,20 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
+import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.PAID;
 
@@ -40,6 +44,8 @@ public class CustomerService {
     private final SuggestionService suggestionService;
     private final TransactionService transactionService;
     private final CommentService commentService;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
@@ -51,6 +57,9 @@ public class CustomerService {
 
         if (finalCheck(customer))
             throw new DuplicateEntityException("User exists!");
+        customer.setRoles(Set.of(ApplicationUserRole.CUSTOMER));
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        Validation.enableUser(customer);
         Customer result = repository.save(customer);
         return new EntityOutDto(result.getId());
     }
@@ -89,13 +98,6 @@ public class CustomerService {
         String email = customer.getEmail();
         Customer byEmail = repository.findByEmail(email);
         return byEmail != null && customer.getId() == null;
-    }
-
-    @Transactional(readOnly = true)
-    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<Customer> search = repository.search(user, pageable);
-        if (search.getData().isEmpty()) throw new EntityNotFoundException("Nothing Found!");
-        return convert2Dto(search);
     }
 
     private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<Customer> list) {
