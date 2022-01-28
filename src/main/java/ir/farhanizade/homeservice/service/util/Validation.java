@@ -37,8 +37,6 @@ public class Validation {
     }
 
     public static boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
-        Customer owner = request.getOwner();
-        isValid(owner);
         Order order = request.getOrder();
         isValid(order);
         if (request.getAddress() == null)
@@ -85,7 +83,6 @@ public class Validation {
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         if (suggestion.getId() != null) return true;
         Expert owner = suggestion.getOwner();
-        isValid(owner);
         Order order = suggestion.getOrder();
         if (!owner.getExpertises().contains(order.getService()))
             throw new BadEntryException("This Order Is Not Available For This Expert!");
@@ -125,5 +122,12 @@ public class Validation {
             throw new EmailNotValidException("Email is not valid!");
         }
         return true;
+    }
+
+    public static void enableUser(User user) {
+        user.setEnabled(true);
+        user.setAccountNonLocked(true);
+        user.setAccountNonExpired(true);
+        user.setCredentialsNonExpired(true);
     }
 }

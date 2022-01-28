@@ -25,7 +25,13 @@ public class AdminController {
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
-        return userController.create(user, Admin.class);
+        EntityOutDto data = adminService.save(user);
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("User added successfully.")
+                .data(data)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/{id}/experts/{expertId}/accept")
@@ -41,8 +47,8 @@ public class AdminController {
     }
 
     @GetMapping("/{id}/search")
-    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@PathVariable Long id, @RequestBody UserSearchInDto param, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<UserSearchOutDto> result = adminService.search(param, pageable);
+    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@PathVariable Long id, @RequestBody UserSearchInDto param, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
+        CustomPage<UserSearchOutDto> result = adminService.search(id, param, pageable);
 
         ResponseResult<CustomPage<UserSearchOutDto>> response = ResponseResult.<CustomPage<UserSearchOutDto>>builder()
                 .data(result)
