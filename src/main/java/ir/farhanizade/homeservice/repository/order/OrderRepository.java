@@ -48,4 +48,7 @@ public interface OrderRepository extends BaseRepository<Order>, CustomOrderRepos
 
     @Query("Select Count(o) From Order o where o.status='DONE' or o.status='PAID'")
     Long countDoneOrders();
+
+    @Query("From Order o where o.id=:id and o.request.owner.id=:ownerId")
+    Optional<Order> findByIdAndOwnerId(Long id, Long ownerId);
 }
