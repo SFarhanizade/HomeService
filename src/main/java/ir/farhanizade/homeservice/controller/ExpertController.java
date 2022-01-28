@@ -18,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.CANCELLED;
 
@@ -130,9 +128,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/transactions")
-    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<TransactionOutDto> result = userService.getTransactions(id, pageable);
+    @GetMapping("/transactions")
+    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<TransactionOutDto> result = userService.getTransactions(pageable);
         ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -142,9 +140,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/transactions/{transaction}")
-    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException {
-        TransactionOutDto result = userService.getTransaction(id, transaction);
+    @GetMapping("/transactions/{transaction}")
+    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        TransactionOutDto result = userService.getTransaction(transaction);
         ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -154,9 +152,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<CommentOutDto> result = userService.getComments(id, pageable);
+    @GetMapping("/comments")
+    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<CommentOutDto> result = userService.getComments(pageable);
         ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -190,9 +188,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/credit")
-    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit(@PathVariable Long id) throws EntityNotFoundException {
-        UserCreditOutDto result = userService.loadCreditById(id);
+    @GetMapping("/credit")
+    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        UserCreditOutDto result = userService.loadCredit();
         ResponseResult<UserCreditOutDto> response = ResponseResult.<UserCreditOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -202,9 +200,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/credit")
-    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@PathVariable Long id, @RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException {
-        UserIncreaseCreditOutDto result = userService.increaseCredit(id, request);
+    @PostMapping("/credit")
+    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        UserIncreaseCreditOutDto result = userService.increaseCredit(request);
         ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
                 .code(1)
                 .message("Credit increased successfully.")

@@ -218,11 +218,13 @@ public class OrderService {
                     if (userId == 0L)
                         id = o.getRequest().getOwner().getId();
                     Suggestion suggestion = suggestionService.findAcceptedByOrderId(o.getId());
+                    Expert expert = suggestion.getOwner();
+                    Long expertId = (expert == null) ? null : expert.getId();
                     return OrderOfUserOutDto.builder()
                             .customerId(id)
                             .requestId(o.getRequest().getId())
                             .orderId(o.getId())
-                            .expertId(suggestion.getOwner().getId())
+                            .expertId(expertId)
                             .suggestionId(suggestion.getId())
                             .mainService(o.getService().getParent().getName())
                             .subService(o.getService().getName())

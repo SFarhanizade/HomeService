@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException {
+    public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Password changed successfully!")
@@ -60,13 +61,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    @GetMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
+    @GetMapping("/orders")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully!")
                 .build();
-        CustomPage<OrderOfUserOutDto> data = userService.getOrders(id, pageable);
+        CustomPage<OrderOfUserOutDto> data = userService.getOrders(pageable);
         response.setData(data);
         return ResponseEntity.ok(response);
     }

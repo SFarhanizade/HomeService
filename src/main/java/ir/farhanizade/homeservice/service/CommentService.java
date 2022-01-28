@@ -5,7 +5,11 @@ import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.exception.BadEntryException;
+import ir.farhanizade.homeservice.exception.EntityNotFoundException;
+import ir.farhanizade.homeservice.exception.UserNotLoggedInException;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +33,8 @@ public class CommentService {
         return new EntityOutDto(saved.getId());
     }
 
-    public CustomPage<CommentOutDto> findAllByUserId(Long id, Pageable pageable) {
+    public CustomPage<CommentOutDto> findAllByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Page<Comment> page = repository.findAllByUserId(id, pageable);
         return convert2Dto(page);
     }

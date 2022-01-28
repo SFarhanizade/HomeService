@@ -141,9 +141,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/transactions")
-    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CustomPage<TransactionOutDto> result = userService.getTransactions(id, pageable);
+    @GetMapping("/transactions")
+    public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        CustomPage<TransactionOutDto> result = userService.getTransactions(pageable);
         ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -153,9 +153,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/transactions/{transaction}")
-    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long id, @PathVariable Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        TransactionOutDto result = userService.getTransaction(id, transaction);
+    @GetMapping("/transactions/{transaction}")
+    public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long transaction) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        TransactionOutDto result = userService.getTransaction(transaction);
         ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -177,9 +177,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CustomPage<CommentOutDto> result = userService.getComments(id, pageable);
+    @GetMapping("/comments")
+    public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        CustomPage<CommentOutDto> result = userService.getComments(pageable);
         ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -190,8 +190,8 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/comments/{comment}")
-    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id,@PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CommentOutDto result = customerService.getComment(id,comment);
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id, @PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
+        CommentOutDto result = customerService.getComment(id, comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -201,9 +201,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/credit")
-    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit(@PathVariable Long id) throws EntityNotFoundException {
-        UserCreditOutDto result = userService.loadCreditById(id);
+    @GetMapping("/credit")
+    public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        UserCreditOutDto result = userService.loadCredit();
         ResponseResult<UserCreditOutDto> response = ResponseResult.<UserCreditOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -213,9 +213,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/credit")
-    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@PathVariable Long id, @RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException {
-        UserIncreaseCreditOutDto result = userService.increaseCredit(id, request);
+    @PostMapping("/credit")
+    public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        UserIncreaseCreditOutDto result = userService.increaseCredit(request);
         ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
                 .code(1)
                 .message("Credit increased successfully.")

@@ -6,11 +6,14 @@ import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.exception.BadEntryException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.exception.NotEnoughMoneyException;
+import ir.farhanizade.homeservice.exception.UserNotLoggedInException;
 import ir.farhanizade.homeservice.repository.TransactionRepository;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.repository.user.ExpertRepository;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +49,8 @@ public class TransactionService {
         return new EntityOutDto(saved.getId());
     }
 
-    public CustomPage<TransactionOutDto> findByUserId(Long id, Pageable pageable) {
+    public CustomPage<TransactionOutDto> findByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Page<Transaction> page = repository.findByUserId(id, pageable);
         return convert2Dto(page);
     }
@@ -75,8 +79,9 @@ public class TransactionService {
                 .build();
     }
 
-    public TransactionOutDto findById(Long transaction) throws EntityNotFoundException {
-        Optional<Transaction> byId = repository.findById(transaction);
+    public TransactionOutDto findById(Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
+        Optional<Transaction> byId = repository.findByIdAndOwnerId(transaction, id);
         Transaction result = byId.orElseThrow(() -> new EntityNotFoundException("Transaction Not Found!"));
         return convert2Dto(result);
     }
