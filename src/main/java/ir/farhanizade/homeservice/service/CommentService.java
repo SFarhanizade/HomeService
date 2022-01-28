@@ -39,14 +39,16 @@ public class CommentService {
         return convert2Dto(page);
     }
 
-    public CommentOutDto findByIdAndCustomerId(Long id, Long customerId) {
+    public CommentOutDto findByIdAndCustomerId(Long customerId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Comment comment = repository.findByIdAndCustomerId(id, customerId);
         CommentOutDto result = convert2Dto(comment);
         result.setDescription(comment.getDescription());
         return result;
     }
 
-    public CommentOutDto findByIdAndExpertId(Long id, Long expertId) {
+    public CommentOutDto findByIdAndExpertId(Long id) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long expertId = LoggedInUser.id();
         Comment comment = repository.findByIdAndExpertId(id, expertId);
         CommentOutDto result = convert2Dto(comment);
         return result;

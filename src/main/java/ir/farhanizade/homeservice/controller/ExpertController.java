@@ -38,7 +38,7 @@ public class ExpertController {
     @PostMapping("/addService")
     public ResponseEntity<ResponseResult<ExpertAddServiceOutDto>>
     addService(@RequestBody ExpertAddServiceInDto request)
-            throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException {
+            throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException, UserNotLoggedInException, BadEntryException {
         HttpStatus status = HttpStatus.ACCEPTED;
         ExpertAddServiceOutDto result = expertService.addService(request);
         ResponseResult<ExpertAddServiceOutDto> response = ResponseResult.<ExpertAddServiceOutDto>builder()
@@ -49,10 +49,10 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/suggestions")
+    @PostMapping("/suggestions")
     public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>>
-    suggest(@PathVariable Long id, @RequestBody ExpertAddSuggestionInDto request) throws Exception {
-        ExpertAddSuggestionOutDto result = expertService.suggest(id, request);
+    suggest(@RequestBody ExpertAddSuggestionInDto request) throws Exception {
+        ExpertAddSuggestionOutDto result = expertService.suggest(request);
         ResponseResult<ExpertAddSuggestionOutDto> response = ResponseResult.<ExpertAddSuggestionOutDto>builder()
                 .code(1)
                 .message("Suggestion added successfully.")
@@ -62,16 +62,16 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/suggestions/{status}")
+    @GetMapping("/suggestions/{status}")
     public ResponseEntity<ResponseResult<CustomPage<ExpertSuggestionOutDto>>>
-    getSuggestions(@PathVariable Long id, @PathVariable String status, Pageable pageable)
-            throws EntityNotFoundException, BadEntryException {
+    getSuggestions(@PathVariable String status, Pageable pageable)
+            throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
         CustomPage<ExpertSuggestionOutDto> result;
         switch (status) {
-            case "accepted" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.ACCEPTED);
-            case "pending" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.PENDING);
-            case "rejected" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.REJECTED);
-            case "all" -> result = expertService.getSuggestions(id, pageable, SuggestionStatus.values());
+            case "accepted" -> result = expertService.getSuggestions(pageable, SuggestionStatus.ACCEPTED);
+            case "pending" -> result = expertService.getSuggestions(pageable, SuggestionStatus.PENDING);
+            case "rejected" -> result = expertService.getSuggestions(pageable, SuggestionStatus.REJECTED);
+            case "all" -> result = expertService.getSuggestions(pageable, SuggestionStatus.values());
             default -> throw new BadEntryException("Status is Wrong!");
         }
         ResponseResult<CustomPage<ExpertSuggestionOutDto>> response =
@@ -84,14 +84,14 @@ public class ExpertController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    @PostMapping("/{id}/suggestions/{suggestionId}/{answer}")
+    @PostMapping("/suggestions/{suggestionId}/{answer}")
     public ResponseEntity<ResponseResult<SuggestionAnswerOutDto>>
-    answerSuggestion(@PathVariable Long id, @PathVariable Long suggestionId, @PathVariable String answer)
-            throws EntityNotFoundException, BadEntryException {
+    answerSuggestion(@PathVariable Long suggestionId, @PathVariable String answer)
+            throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
         SuggestionAnswerOutDto result;
         switch (answer) {
-            case "accept" -> result = expertService.answerSuggestion(id, suggestionId, BUSY);
-            case "reject" -> result = expertService.answerSuggestion(id, suggestionId, CANCELLED);
+            case "accept" -> result = expertService.answerSuggestion(suggestionId, BUSY);
+            case "reject" -> result = expertService.answerSuggestion(suggestionId, CANCELLED);
             default -> throw new BadEntryException("Status is Wrong!");
         }
         ResponseResult<SuggestionAnswerOutDto> response =
@@ -104,9 +104,9 @@ public class ExpertController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    @PostMapping("/{id}/suggestions/{suggestionId}/start")
-    public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
-        EntityOutDto result = expertService.startToWork(id, suggestionId);
+    @PostMapping("/suggestions/{suggestionId}/start")
+    public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException {
+        EntityOutDto result = expertService.startToWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Work started successfully.")
@@ -115,10 +115,10 @@ public class ExpertController {
         HttpStatus status = HttpStatus.CREATED;
         return ResponseEntity.status(status).body(response);
     }
-    
-    @PostMapping("/{id}/suggestions/{suggestionId}/done")
-    public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long id, @PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException {
-        EntityOutDto result = expertService.finishWork(id, suggestionId);
+
+    @PostMapping("/suggestions/{suggestionId}/done")
+    public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException {
+        EntityOutDto result = expertService.finishWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Work finished successfully.")
@@ -164,9 +164,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/comments/{comment}")
-    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id, @PathVariable Long comment) {
-        CommentOutDto result = expertService.getComment(id, comment);
+    @GetMapping("/comments/{comment}")
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long comment) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        CommentOutDto result = expertService.getComment(comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")
@@ -176,9 +176,9 @@ public class ExpertController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<CustomPage<OrderFinishOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) {
-        CustomPage<OrderFinishOutDto> result = expertService.getOrders(id, pageable);
+    @GetMapping("/orders")
+    public ResponseEntity<ResponseResult<CustomPage<OrderFinishOutDto>>> showOrders(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        CustomPage<OrderFinishOutDto> result = expertService.getOrders(pageable);
         ResponseResult<CustomPage<OrderFinishOutDto>> response = ResponseResult.<CustomPage<OrderFinishOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")

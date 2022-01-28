@@ -11,6 +11,7 @@ import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -65,7 +66,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderOutDto findByIdAndCustomerId(Long id, Long orderId) throws EntityNotFoundException {
+    public OrderOutDto findByIdAndCustomerId(Long orderId) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
         Optional<Order> byIdAndCustomerId = repository.findByIdAndCustomerId(id, orderId);
         Order result = byIdAndCustomerId.orElseThrow(() -> new EntityNotFoundException("Order Doesn't Exist!"));
         Request request = result.getRequest();
@@ -90,14 +92,17 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> findAllByCustomerId(Long ownerId, Pageable pageable) throws EntityNotFoundException {
-        Page<Order> page = repository.findAllByCustomerId(ownerId, pageable);
+    public CustomPage<OrderOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
+        Page<Order> page = repository.findAllByCustomerId(id, pageable);
         return convert2Dto(page);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto removeOrderByIdAndOwnerId(Long orderId, Long ownerId) throws EntityNotFoundException, BadEntryException {
-        Order order = findById(orderId);
+    public EntityOutDto removeOrderByIdAndOwnerId(Long orderId) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+        Long ownerId = LoggedInUser.id();
+        Order order = repository.findByIdAndOwnerId(orderId, ownerId)
+                .orElseThrow(() -> new EntityNotFoundException("Order Not Found!"));
         Request request = order.getRequest();
         if (!request.getOwner().getId().equals(ownerId)) throw new EntityNotFoundException("This order is not yours!");
         if (request.getStatus().equals(BaseMessageStatus.DONE))
@@ -114,8 +119,9 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException {
-        Suggestion suggestion = suggestionService.findById(id);
+    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException, UserNotLoggedInException {
+        Long customerId = LoggedInUser.id();
+        Suggestion suggestion = suggestionService.findByIdAndCustomerId(id, customerId);
         Validation.isValid(suggestion);
         Order order = suggestion.getOrder();
         if (!(order.getStatus().equals(WAITING_FOR_SELECTION) ||
@@ -165,7 +171,8 @@ public class OrderService {
                 .build();
     }
 
-    public CustomPage<OrderFinishOutDto> findAllByExpertId(Long id, Pageable pageable) {
+    public CustomPage<OrderFinishOutDto> findAllByExpertId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByExpertId(id, pageable);
         return convert2OutDto(page);
     }
@@ -195,18 +202,20 @@ public class OrderService {
                 .build();
     }
 
-    public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Long id, Pageable pageable) {
+    public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByCustomerId(id, pageable);
         return convert2CustomPage(page, id);
     }
 
-    public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Long id, Pageable pageable) {
+    public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByExpertId(id, pageable);
         return convert2CustomPage(page, 0L);
     }
 
-    public CustomPage<OrderOfUserOutDto> getOrdersByRangeOfTime(Date time1, Date time2, Pageable pageable) {
-        Page<Order> page = repository.findOrdersByRangeOfTime(time1, time2, pageable);
+    public CustomPage<OrderOfUserOutDto> getOrdersByRangeOfTime(Date startTime, Date endTime, Pageable pageable) {
+        Page<Order> page = repository.findOrdersByRangeOfTime(startTime, endTime, pageable);
         return convert2CustomPage(page, 0L);
     }
 

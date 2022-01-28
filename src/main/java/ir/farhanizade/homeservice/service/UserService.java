@@ -157,10 +157,10 @@ public class UserService {
         UserTypeAndId typeAndId = LoggedInUser.getTypeAndId();
         switch (typeAndId.getRole()) {
             case CUSTOMER: {
-                return orderService.findOrdersByCustomer(typeAndId.getId(), pageable);
+                return orderService.findOrdersByCustomer(pageable);
             }
             case EXPERT: {
-                return orderService.getOrdersOfExpert(typeAndId.getId(), pageable);
+                return orderService.getOrdersOfExpert(pageable);
             }
             default: {
                 throw new BadEntryException("User Not Allowed");

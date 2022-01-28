@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpertAddServiceInDto {
-    private Long expertId;
     private Long serviceId;
 }

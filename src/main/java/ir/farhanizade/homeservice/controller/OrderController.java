@@ -22,9 +22,18 @@ public class OrderController {
     private final ExpertService expertService;
     private final OrderService orderService;
 
-    @GetMapping("experts/{id}")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showList(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<OrderOutDto> result = expertService.loadAvailableOrders(id, pageable);
+    @GetMapping("experts")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showList(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<OrderOutDto> result = null;
+        try {
+            result = expertService.loadAvailableOrders(pageable);
+        } catch (EntityNotFoundException e) {
+            e.printStackTrace();
+        } catch (UserNotLoggedInException e) {
+            e.printStackTrace();
+        } catch (BadEntryException e) {
+            e.printStackTrace();
+        }
         ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")

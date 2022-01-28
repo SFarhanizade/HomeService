@@ -10,6 +10,7 @@ import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.AdminRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -48,8 +49,7 @@ public class AdminService {
         return byEmail != null && admin.getId() == null;
     }
 
-    public EntityOutDto acceptExpert(Long id, Long expertId) throws UserNotValidException, EntityNotFoundException {
-        exists(id);
+    public EntityOutDto acceptExpert(Long expertId) throws UserNotValidException, EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         return expertService.acceptExpert(expertId);
     }
 
@@ -59,8 +59,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<UserSearchOutDto> search(Long id, UserSearchInDto user, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
-        exists(id);
+    public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
         return userService.search(user, pageable);
     }
 }

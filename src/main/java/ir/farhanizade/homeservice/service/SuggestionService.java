@@ -9,6 +9,7 @@ import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.SuggestionRepository;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,8 +52,9 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order,Pageable pageable) throws EntityNotFoundException {
-        Page<Suggestion> suggestions = repository.findAllByOrderId(order, pageable);
+    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order,Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
+        Page<Suggestion> suggestions = repository.findAllByOrderId(id,order, pageable);
 //        if (suggestions.size() == 0)
 //            throw new EntityNotFoundException("No Suggestions Found For This Order!");
         return convert2Dto(suggestions);
@@ -68,21 +70,24 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByOwnerId(Long id, Pageable pageable) throws EntityNotFoundException {
+    public CustomPage<SuggestionOutDto> findAllByOwnerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByOwnerId(id, pageable);
         if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByCustomerId(Long id, Pageable pageable) throws EntityNotFoundException {
+    public CustomPage<SuggestionOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long id = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByCustomerId(id, pageable);
         if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(Long ownerId, SuggestionStatus[] status, Pageable pageable) throws EntityNotFoundException {
+    public CustomPage<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(SuggestionStatus[] status, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long ownerId = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByOwnerIdAndStatus(ownerId, status, pageable);
         if (page.getContent().isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
         return convert2DtoList(page);
@@ -134,7 +139,8 @@ public class SuggestionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public SuggestionAnswerOutDto answer(Long ownerId, Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException {
+    public SuggestionAnswerOutDto answer(Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+        Long ownerId = LoggedInUser.id();
         Suggestion suggestion = findById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
         if(!suggestion.getStatus().equals(BaseMessageStatus.WAITING)) throw new BadEntryException("This suggestion is done!");
@@ -157,8 +163,9 @@ public class SuggestionService {
                 .build();
     }
 
-    public SuggestionOutDto getById(Long id) throws EntityNotFoundException {
-        Suggestion suggestion = findById(id);
+    public SuggestionOutDto getById(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long customerId = LoggedInUser.id();
+        Suggestion suggestion = findByIdAndCustomerId(id,customerId);
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
                 .ownerName(suggestion.getOwner().getName())
@@ -172,7 +179,8 @@ public class SuggestionService {
                 .build();
     }
 
-    public Suggestion findByIdAndOwnerId(Long id, Long ownerId) throws EntityNotFoundException {
+    public Suggestion findByIdAndOwnerId(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Long ownerId = LoggedInUser.id();
         findById(id);
         Optional<Suggestion> byIdAndOwnerId = repository.findByIdAndOwnerId(id, ownerId);
         return byIdAndOwnerId.orElseThrow(() -> new EntityNotFoundException("Suggestion Not Found!"));
@@ -191,5 +199,10 @@ public class SuggestionService {
 
     public Long countNumberOfSuggestions() {
         return repository.countNumberOfSuggestions();
+    }
+
+    public Suggestion findByIdAndCustomerId(Long id, Long customerId) throws EntityNotFoundException {
+        return repository.findByIdAndCustomerId(id, customerId)
+                .orElseThrow(() -> new EntityNotFoundException("Suggestion Not Found!"));
     }
 }

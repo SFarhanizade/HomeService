@@ -26,16 +26,15 @@ public class CustomerController {
     private final UserController userController;
     private final CustomerService customerService;
     private final UserService userService;
-    private final RequestService requestService;
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
         return userController.create(user, Customer.class);
     }
 
-    @GetMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<OrderOutDto> result = customerService.getOrders(id, pageable);
+    @GetMapping("/orders")
+    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<OrderOutDto> result = customerService.getOrders(pageable);
         ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
@@ -45,9 +44,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/orders")
-    public ResponseEntity<ResponseResult<EntityOutDto>> request(@PathVariable Long id, @RequestBody RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
-        EntityOutDto result = customerService.request(id, request);
+    @PostMapping("/orders")
+    public ResponseEntity<ResponseResult<EntityOutDto>> request(@RequestBody RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException, UserNotLoggedInException {
+        EntityOutDto result = customerService.request(request);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Order saved successfully!")
@@ -57,9 +56,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/orders/{order}")
-    public ResponseEntity<ResponseResult<OrderOutDto>> showOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException {
-        OrderOutDto result = customerService.getOrder(id, order);
+    @GetMapping("/orders/{order}")
+    public ResponseEntity<ResponseResult<OrderOutDto>> showOrder(@PathVariable Long order) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        OrderOutDto result = customerService.getOrder(order);
         ResponseResult<OrderOutDto> response = ResponseResult.<OrderOutDto>builder()
                 .code(1)
                 .message("Order loaded successfully.")
@@ -69,9 +68,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/orders/{order}/remove")
-    public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long id, @PathVariable Long order) throws EntityNotFoundException, BadEntryException {
-        EntityOutDto result = customerService.removeOrder(id, order);
+    @PostMapping("/orders/{order}/remove")
+    public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long order) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+        EntityOutDto result = customerService.removeOrder(order);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Order removed successfully.")
@@ -81,9 +80,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/orders/{order}/suggestions")
-    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long id, @PathVariable Long order, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<SuggestionOutDto> result = customerService.getSuggestionsByOrder(id, order, pageable);
+    @GetMapping("/orders/{order}/suggestions")
+    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long order, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<SuggestionOutDto> result = customerService.getSuggestionsByOrder(order, pageable);
         ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -93,9 +92,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/suggestions")
-    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showAllSuggestions(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        CustomPage<SuggestionOutDto> result = customerService.getSuggestions(id, pageable);
+    @GetMapping("/suggestions")
+    public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showAllSuggestions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        CustomPage<SuggestionOutDto> result = customerService.getSuggestions(pageable);
         ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -105,9 +104,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/suggestions/{suggestion}")
-    public ResponseEntity<ResponseResult<SuggestionOutDto>> showSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException {
-        SuggestionOutDto result = customerService.getSuggestion(id, suggestion);
+    @GetMapping("/suggestions/{suggestion}")
+    public ResponseEntity<ResponseResult<SuggestionOutDto>> showSuggestion(@PathVariable Long suggestion) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        SuggestionOutDto result = customerService.getSuggestion(suggestion);
         ResponseResult<SuggestionOutDto> response = ResponseResult.<SuggestionOutDto>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -117,9 +116,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/suggestions/{suggestion}/accept")
-    public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
-        EntityOutDto result = customerService.acceptSuggestion(id, suggestion);
+    @PostMapping("/suggestions/{suggestion}/accept")
+    public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, UserNotLoggedInException {
+        EntityOutDto result = customerService.acceptSuggestion(suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("List of suggestions loaded successfully.")
@@ -129,9 +128,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/suggestions/{suggestion}/pay")
-    public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long id, @PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        EntityOutDto result = customerService.pay(id, suggestion);
+    @PostMapping("/suggestions/{suggestion}/pay")
+    public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        EntityOutDto result = customerService.pay(suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Paid successfully.")
@@ -165,9 +164,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/{id}/suggestions/{suggestion}/comment")
-    public ResponseEntity<ResponseResult<EntityOutDto>> comment(@PathVariable Long id, @PathVariable Long suggestion, @RequestBody CommentInDto comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        EntityOutDto result = customerService.comment(id, suggestion, comment);
+    @PostMapping("/suggestions/{suggestion}/comment")
+    public ResponseEntity<ResponseResult<EntityOutDto>> comment(@PathVariable Long suggestion, @RequestBody CommentInDto comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        EntityOutDto result = customerService.comment(suggestion, comment);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Commented successfully.")
@@ -189,9 +188,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/comments/{comment}")
-    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long id, @PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException {
-        CommentOutDto result = customerService.getComment(id, comment);
+    @GetMapping("/comments/{comment}")
+    public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        CommentOutDto result = customerService.getComment(comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")

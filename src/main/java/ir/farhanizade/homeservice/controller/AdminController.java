@@ -34,21 +34,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{id}/experts/{expertId}/accept")
-    public ResponseEntity<ResponseResult<EntityOutDto>> acceptExpert(@PathVariable Long id, @PathVariable Long expertId) throws UserNotValidException, EntityNotFoundException {
+    @PostMapping("/experts/{expertId}/accept")
+    public ResponseEntity<ResponseResult<EntityOutDto>> acceptExpert(@PathVariable Long expertId) throws UserNotValidException, EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("User accepted successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
-        EntityOutDto result = adminService.acceptExpert(id, expertId);
+        EntityOutDto result = adminService.acceptExpert(expertId);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/{id}/search")
-    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@PathVariable Long id, @RequestBody UserSearchInDto param, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
-        CustomPage<UserSearchOutDto> result = adminService.search(id, param, pageable);
+    @GetMapping("/search")
+    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>> search(@RequestBody UserSearchInDto param, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
+        CustomPage<UserSearchOutDto> result = adminService.search(param, pageable);
 
         ResponseResult<CustomPage<UserSearchOutDto>> response = ResponseResult.<CustomPage<UserSearchOutDto>>builder()
                 .data(result)

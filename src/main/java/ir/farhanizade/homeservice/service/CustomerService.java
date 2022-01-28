@@ -19,6 +19,7 @@ import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -122,22 +123,22 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> getOrders(Long id, Pageable pageable) throws EntityNotFoundException {
-        exists(id);
-        return orderRepository.findAllByCustomerId(id, pageable);
+    public CustomPage<OrderOutDto> getOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        return orderRepository.findAllByCustomerId(pageable);
     }
 
     @Transactional(readOnly = true)
-    public OrderOutDto getOrder(Long id, Long orderId) throws EntityNotFoundException {
-        exists(id);
-        return orderRepository.findByIdAndCustomerId(id, orderId);
+    public OrderOutDto getOrder(Long orderId) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        return orderRepository.findByIdAndCustomerId(orderId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto request(Long id, RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
+    public EntityOutDto request(RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException, UserNotLoggedInException {
+        Long id = LoggedInUser.id();
         return requestService.save(findById(id), request);
     }
 
+    @Deprecated(forRemoval = true)
     @Transactional(readOnly = true)
     public boolean exists(Long id) throws EntityNotFoundException {
         boolean exists = repository.existsById(id);
@@ -148,21 +149,18 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long id, Long order, Pageable pageable) throws EntityNotFoundException {
-        exists(id);
+    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long order, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         return suggestionService.findAllByOrderId(order, pageable);
     }
 
     @Transactional(readOnly = true)
-    public SuggestionOutDto getSuggestion(Long id, Long suggestion) throws EntityNotFoundException {
-        exists(id);
+    public SuggestionOutDto getSuggestion(Long suggestion) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         return suggestionService.getById(suggestion);
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> getSuggestions(Long id, Pageable pageable) throws EntityNotFoundException {
-        exists(id);
-        return suggestionService.findAllByCustomerId(id, pageable);
+    public CustomPage<SuggestionOutDto> getSuggestions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        return suggestionService.findAllByCustomerId(pageable);
     }
 
     private UserOutDto convert2Dto(Customer customer) {
@@ -186,20 +184,18 @@ public class CustomerService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto removeOrder(Long id, Long orderId) throws EntityNotFoundException, BadEntryException {
-        exists(id);
-        return orderRepository.removeOrderByIdAndOwnerId(orderId, id);
+    public EntityOutDto removeOrder(Long orderId) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+        return orderRepository.removeOrderByIdAndOwnerId(orderId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto acceptSuggestion(Long id, Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException {
-        exists(id);
+    public EntityOutDto acceptSuggestion(Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, UserNotLoggedInException {
         return orderRepository.acceptSuggestion(suggestion);
     }
 
     @Transactional
-    public EntityOutDto pay(Long id, Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException {
-        Customer customer = findById(id);
+    public EntityOutDto pay(Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, UserNotLoggedInException {
+        Customer customer = findById(LoggedInUser.id());
         Suggestion suggestion = suggestionService.findById(suggestionId);
         if (suggestion.getOrder().getStatus().equals(PAID))
             throw new BadEntryException("You can't pay more than once!");
@@ -228,8 +224,8 @@ public class CustomerService {
 
 
     @Transactional
-    public EntityOutDto comment(Long id, Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException {
-        Customer customer = findById(id);
+    public EntityOutDto comment(Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        Customer customer = findById(LoggedInUser.id());
         Suggestion suggestion = suggestionService.findById(suggestionId);
         Expert expert = suggestion.getOwner();
         Order order = suggestion.getOrder();
@@ -244,8 +240,7 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CommentOutDto getComment(Long id, Long commentId) throws EntityNotFoundException {
-        exists(id);
-        return commentService.findByIdAndCustomerId(id, commentId);
+    public CommentOutDto getComment(Long commentId) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+        return commentService.findByIdAndCustomerId(commentId);
     }
 }
