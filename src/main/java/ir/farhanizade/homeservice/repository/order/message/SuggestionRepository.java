@@ -13,8 +13,8 @@ import java.util.Optional;
 
 public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
-    @Query("From Suggestion s where s.order.id=:orderId")
-    Page<Suggestion> findAllByOrderId(Long orderId, Pageable pageable);
+    @Query("From Suggestion s where s.order.id=:orderId and s.order.request.owner.id=:id")
+    Page<Suggestion> findAllByOrderId(Long id, Long orderId, Pageable pageable);
 
     @Query("From Suggestion s where s.owner.id=:ownerId")
     Page<Suggestion> findAllByOwnerId(Long ownerId, Pageable pageable);
@@ -36,4 +36,7 @@ public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
     @Query("Select Count(s) From Suggestion s")
     Long countNumberOfSuggestions();
+
+    @Query("From Suggestion s where s.id=:id and s.order.request.owner.id=:customerId")
+    Optional<Suggestion> findByIdAndCustomerId(Long id, Long customerId);
 }
