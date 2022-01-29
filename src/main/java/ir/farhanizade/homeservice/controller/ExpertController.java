@@ -30,7 +30,7 @@ public class ExpertController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ResponseResult<EntityOutDto>>
+    public ResponseEntity<ResponseResult<UUIDOutDto>>
     create(@RequestBody UserInDto user) throws Exception {
         return userController.create(user, Expert.class);
     }
