@@ -49,7 +49,7 @@ public class CustomerService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
+    public Long save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         Customer customer = user.convert2Customer();
         boolean isValid = Validation.isValid(customer);
 
@@ -62,7 +62,7 @@ public class CustomerService {
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         Validation.enableUser(customer);
         Customer result = repository.save(customer);
-        return new EntityOutDto(result.getId());
+        return result.getId();
     }
 
     @Transactional(readOnly = true)
@@ -194,7 +194,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public EntityOutDto pay(Long suggestionId) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, UserNotLoggedInException {
+    public EntityOutDto pay(Long suggestionId, String method) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, UserNotLoggedInException {
         Customer customer = findById(LoggedInUser.id());
         Suggestion suggestion = suggestionService.findById(suggestionId);
         if (suggestion.getOrder().getStatus().equals(PAID))
@@ -212,7 +212,7 @@ public class CustomerService {
                 .order(order)
                 .build();
 
-        EntityOutDto result = transactionService.save(transaction);
+        EntityOutDto result = transactionService.save(transaction, method);
 
         Request request = order.getRequest();
         request.setStatus(BaseMessageStatus.DONE);

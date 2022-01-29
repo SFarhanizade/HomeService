@@ -49,7 +49,7 @@ public class ExpertService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
+    public Long save(UserInDto user) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, DuplicateEntityException, NullFieldException {
         Expert expert = user.convert2Expert();
         if (!Validation.isValid(expert))
             throw new UserNotValidException("User is not valid!");
@@ -59,7 +59,7 @@ public class ExpertService {
         expert.setPassword(passwordEncoder.encode(expert.getPassword()));
         Validation.enableUser(expert);
         Expert result = repository.save(expert);
-        return new EntityOutDto(result.getId());
+        return result.getId();
     }
 
     @Transactional(rollbackFor = Exception.class)

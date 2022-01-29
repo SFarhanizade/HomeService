@@ -5,10 +5,7 @@ import ir.farhanizade.homeservice.dto.in.TimeRangeInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.OrderOfUserOutDto;
-import ir.farhanizade.homeservice.dto.out.ReportRegisterTimeUsersOutDto;
-import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
+import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.UserService;
@@ -19,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -26,13 +26,25 @@ public class UserController {
 
     private final UserService userService;
 
-    public ResponseEntity<ResponseResult<EntityOutDto>> create(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
-        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+    public ResponseEntity<ResponseResult<UUIDOutDto>> create(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        ResponseResult<UUIDOutDto> response = ResponseResult.<UUIDOutDto>builder()
                 .code(1)
                 .message("User saved successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
-        EntityOutDto result = userService.save(user, type);
+        UUIDOutDto result = userService.save(user, type);
+        response.setData(result);
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @GetMapping("/verify/{uuid}")
+    public ResponseEntity<ResponseResult<EntityOutDto>> verifyEmail(@PathVariable String uuid) throws UUIDNotFoundException, UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
+                .code(1)
+                .message("User verified successfully!")
+                .build();
+        HttpStatus status = HttpStatus.ACCEPTED;
+        EntityOutDto result = userService.verifyEmail(uuid);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }

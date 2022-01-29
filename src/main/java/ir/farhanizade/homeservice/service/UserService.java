@@ -7,10 +7,13 @@ import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
+import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.security.user.UserTypeAndId;
+import ir.farhanizade.homeservice.security.user.UserUUID;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,17 +63,42 @@ public class UserService {
         return new EntityOutDto(id);
     }
 
-    public EntityOutDto save(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
-        EntityOutDto result;
+    public UUIDOutDto save(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        Long id;
         if (type == Expert.class) {
-            result = expertService.save(user);
-
+            id = expertService.save(user);
         } else /*if (type == Customer.class)*/ {
-            result = customerService.save(user);
+            id = customerService.save(user);
         } /*else {
             result = adminService.save(user);
         }*/
-        return result;
+        String uuid = UserUUID.createUUID(id);
+        return new UUIDOutDto(uuid);
+    }
+
+    @Transactional(readOnly = true)
+    public EntityOutDto verifyEmail(String uuid) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, UUIDNotFoundException {
+        Long id = UserUUID.getIdByUUID(uuid);
+        User user = findById(id);
+        ApplicationUserRole role = getRole(user);
+        UserStatus status = null;
+        switch (role) {
+            case CUSTOMER -> status = UserStatus.ACCEPTED;
+            case EXPERT -> status = UserStatus.PENDING;
+        }
+        user.setStatus(status);
+        repository.save(user);
+        return new EntityOutDto(id);
+    }
+
+    private ApplicationUserRole getRole(User user) throws BadEntryException {
+        String roleStr = user.getAuthorities().stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .findFirst()
+                .orElseThrow(() -> new BadEntryException("User Not Allowed!"))
+                .getAuthority()
+                .substring(5);
+        return ApplicationUserRole.valueOf(roleStr);
     }
 
     @Transactional(readOnly = true)//TODO: should move to AdminService

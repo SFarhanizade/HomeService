@@ -18,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping("/customers")
 @RequiredArgsConstructor
@@ -27,8 +30,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
+    @PostMapping("/sign-up")
+    public ResponseEntity<ResponseResult<UUIDOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
         return userController.create(user, Customer.class);
     }
 
@@ -128,9 +131,9 @@ public class CustomerController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/suggestions/{suggestion}/pay")
-    public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
-        EntityOutDto result = customerService.pay(suggestion);
+    @PostMapping("/suggestions/{suggestion}/pay/{method}")
+    public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long suggestion, @PathVariable String method) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException {
+        EntityOutDto result = customerService.pay(suggestion, method);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
                 .message("Paid successfully.")
