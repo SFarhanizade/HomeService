@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.controller.BankController;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
@@ -29,21 +30,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TransactionService {
     private final TransactionRepository repository;
+    private final BankController bankController;
     private final CustomerRepository customerRepository;
     private final ExpertRepository expertRepository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public EntityOutDto save(Transaction transaction) throws NotEnoughMoneyException {
+    public EntityOutDto save(Transaction transaction, String method) throws NotEnoughMoneyException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
         Customer payer = transaction.getPayer();
         Expert recipient = transaction.getRecipient();
         BigDecimal amount = transaction.getAmount();
-        BigDecimal payerCredit = payer.getCredit();
         BigDecimal recipientCredit = recipient.getCredit();
-        if (payerCredit.compareTo(amount) == -1)
-            throw new NotEnoughMoneyException("");
-        payer.setCredit(payerCredit.subtract(amount));
+        BigDecimal payerCredit = payer.getCredit();
+        if ("credit".equals(method)) {
+            if (payerCredit.compareTo(amount) == -1)
+                throw new NotEnoughMoneyException("");
+            payer.setCredit(payerCredit.subtract(amount));
+        } else {
+            if (!bankController.pay())
+                throw new NotEnoughMoneyException("");
+        }
         recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
         Transaction saved = repository.save(transaction);
         return new EntityOutDto(saved.getId());
