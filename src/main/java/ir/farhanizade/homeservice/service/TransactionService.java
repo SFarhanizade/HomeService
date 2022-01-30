@@ -1,6 +1,5 @@
 package ir.farhanizade.homeservice.service;
 
-import ir.farhanizade.homeservice.controller.BankController;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
@@ -18,9 +17,11 @@ import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,12 +31,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TransactionService {
     private final TransactionRepository repository;
-    private final BankController bankController;
     private final CustomerRepository customerRepository;
     private final ExpertRepository expertRepository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public EntityOutDto save(Transaction transaction, String method) throws NotEnoughMoneyException {
+    public EntityOutDto save(Transaction transaction, String method) throws NotEnoughMoneyException, BadEntryException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
         Customer payer = transaction.getPayer();
@@ -48,7 +48,15 @@ public class TransactionService {
                 throw new NotEnoughMoneyException("");
             payer.setCredit(payerCredit.subtract(amount));
         } else {
-            if (!bankController.pay())
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Boolean> bankResponse;
+            try {
+                bankResponse = restTemplate.postForEntity("http://localhost:8181/bank/payment",
+                        null, Boolean.class);
+            } catch (Exception e) {
+                throw new BadEntryException("Bank is not available!");
+            }
+            if (!bankResponse.getBody())
                 throw new NotEnoughMoneyException("");
         }
         recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
