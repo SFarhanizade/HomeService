@@ -10,6 +10,7 @@ import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.exception.*;
+import ir.farhanizade.homeservice.security.user.Accepted;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ExpertController {
     private final UserController userController;
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("sign-up")
     public ResponseEntity<ResponseResult<UUIDOutDto>>
     create(@RequestBody UserInDto user) throws Exception {
         return userController.create(user, Expert.class);
@@ -50,6 +51,7 @@ public class ExpertController {
     }
 
     @PostMapping("/suggestions")
+    @Accepted
     public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>>
     suggest(@RequestBody ExpertAddSuggestionInDto request) throws Exception {
         ExpertAddSuggestionOutDto result = expertService.suggest(request);
@@ -85,6 +87,7 @@ public class ExpertController {
     }
 
     @PostMapping("/suggestions/{suggestionId}/{answer}")
+    @Accepted
     public ResponseEntity<ResponseResult<SuggestionAnswerOutDto>>
     answerSuggestion(@PathVariable Long suggestionId, @PathVariable String answer)
             throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
@@ -105,6 +108,7 @@ public class ExpertController {
     }
 
     @PostMapping("/suggestions/{suggestionId}/start")
+    @Accepted
     public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException {
         EntityOutDto result = expertService.startToWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -117,6 +121,7 @@ public class ExpertController {
     }
 
     @PostMapping("/suggestions/{suggestionId}/done")
+    @Accepted
     public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException {
         EntityOutDto result = expertService.finishWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -201,6 +206,7 @@ public class ExpertController {
     }
 
     @PostMapping("/credit")
+    @Accepted
     public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
         UserIncreaseCreditOutDto result = userService.increaseCredit(request);
         ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
