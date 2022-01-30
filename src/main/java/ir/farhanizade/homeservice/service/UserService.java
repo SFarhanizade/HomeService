@@ -208,4 +208,9 @@ public class UserService {
         return repository.getIdByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
     }
+
+    public UserStatus getStatusById(Long id) throws EntityNotFoundException {
+        return repository.getStatusById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
+    }
 }
