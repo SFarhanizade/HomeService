@@ -1,6 +1,7 @@
 package ir.farhanizade.homeservice.repository.user;
 
 import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.repository.BaseRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,7 @@ public interface UserRepository extends BaseRepository<User>, CustomUserReposito
 
     @Query("Select u.id From User u Where u.email=:username")
     Optional<Long> getIdByUsername(String username);
+
+    @Query("Select u.status From User u where u.id=:id")
+    Optional<UserStatus> getStatusById(Long id);
 }
