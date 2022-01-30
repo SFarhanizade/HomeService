@@ -36,6 +36,7 @@ public class User extends BasePerson implements UserDetails {
 
     @Builder.Default
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.NEW;
     private boolean isAccountNonExpired;
     private boolean isAccountNonLocked;
@@ -53,7 +54,7 @@ public class User extends BasePerson implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getEmail();//TODO: Continue here and complete the UserDetails implementations
+        return getEmail();
     }
 
     @Override
