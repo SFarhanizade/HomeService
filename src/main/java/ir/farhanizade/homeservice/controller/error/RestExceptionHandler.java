@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 public class RestExceptionHandler {
 
-
+    @ExceptionHandler(BadEntryException.class)
+    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(BadEntryException ex){
+        return buildResponseEntity(ex);
+    }
 
     @ExceptionHandler(BusyOrderException.class)
     protected ResponseEntity<ResponseResult<Void>> handleBadRequest(BusyOrderException ex){
@@ -34,6 +37,11 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<ResponseResult<Void>> handleBadRequest(EntityNotFoundException ex){
+        return buildResponseEntity(ex);
+    }
+
+    @ExceptionHandler(ExpertNotAcceptedException.class)
+    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(ExpertNotAcceptedException ex){
         return buildResponseEntity(ex);
     }
 
@@ -57,8 +65,18 @@ public class RestExceptionHandler {
         return buildResponseEntity(ex);
     }
 
+    @ExceptionHandler(UserNotLoggedInException.class)
+    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(UserNotLoggedInException ex){
+        return buildResponseEntity(ex);
+    }
+
     @ExceptionHandler(UserNotValidException.class)
     protected ResponseEntity<ResponseResult<Void>> handleBadRequest(UserNotValidException ex){
+        return buildResponseEntity(ex);
+    }
+
+    @ExceptionHandler(UUIDNotFoundException.class)
+    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(UUIDNotFoundException ex){
         return buildResponseEntity(ex);
     }
 
