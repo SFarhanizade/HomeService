@@ -1,5 +1,6 @@
 package ir.farhanizade.homeservice.security.user;
 
+import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.BadEntryException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.exception.UserNotLoggedInException;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoggedInUser {
+
+    //TODO: remove usage of user id and use LoggedInUser class instead
 
     private UserService userService;
     private static UserService service;
@@ -48,6 +51,11 @@ public class LoggedInUser {
                 .getAuthority()
                 .substring(5);
         ApplicationUserRole role = ApplicationUserRole.valueOf(roleStr);
-        return new UserTypeAndId(role,id());
+        return new UserTypeAndId(role, id());
+    }
+
+    public static UserStatus getStatus() throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        Long id = id();
+        return service.getStatusById(id);
     }
 }
