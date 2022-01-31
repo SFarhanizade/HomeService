@@ -1,7 +1,8 @@
 package ir.farhanizade.homeservice.security;
 
-import ir.farhanizade.homeservice.entity.user.User;
-import ir.farhanizade.homeservice.security.user.LoggedInUser;
+import ir.farhanizade.homeservice.security.jwt.JwtConfig;
+import ir.farhanizade.homeservice.security.jwt.JwtTokenVerifier;
+import ir.farhanizade.homeservice.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import ir.farhanizade.homeservice.security.user.UserManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,12 +13,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import javax.crypto.SecretKey;
 
 @Configuration
 @EnableWebSecurity
@@ -27,17 +26,22 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final UserManager userService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/experts/sign-up", "/customers/sign-up", "/users/verify/**").permitAll()
-                .anyRequest()
-                .authenticated()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .httpBasic();
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers("/experts/sign-up", "/customers/sign-up", "/users/verify/**", "/users/login").permitAll()
+                .anyRequest()
+                .authenticated();
     }
 
     @Override
@@ -52,21 +56,4 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(userService);
         return provider;
     }
-
-//    @Override
-//    @Bean
-//    protected UserDetailsService userDetailsService() {
-//        UserDetails annaSmith = User.builder()
-//                .username("annasmith")
-//                .password(passwordEncoder.encode("password"))
-//                .roles(ApplicationUserRole.CUSTOMER.name())
-//                .build();
-//
-//        UserDetails admin = User.builder()
-//                .username("admin")
-//                .password(passwordEncoder.encode("password"))
-//                .roles(ApplicationUserRole.ADMIN.name())
-//                .build();
-//        return new InMemoryUserDetailsManager(annaSmith, admin);
-//    }
 }
