@@ -12,7 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpertAddSuggestionInDto {
-    private Long orderId;
     private Long price;
     private Date dateTime;
     private String details;
