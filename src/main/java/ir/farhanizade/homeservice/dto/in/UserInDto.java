@@ -16,6 +16,9 @@ import javax.validation.constraints.Size;
 @Builder
 public class UserInDto {
     @NonNull
+    private String type;
+
+    @NonNull
     @Size(min = 3, max = 20)
     private String firstname;
     @NonNull
@@ -45,7 +48,7 @@ public class UserInDto {
                 .build();
     }
 
-    public Admin convert2Admin(){
+    public Admin convert2Admin() {
         return Admin.builder()
                 .fName(firstname)
                 .lName(lastname)
