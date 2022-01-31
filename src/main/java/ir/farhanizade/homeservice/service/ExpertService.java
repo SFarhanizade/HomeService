@@ -42,9 +42,6 @@ import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 public class ExpertService {
     private final ExpertRepository repository;
     private final SubServiceService serviceManager;
-    private final OrderService orderService;
-    private final SuggestionService suggestionService;
-    private final CommentService commentService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -62,24 +59,9 @@ public class ExpertService {
         return result.getId();
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public ExpertAddSuggestionOutDto suggest(ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, UserNotLoggedInException {
-        Expert expert = findById(LoggedInUser.id());
-        Order order = orderService.findById(request.getOrderId());
-        Suggestion suggestion = Suggestion.builder()
-                .owner(expert)
-                .order(order)
-                .price(new BigDecimal(request.getPrice()))
-                .suggestedDateTime(request.getDateTime())
-                .details(request.getDetails())
-                .duration(request.getDuration())
-                .build();
-        ExpertAddSuggestionOutDto result = suggestionService.save(suggestion);
-        return result;
-    }
 
     @Transactional(rollbackFor = Exception.class)
-    public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException, UserNotLoggedInException, BadEntryException {
+    public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Expert expert = findById(LoggedInUser.id());
         if (!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
         SubService service = serviceManager.loadById(request.getServiceId());
@@ -95,26 +77,6 @@ public class ExpertService {
                         .collect(Collectors.toSet()))
                 .build();
         return result;
-    }
-
-    @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> loadAvailableOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
-        Expert entity = findById(LoggedInUser.id());
-        Set<SubService> expertises = entity.getExpertises();
-        if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
-//        Pageable pageable = Pageable.unpaged();
-//        return orderService.findByExpertise(expertises,page);
-        return orderService.loadByExpertises(expertises, pageable);
-//        List<OrderOutDto> resultList = availableOrders.stream()
-//                .map(o ->
-//                        OrderOutDto.builder()
-//                                .id(o.getId())
-//                                .service(o.getService().getName())
-//                                .price(o.getRequest().getPrice())
-//                                .suggestedDateTime(o.getRequest().getSuggestedDateTime())
-//                                .createdDateTime(o.getRequest().getDateTime())
-//                                .status(o.getStatus())
-//                                .build()).toList();
     }
 
     @Transactional(readOnly = true)
@@ -188,10 +150,6 @@ public class ExpertService {
                 .build();
     }
 
-    public CustomPage<ExpertSuggestionOutDto> getSuggestions(Pageable pageable, SuggestionStatus... status) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
-        return suggestionService.findAllByOwnerIdAndStatus(status, pageable);
-    }
-
     private UserOutDto convert2Dto(Expert expert) {
         return UserOutDto.builder()
                 .id(expert.getId())
@@ -212,11 +170,7 @@ public class ExpertService {
                 .build();
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public SuggestionAnswerOutDto answerSuggestion(Long suggestionId, BaseMessageStatus status) throws BadEntryException, EntityNotFoundException, UserNotLoggedInException {
-        return suggestionService.answer(suggestionId, status);
-    }
-
+    //TODO: move to AdminService
     @Transactional(propagation = Propagation.REQUIRED)
     public EntityOutDto acceptExpert(Long expertId) throws EntityNotFoundException {
         Expert expert = findById(expertId);
@@ -225,41 +179,4 @@ public class ExpertService {
         return new EntityOutDto(expertId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto startToWork(Long suggestionId) throws EntityNotFoundException, BadEntryException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, UserNotLoggedInException {
-        Suggestion suggestion = suggestionService.findByIdAndOwnerId(suggestionId);
-        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED)) {
-            Order order = suggestion.getOrder();
-            order.setStatus(OrderStatus.STARTED);
-            suggestionService.save(suggestion);
-            return new EntityOutDto(suggestionId);
-        } else throw new BadEntryException("This order is not yours!");
-    }
-
-    public EntityOutDto finishWork(Long suggestionId) throws EntityNotFoundException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, UserNotLoggedInException {
-        Suggestion suggestion = suggestionService.findByIdAndOwnerId(suggestionId);
-        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED) &&
-                suggestion.getStatus().equals(BUSY)) {
-            Order order = suggestion.getOrder();
-            order.setStatus(OrderStatus.DONE);
-            order.getRequest().setStatus(DONE);
-            suggestion.setStatus(DONE);
-            order.setFinishDateTime(new Date(System.currentTimeMillis()));
-            suggestionService.save(suggestion);
-            return new EntityOutDto(suggestionId);
-        } else throw new BadEntryException("This order is not yours!");
-    }
-
-    @Transactional(readOnly = true)
-    public boolean exists(Long id) {
-        return repository.existsById(id);
-    }
-
-    public CommentOutDto getComment(Long comment) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
-        return commentService.findByIdAndExpertId(comment);
-    }
-
-    public CustomPage<OrderFinishOutDto> getOrders(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
-        return orderService.findAllByExpertId(pageable);
-    }
 }

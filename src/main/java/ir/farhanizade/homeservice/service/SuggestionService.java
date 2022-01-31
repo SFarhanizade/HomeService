@@ -3,6 +3,7 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
@@ -17,12 +18,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_EXPERT;
 import static ir.farhanizade.homeservice.entity.order.OrderStatus.WAITING_FOR_SELECTION;
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
+import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.DONE;
 import static ir.farhanizade.homeservice.entity.order.message.SuggestionStatus.REJECTED;
 
 @Service
@@ -52,11 +55,9 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order,Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<SuggestionOutDto> findAllByOrderId(Long order, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
-        Page<Suggestion> suggestions = repository.findAllByOrderId(id,order, pageable);
-//        if (suggestions.size() == 0)
-//            throw new EntityNotFoundException("No Suggestions Found For This Order!");
+        Page<Suggestion> suggestions = repository.findAllByOrderId(id, order, pageable);
         return convert2Dto(suggestions);
     }
 
@@ -70,7 +71,7 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByOwnerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<SuggestionOutDto> findAllByOwnerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByOwnerId(id, pageable);
         if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
@@ -78,7 +79,7 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<SuggestionOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<SuggestionOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByCustomerId(id, pageable);
         if (page.getContent().size() == 0) throw new EntityNotFoundException("No Suggestions Found!");
@@ -86,7 +87,7 @@ public class SuggestionService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(SuggestionStatus[] status, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<ExpertSuggestionOutDto> findAllByOwnerIdAndStatus(SuggestionStatus[] status, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long ownerId = LoggedInUser.id();
         Page<Suggestion> page = repository.findAllByOwnerIdAndStatus(ownerId, status, pageable);
         if (page.getContent().isEmpty()) throw new EntityNotFoundException("No Suggestion Found!");
@@ -139,11 +140,12 @@ public class SuggestionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public SuggestionAnswerOutDto answer(Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+    public SuggestionAnswerOutDto answer(Long suggestionId, BaseMessageStatus status) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException, AccountIsLockedException {
         Long ownerId = LoggedInUser.id();
         Suggestion suggestion = findById(suggestionId);
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
-        if(!suggestion.getStatus().equals(BaseMessageStatus.WAITING)) throw new BadEntryException("This suggestion is done!");
+        if (!suggestion.getStatus().equals(BaseMessageStatus.WAITING))
+            throw new BadEntryException("This suggestion is done!");
         Order order = suggestion.getOrder();
         Request request = order.getRequest();
         if (status.equals(BUSY)) {
@@ -163,9 +165,9 @@ public class SuggestionService {
                 .build();
     }
 
-    public SuggestionOutDto getById(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public SuggestionOutDto getById(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long customerId = LoggedInUser.id();
-        Suggestion suggestion = findByIdAndCustomerId(id,customerId);
+        Suggestion suggestion = findByIdAndCustomerId(id, customerId);
         return SuggestionOutDto.builder()
                 .id(suggestion.getId())
                 .ownerName(suggestion.getOwner().getName())
@@ -179,7 +181,7 @@ public class SuggestionService {
                 .build();
     }
 
-    public Suggestion findByIdAndOwnerId(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public Suggestion findByIdAndOwnerId(Long id) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long ownerId = LoggedInUser.id();
         findById(id);
         Optional<Suggestion> byIdAndOwnerId = repository.findByIdAndOwnerId(id, ownerId);
@@ -187,7 +189,7 @@ public class SuggestionService {
     }
 
     public Suggestion findByStatusAndOrderId(SuggestionStatus accepted, Long id) {
-        Optional<Suggestion> optional =repository.findByStatusAndOrderId(accepted,id);
+        Optional<Suggestion> optional = repository.findByStatusAndOrderId(accepted, id);
         Suggestion suggestion = optional.orElseGet(null);
         return suggestion;
     }
@@ -204,5 +206,29 @@ public class SuggestionService {
     public Suggestion findByIdAndCustomerId(Long id, Long customerId) throws EntityNotFoundException {
         return repository.findByIdAndCustomerId(id, customerId)
                 .orElseThrow(() -> new EntityNotFoundException("Suggestion Not Found!"));
+    }
+
+    public EntityOutDto startToWork(Long suggestionId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
+        Suggestion suggestion = findByIdAndOwnerId(suggestionId);
+        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED)) {
+            Order order = suggestion.getOrder();
+            order.setStatus(OrderStatus.STARTED);
+            repository.save(suggestion);
+            return new EntityOutDto(suggestionId);
+        } else throw new BadEntryException("This order is not yours!");
+    }
+
+    public EntityOutDto finishWork(Long suggestionId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
+        Suggestion suggestion = findByIdAndOwnerId(suggestionId);
+        if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED) &&
+                suggestion.getStatus().equals(BUSY)) {
+            Order order = suggestion.getOrder();
+            order.setStatus(OrderStatus.DONE);
+            order.getRequest().setStatus(DONE);
+            suggestion.setStatus(DONE);
+            order.setFinishDateTime(new Date(System.currentTimeMillis()));
+            repository.save(suggestion);
+            return new EntityOutDto(suggestionId);
+        } else throw new BadEntryException("This order is not yours!");
     }
 }

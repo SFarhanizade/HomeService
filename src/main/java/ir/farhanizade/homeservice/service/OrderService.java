@@ -1,5 +1,7 @@
 package ir.farhanizade.homeservice.service;
 
+import ir.farhanizade.homeservice.dto.in.ExpertAddSuggestionInDto;
+import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Order;
@@ -8,10 +10,13 @@ import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.OrderRepository;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
+import ir.farhanizade.homeservice.security.user.UserTypeAndId;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +42,32 @@ public class OrderService {
     private final OrderRepository repository;
     private final SuggestionService suggestionService;
     private final RequestService requestService;
+    private final CustomerService customerService;
+    private final UserService userService;
+    private final ExpertService expertService;
+
+    @Transactional(rollbackFor = Exception.class)
+    public EntityOutDto request(RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException, UserNotLoggedInException, AccountIsLockedException {
+        Long id = LoggedInUser.id();
+        Customer customer = customerService.findById(id);
+        return requestService.save(customer, request);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public ExpertAddSuggestionOutDto suggest(Long orderId, ExpertAddSuggestionInDto request) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, UserNotLoggedInException, AccountIsLockedException {
+        Expert expert = expertService.findById(LoggedInUser.id());
+        Order order = findById(orderId);
+        Suggestion suggestion = Suggestion.builder()
+                .owner(expert)
+                .order(order)
+                .price(new BigDecimal(request.getPrice()))
+                .suggestedDateTime(request.getDateTime())
+                .details(request.getDetails())
+                .duration(request.getDuration())
+                .build();
+        ExpertAddSuggestionOutDto result = suggestionService.save(suggestion);
+        return result;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public void save(Order order) {
@@ -46,10 +78,6 @@ public class OrderService {
     public CustomPage<OrderOutDto> loadByExpertises(Set<SubService> expertises, Pageable pageable) throws EntityNotFoundException {
         Page<Order> page = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION, CANCELLED, BUSY, pageable);
         return convert2Dto(page);
-//        if (orders.size() == 0) {
-//            throw new EntityNotFoundException("No Orders Found!");
-//        }
-//        return orders;
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +94,15 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderOutDto findByIdAndCustomerId(Long orderId) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<OrderOutDto> loadAvailableOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
+        Expert entity = expertService.findById(LoggedInUser.id());
+        Set<SubService> expertises = entity.getExpertises();
+        if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
+        return loadByExpertises(expertises, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderOutDto findByIdAndCustomerId(Long orderId) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Optional<Order> byIdAndCustomerId = repository.findByIdAndCustomerId(id, orderId);
         Order result = byIdAndCustomerId.orElseThrow(() -> new EntityNotFoundException("Order Doesn't Exist!"));
@@ -91,15 +127,35 @@ public class OrderService {
                 .build();
     }
 
+    public CustomPage<OrderOfUserOutDto> getOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
+        UserTypeAndId typeAndId = LoggedInUser.getTypeAndId();
+        switch (typeAndId.getRole()) {
+            case CUSTOMER: {
+                return findOrdersByCustomer(pageable);
+            }
+            case EXPERT: {
+                return getOrdersOfExpert(pageable);
+            }
+            default: {
+                throw new BadEntryException("User Not Allowed");
+            }
+        }
+    }
+
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<OrderOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
-        Page<Order> page = repository.findAllByCustomerId(id, pageable);
+        User user = userService.findById(id);
+        Page<Order> page;
+        if (user instanceof Customer)
+            page = repository.findAllByCustomerId(id, pageable);
+        else
+            page = repository.findAllByCustomerId(id, pageable);
         return convert2Dto(page);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto removeOrderByIdAndOwnerId(Long orderId) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException {
+    public EntityOutDto removeOrderByIdAndOwnerId(Long orderId) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException, AccountIsLockedException {
         Long ownerId = LoggedInUser.id();
         Order order = repository.findByIdAndOwnerId(orderId, ownerId)
                 .orElseThrow(() -> new EntityNotFoundException("Order Not Found!"));
@@ -119,7 +175,7 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException, UserNotLoggedInException {
+    public EntityOutDto acceptSuggestion(Long id) throws BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, EntityNotFoundException, DuplicateEntityException, UserNotLoggedInException, AccountIsLockedException {
         Long customerId = LoggedInUser.id();
         Suggestion suggestion = suggestionService.findByIdAndCustomerId(id, customerId);
         Validation.isValid(suggestion);
@@ -135,18 +191,6 @@ public class OrderService {
         suggestionService.save(suggestion);
         return new EntityOutDto(id);
     }
-
-//    public CustomPage<OrderOutDto> findByExpertise(Set<SubService> expertises, Pageable pageable){
-//        CustomPage<Order> byExpertises = repository.findByExpertises(expertises, pageable);
-//        List<Order> data = byExpertises.getData();
-//        List<OrderOutDto> orders = convert2Dto(data);
-//        return CustomPage.<OrderOutDto>builder()
-//                .data(orders)
-//                .pageSize(byExpertises.getPageSize())
-//                .lastPage(byExpertises.getLastPage())
-//                .pageNumber(byExpertises.getPageNumber())
-//                .build();
-//    }
 
     private CustomPage<OrderOutDto> convert2Dto(Page<Order> page) throws EntityNotFoundException {
         if (page.getContent().size() == 0) throw new EntityNotFoundException("No Orders Found!");
@@ -171,7 +215,7 @@ public class OrderService {
                 .build();
     }
 
-    public CustomPage<OrderFinishOutDto> findAllByExpertId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CustomPage<OrderFinishOutDto> findAllByExpertId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByExpertId(id, pageable);
         return convert2OutDto(page);
@@ -202,13 +246,13 @@ public class OrderService {
                 .build();
     }
 
-    public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CustomPage<OrderOfUserOutDto> findOrdersByCustomer(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByCustomerId(id, pageable);
         return convert2CustomPage(page, id);
     }
 
-    public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByExpertId(id, pageable);
         return convert2CustomPage(page, 0L);
@@ -272,5 +316,9 @@ public class OrderService {
 
     public Long getNumberOfDoneOrders() {
         return repository.countDoneOrders();
+    }
+
+    public CustomPage<SuggestionOutDto> getSuggestionsByOrder(Long order, Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
+        return suggestionService.findAllByOrderId(order, pageable);
     }
 }

@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.Comment;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.exception.AccountIsLockedException;
 import ir.farhanizade.homeservice.exception.BadEntryException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.exception.UserNotLoggedInException;
@@ -33,13 +34,14 @@ public class CommentService {
         return new EntityOutDto(saved.getId());
     }
 
-    public CustomPage<CommentOutDto> findAllByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CustomPage<CommentOutDto> findAllByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Comment> page = repository.findAllByUserId(id, pageable);
         return convert2Dto(page);
     }
 
-    public CommentOutDto findByIdAndCustomerId(Long customerId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    //TODO: merge it with findByIdAndExpertId()
+    public CommentOutDto findByIdAndCustomerId(Long customerId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Comment comment = repository.findByIdAndCustomerId(id, customerId);
         CommentOutDto result = convert2Dto(comment);
@@ -47,7 +49,7 @@ public class CommentService {
         return result;
     }
 
-    public CommentOutDto findByIdAndExpertId(Long id) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CommentOutDto findByIdAndExpertId(Long id) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long expertId = LoggedInUser.id();
         Comment comment = repository.findByIdAndExpertId(id, expertId);
         CommentOutDto result = convert2Dto(comment);

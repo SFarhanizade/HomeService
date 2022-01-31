@@ -38,12 +38,11 @@ public class UserService {
     private final CustomerService customerService;
     private final TransactionService transactionService;
     private final CommentService commentService;
-    private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
 
 
     @Transactional(rollbackFor = Exception.class)
-    public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         String currentPassword = passwordEncoder.encode(user.getCurrentPassword());
         String newPassword = passwordEncoder.encode(user.getNewPassword());
         Long id = LoggedInUser.id();
@@ -63,20 +62,20 @@ public class UserService {
         return new EntityOutDto(id);
     }
 
-    public UUIDOutDto save(UserInDto user, Class<?> type) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    public UUIDOutDto save(UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
         Long id;
-        if (type == Expert.class) {
+        if ("expert".equals(user.getType())) {
             id = expertService.save(user);
-        } else /*if (type == Customer.class)*/ {
+        } else if ("customer".equals(user.getType())) {
             id = customerService.save(user);
-        } /*else {
-            result = adminService.save(user);
-        }*/
+        } else {
+            throw new UserNotValidException("User is not valid!");
+        }
         String uuid = UserUUID.createUUID(id);
         return new UUIDOutDto(uuid);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public EntityOutDto verifyEmail(String uuid) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, UUIDNotFoundException {
         Long id = UserUUID.getIdByUUID(uuid);
         User user = findById(id);
@@ -126,7 +125,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<TransactionOutDto> getTransactions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public CustomPage<TransactionOutDto> getTransactions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         return transactionService.findByUserId(pageable);
     }
 
@@ -151,23 +150,23 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public TransactionOutDto getTransaction(Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public TransactionOutDto getTransaction(Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         return transactionService.findById(transaction);
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<CommentOutDto> getComments(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    public CustomPage<CommentOutDto> getComments(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         return commentService.findAllByUserId(pageable);
     }
 
     @Transactional(readOnly = true)
-    public UserCreditOutDto loadCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public UserCreditOutDto loadCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         User user = findById(LoggedInUser.id());
         return new UserCreditOutDto(user.getId(), user.getCredit());
     }
 
     @Transactional
-    public UserIncreaseCreditOutDto increaseCredit(UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public UserIncreaseCreditOutDto increaseCredit(UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         User user = findById(LoggedInUser.id());
         user.setCredit(user.getCredit().add(new BigDecimal(request.getAmount())));
         User saved = repository.save(user);
@@ -183,20 +182,9 @@ public class UserService {
         return byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
-    public CustomPage<OrderOfUserOutDto> getOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException {
-        UserTypeAndId typeAndId = LoggedInUser.getTypeAndId();
-        switch (typeAndId.getRole()) {
-            case CUSTOMER: {
-                return orderService.findOrdersByCustomer(pageable);
-            }
-            case EXPERT: {
-                return orderService.getOrdersOfExpert(pageable);
-            }
-            default: {
-                throw new BadEntryException("User Not Allowed");
-            }
-        }
-    }
+
+    //TODO: move to OrderService
+
 
     public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange) {
         Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getStartTime(), timeRange.getEndTime());
@@ -211,6 +199,11 @@ public class UserService {
 
     public UserStatus getStatusById(Long id) throws EntityNotFoundException {
         return repository.getStatusById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
+    }
+
+    public UserStatus getStatusByUsername(String username) throws EntityNotFoundException {
+        return repository.getStatusByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
     }
 }
