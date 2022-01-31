@@ -26,4 +26,7 @@ public interface UserRepository extends BaseRepository<User>, CustomUserReposito
 
     @Query("Select u.status From User u where u.id=:id")
     Optional<UserStatus> getStatusById(Long id);
+
+    @Query("Select u.status From User u where u.email=:username")
+    Optional<UserStatus> getStatusByUsername(String username);
 }
