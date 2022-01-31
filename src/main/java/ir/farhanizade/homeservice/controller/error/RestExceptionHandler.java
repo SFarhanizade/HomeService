@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 public class RestExceptionHandler {
 
+    @ExceptionHandler(AccountIsLockedException.class)
+    protected ResponseEntity<ResponseResult<Void>> handleBadRequest(AccountIsLockedException ex){
+        return buildResponseEntity(ex);
+    }
+
     @ExceptionHandler(BadEntryException.class)
     protected ResponseEntity<ResponseResult<Void>> handleBadRequest(BadEntryException ex){
         return buildResponseEntity(ex);
