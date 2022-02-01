@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.controller.api.filter.UserSpecification;
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
+import ir.farhanizade.homeservice.entity.user.Customer;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.entity.user.User;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
@@ -12,7 +13,6 @@ import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
-import ir.farhanizade.homeservice.security.user.UserTypeAndId;
 import ir.farhanizade.homeservice.security.user.UserUUID;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
@@ -43,20 +43,20 @@ public class UserService {
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto changePassword(UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        String currentPassword = passwordEncoder.encode(user.getCurrentPassword());
-        String newPassword = passwordEncoder.encode(user.getNewPassword());
-        Long id = LoggedInUser.id();
-        User entity = findById(id);
-        if (currentPassword.equals(newPassword)) {
-            throw new PasswordNotValidException("The new password is the same as the current password!");
-        }
-        if (!Validation.passwordIsValid(newPassword)) {
+        if (!Validation.passwordIsValid(user.getNewPassword())) {
             throw new PasswordNotValidException("The new password is not valid!");
         }
+        if (user.getCurrentPassword().equals(user.getNewPassword())) {
+            throw new PasswordNotValidException("The new password is the same as the current password!");
+        }
+        String currentPassword = user.getCurrentPassword();
+        Long id = LoggedInUser.id();
+        User entity = findById(id);
 
-        if (!currentPassword.equals(entity.getPassword())) {
+        if (!passwordEncoder.matches(currentPassword, entity.getPassword())) {
             throw new WrongPasswordException("The current password is not correct!");
         }
+        String newPassword = passwordEncoder.encode(user.getNewPassword());
         entity.setPassword(newPassword);
         repository.save(entity);
         return new EntityOutDto(id);
@@ -100,7 +100,7 @@ public class UserService {
         return ApplicationUserRole.valueOf(roleStr);
     }
 
-    @Transactional(readOnly = true)//TODO: should move to AdminService
+    @Transactional(readOnly = true)
     public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
         if (isExpert(user)) {
             return expertService.search(user, pageable);
@@ -182,10 +182,6 @@ public class UserService {
         return byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
-
-    //TODO: move to OrderService
-
-
     public ReportRegisterTimeUsersOutDto getNumberOfUsersByRegisterTime(TimeRangeInDto timeRange) {
         Long customer = repository.getNumberOfCustomersByRegisterTime(timeRange.getStartTime(), timeRange.getEndTime());
         Long expert = repository.getNumberOfExpertsByRegisterTime(timeRange.getStartTime(), timeRange.getEndTime());
@@ -205,5 +201,17 @@ public class UserService {
     public UserStatus getStatusByUsername(String username) throws EntityNotFoundException {
         return repository.getStatusByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
+    }
+
+    public UserSearchOutDto getUserById(Long id) throws EntityNotFoundException {
+        Optional<User> byId = repository.findById(id);
+        User user = byId.orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
+        UserSearchOutDto result = new UserSearchOutDto().convert2Dto(user);
+        if (user instanceof Expert) {
+            result.setType("expert");
+        } else if (user instanceof Customer) {
+            result.setType("customer");
+        }
+        return result;
     }
 }

@@ -13,6 +13,9 @@ import java.util.Optional;
 
 public interface SuggestionRepository extends BaseRepository<Suggestion> {
 
+    @Query("From Suggestion s")
+    Page<Suggestion> getAll(Pageable pageable);
+
     @Query("From Suggestion s where s.order.id=:orderId and s.order.request.owner.id=:id")
     Page<Suggestion> findAllByOrderId(Long id, Long orderId, Pageable pageable);
 

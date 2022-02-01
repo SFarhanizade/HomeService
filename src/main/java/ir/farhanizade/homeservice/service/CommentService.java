@@ -10,7 +10,9 @@ import ir.farhanizade.homeservice.exception.BadEntryException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.exception.UserNotLoggedInException;
 import ir.farhanizade.homeservice.repository.order.CommentRepository;
+import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
+import ir.farhanizade.homeservice.security.user.UserTypeAndId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,18 +42,16 @@ public class CommentService {
         return convert2Dto(page);
     }
 
-    //TODO: merge it with findByIdAndExpertId()
-    public CommentOutDto findByIdAndCustomerId(Long customerId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
-        Long id = LoggedInUser.id();
-        Comment comment = repository.findByIdAndCustomerId(id, customerId);
-        CommentOutDto result = convert2Dto(comment);
-        result.setDescription(comment.getDescription());
-        return result;
-    }
-
-    public CommentOutDto findByIdAndExpertId(Long id) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
-        Long expertId = LoggedInUser.id();
-        Comment comment = repository.findByIdAndExpertId(id, expertId);
+    public CommentOutDto getCommentById(Long id) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
+        UserTypeAndId typeAndId = LoggedInUser.getTypeAndId();
+        Long userId = typeAndId.getId();
+        ApplicationUserRole role = typeAndId.getRole();
+        Comment comment;
+        switch (role) {
+            case CUSTOMER -> comment = repository.findByIdAndCustomerId(id, userId);
+            case EXPERT -> comment = repository.findByIdAndExpertId(id, userId);
+            default -> throw new BadEntryException("User not allowed!");
+        }
         CommentOutDto result = convert2Dto(comment);
         return result;
     }

@@ -2,6 +2,8 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.ServiceOutDto;
+import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
@@ -9,6 +11,8 @@ import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.repository.service.MainServiceRepository;
 import ir.farhanizade.homeservice.repository.service.SubServiceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,18 +47,27 @@ public class SubServiceService {
     }
 
     @Transactional(readOnly = true)
-    public List<SubService> loadAll() {
-        return repository.findAll();
+    public CustomPage<ServiceOutDto> loadAll(Pageable pageable) {
+        Page<SubService> page = repository.findAll(pageable);
+        List<ServiceOutDto> data = page.getContent().stream()
+                .map(s -> new ServiceOutDto(s.getId(), s.getName(), s.getBasePrice())).toList();
+
+        CustomPage<ServiceOutDto> result = new CustomPage<>();
+        result.setData(data);
+        return result.convert(page);
     }
 
     @Transactional(readOnly = true)
     public SubService loadById(Long serviceId) throws EntityNotFoundException {
         Optional<SubService> byId = repository.findById(serviceId);
-        if(byId.isPresent()){
-            return byId.get();
-        }else{
-            throw new EntityNotFoundException("Service doesn't exist!");
-        }
+        return byId.orElseThrow(() -> new EntityNotFoundException("Service doesn't exist!"));
+    }
+
+    @Transactional(readOnly = true)
+    public ServiceOutDto findById(Long serviceId) throws EntityNotFoundException {
+        Optional<SubService> byId = repository.findById(serviceId);
+        SubService subService = byId.orElseThrow(() -> new EntityNotFoundException("Service doesn't exist!"));
+        return new ServiceOutDto(serviceId, subService.getName(), subService.getBasePrice());
     }
 }
 

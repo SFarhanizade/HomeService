@@ -3,16 +3,20 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.SuggestionOutDto;
 import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
+import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.user.Admin;
 import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.AdminRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ public class AdminService {
     private final ExpertService expertService;
     private final CustomerService customerService;
     private final UserService userService;
+    private final SuggestionService suggestionService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -36,6 +41,7 @@ public class AdminService {
         if (!Validation.isValid(admin)) throw new UserNotValidException("User is not valid!");
         if (finalCheck(admin)) throw new DuplicateEntityException("User exists!");
         admin.setRoles(Set.of(ApplicationUserRole.ADMIN));
+        admin.setStatus(UserStatus.ACCEPTED);
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         Validation.enableUser(admin);
         Admin result = repository.save(admin);
@@ -61,5 +67,10 @@ public class AdminService {
     @Transactional(readOnly = true)
     public CustomPage<UserSearchOutDto> search(UserSearchInDto user, Pageable pageable) throws EntityNotFoundException, UserNotValidException {
         return userService.search(user, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public CustomPage<SuggestionOutDto> loadAllSuggestions(Pageable pageable) {
+        return suggestionService.loadAll(pageable);
     }
 }

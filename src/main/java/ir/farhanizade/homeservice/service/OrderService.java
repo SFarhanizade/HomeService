@@ -94,6 +94,32 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public OrderOfUserOutDto getById(Long id) throws EntityNotFoundException {
+        return convert2OrderOfUserOutDto(findById(id));
+    }
+
+    private OrderOfUserOutDto convert2OrderOfUserOutDto(Order order) {
+        Long id = order.getRequest().getOwner().getId();
+        Suggestion suggestion = suggestionService.findAcceptedByOrderId(order.getId());
+        Expert expert = suggestion.getOwner();
+        Long expertId = (expert == null) ? null : expert.getId();
+        return OrderOfUserOutDto.builder()
+                .customerId(id)
+                .requestId(order.getRequest().getId())
+                .orderId(order.getId())
+                .expertId(expertId)
+                .suggestionId(suggestion.getId())
+                .mainService(order.getService().getParent().getName())
+                .subService(order.getService().getName())
+                .status(order.getStatus())
+                .suggestionStatus(suggestion.getSuggestionStatus())
+                .price(suggestion.getPrice())
+                .createdTime(order.getCreatedTime())
+                .finishTime(order.getFinishDateTime())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public CustomPage<OrderOutDto> loadAvailableOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Expert entity = expertService.findById(LoggedInUser.id());
         Set<SubService> expertises = entity.getExpertises();
@@ -136,22 +162,23 @@ public class OrderService {
             case EXPERT: {
                 return getOrdersOfExpert(pageable);
             }
+            case ADMIN:{
+                return getAllOrders(pageable);
+            }
             default: {
                 throw new BadEntryException("User Not Allowed");
             }
         }
     }
 
-    @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> findAllByCustomerId(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        Long id = LoggedInUser.id();
-        User user = userService.findById(id);
-        Page<Order> page;
-        if (user instanceof Customer)
-            page = repository.findAllByCustomerId(id, pageable);
-        else
-            page = repository.findAllByCustomerId(id, pageable);
-        return convert2Dto(page);
+    private CustomPage<OrderOfUserOutDto> getAllOrders(Pageable pageable){
+        Page<Order> page = repository.findAll(pageable);
+        CustomPage<OrderOfUserOutDto> result = new CustomPage<>();
+        List<Order> content = page.getContent();
+        List<OrderOfUserOutDto> data = content.stream()
+                .map(this::convert2OrderOfUserOutDto).toList();
+        result.setData(data);
+        return result.convert(page);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -255,7 +282,35 @@ public class OrderService {
     public CustomPage<OrderOfUserOutDto> getOrdersOfExpert(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
         Page<Order> page = repository.findAllByExpertId(id, pageable);
-        return convert2CustomPage(page, 0L);
+        return convert2CustomPage4JustStatus(page, id);
+    }
+
+    private CustomPage<OrderOfUserOutDto> convert2CustomPage4JustStatus(Page<Order> page, Long expertId) {
+        CustomPage<OrderOfUserOutDto> result = new CustomPage<>();
+        List<Order> content = page.getContent();
+        List<OrderOfUserOutDto> data = content.stream()
+                .map(o -> {
+                    Request request = o.getRequest();
+                    Customer customer = request.getOwner();
+                    Suggestion suggestion = o.getSuggestions().stream()
+                            .filter(s -> s.getOwner().getId().equals(expertId)).findFirst().get();
+                    return OrderOfUserOutDto.builder()
+                            .customerId(customer.getId())
+                            .requestId(request.getId())
+                            .orderId(o.getId())
+                            .expertId(expertId)
+                            .suggestionId(suggestion.getId())
+                            .mainService(o.getService().getParent().getName())
+                            .subService(o.getService().getName())
+                            .status(o.getStatus())
+                            .suggestionStatus(suggestion.getSuggestionStatus())
+                            .createdTime(o.getCreatedTime())
+                            .finishTime(o.getFinishDateTime())
+                            .build();
+                }).toList();
+
+        result.setData(data);
+        return result.convert(page);
     }
 
     public CustomPage<OrderOfUserOutDto> getOrdersByRangeOfTime(Date startTime, Date endTime, Pageable pageable) {
@@ -266,28 +321,7 @@ public class OrderService {
     private CustomPage<OrderOfUserOutDto> convert2CustomPage(Page<Order> page, Long userId) {
         List<Order> orders = page.getContent();
         List<OrderOfUserOutDto> data = orders.stream()
-                .map(o -> {
-                    Long id = userId;
-                    if (userId == 0L)
-                        id = o.getRequest().getOwner().getId();
-                    Suggestion suggestion = suggestionService.findAcceptedByOrderId(o.getId());
-                    Expert expert = suggestion.getOwner();
-                    Long expertId = (expert == null) ? null : expert.getId();
-                    return OrderOfUserOutDto.builder()
-                            .customerId(id)
-                            .requestId(o.getRequest().getId())
-                            .orderId(o.getId())
-                            .expertId(expertId)
-                            .suggestionId(suggestion.getId())
-                            .mainService(o.getService().getParent().getName())
-                            .subService(o.getService().getName())
-                            .status(o.getStatus())
-                            .suggestionStatus(suggestion.getSuggestionStatus())
-                            .price(suggestion.getPrice())
-                            .createdTime(o.getCreatedTime())
-                            .finishTime(o.getFinishDateTime())
-                            .build();
-                }).toList();
+                .map(this::convert2OrderOfUserOutDto).toList();
         CustomPage<OrderOfUserOutDto> result = new CustomPage().convert(page);
         result.setData(data);
         return result;

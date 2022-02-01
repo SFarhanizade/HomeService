@@ -50,8 +50,9 @@ public class SuggestionService {
 
 
     @Transactional(readOnly = true)
-    public List<Suggestion> loadAll() {
-        return repository.findAll();
+    public CustomPage<SuggestionOutDto> loadAll(Pageable pageable) {
+        Page<Suggestion> all = repository.getAll(pageable);
+        return convert2Dto(all);
     }
 
     @Transactional(readOnly = true)
@@ -98,6 +99,7 @@ public class SuggestionService {
         List<ExpertSuggestionOutDto> data = page.getContent().stream().map(s ->
                 ExpertSuggestionOutDto.builder()
                         .id(s.getId())
+                        .orderId(s.getOrder().getId())
                         .service(s.getOrder().getService().getName())
                         .price(s.getPrice())
                         .suggestedDateTime(s.getSuggestedDateTime())
