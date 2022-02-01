@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
-    private final ExpertService expertService;
     private final OrderService orderService;
     private final SuggestionService suggestionService;
     private final CustomerService customerService;
-    private final CommentService commentService;
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> request(@RequestBody RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException, UserNotLoggedInException, AccountIsLockedException {
@@ -48,9 +46,9 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        CustomPage<OrderOutDto> result = orderService.findAllByCustomerId(pageable);
-        ResponseResult<CustomPage<OrderOutDto>> response = ResponseResult.<CustomPage<OrderOutDto>>builder()
+    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> showOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
+        CustomPage<OrderOfUserOutDto> result = orderService.getOrders(pageable);
+        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
                 .code(1)
                 .message("List of orders loaded successfully.")
                 .data(result)
@@ -166,72 +164,6 @@ public class OrderController {
                 .build();
         HttpStatus status = HttpStatus.OK;
         return ResponseEntity.status(status).body(response);
-    }
-
-    @GetMapping("/time")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@RequestBody TimeRangeInDto timeRange, Pageable pageable) throws EntityNotFoundException {
-        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByRangeOfTime(timeRange.getStartTime(), timeRange.getEndTime(), pageable);
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Integer status, Pageable pageable) throws EntityNotFoundException {
-        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByStatus(status, pageable);
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/mainService/{id}")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrders(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersByMainService(id, pageable);
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/subService/{id}")
-    public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> getOrdersBySubService(@PathVariable Long id, Pageable pageable) throws EntityNotFoundException {
-        ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        CustomPage<OrderOfUserOutDto> data = orderService.getOrdersBySubService(id, pageable);
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/report/messages")
-    public ResponseEntity<ResponseResult<RequestAndSuggestionReportOutDto>> getNumberOfRequestsAndSuggestions() {
-        ResponseResult<RequestAndSuggestionReportOutDto> response = ResponseResult.<RequestAndSuggestionReportOutDto>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        RequestAndSuggestionReportOutDto data = orderService.getNumberOfRequestsAndSuggestions();
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/report/done")
-    public ResponseEntity<ResponseResult<Long>> getNumberOfDoneOrders() {
-        ResponseResult<Long> response = ResponseResult.<Long>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        Long data = orderService.getNumberOfDoneOrders();
-        response.setData(data);
-        return ResponseEntity.ok(response);
     }
 
 }

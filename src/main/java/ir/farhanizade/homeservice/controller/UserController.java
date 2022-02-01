@@ -22,30 +22,6 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    @GetMapping("/report/registerTime")
-    public ResponseEntity<ResponseResult<ReportRegisterTimeUsersOutDto>> getNumberOfUsersByRegisterTime(@RequestBody TimeRangeInDto timeRange) {
-        ResponseResult<ReportRegisterTimeUsersOutDto> response = ResponseResult.<ReportRegisterTimeUsersOutDto>builder()
-                .code(1)
-                .message("Loaded successfully!")
-                .build();
-        ReportRegisterTimeUsersOutDto data = userService.getNumberOfUsersByRegisterTime(timeRange);
-        response.setData(data);
-        return ResponseEntity.ok(response);
-    }
-
-
-    @GetMapping
-    public ResponseEntity<ResponseResult<CustomPage<UserSearchOutDto>>>
-    search(@RequestBody UserSearchInDto user, Pageable pageable) throws EntityNotFoundException {
-        ResponseResult<CustomPage<UserSearchOutDto>> response = ResponseResult.<CustomPage<UserSearchOutDto>>builder()
-                .code(1)
-                .message("Done!")
-                .build();
-        CustomPage<UserSearchOutDto> result = userService.search(user, pageable);
-
-        response.setData(result);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-    }
 
     private final UserService userService;
     private final ExpertService expertService;
@@ -131,7 +107,7 @@ public class UserController {
 
     @GetMapping("/comments/{comment}")
     public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long comment) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
-        CommentOutDto result = commentService.findByIdAndExpertId(comment);
+        CommentOutDto result = commentService.getCommentById(comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
                 .code(1)
                 .message("Loaded successfully.")

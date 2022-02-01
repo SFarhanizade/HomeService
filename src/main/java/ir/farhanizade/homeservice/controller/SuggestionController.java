@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.BUSY;
@@ -20,6 +21,7 @@ import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.
 @RestController
 @RequestMapping("/suggestions")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('EXPERT')")
 public class SuggestionController {
     private final SuggestionService suggestionService;
 
@@ -65,7 +67,7 @@ public class SuggestionController {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    @PostMapping("/suggestions/{suggestionId}/start")
+    @PostMapping("/{suggestionId}/start")
     public ResponseEntity<ResponseResult<EntityOutDto>> startToWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = suggestionService.startToWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -77,7 +79,7 @@ public class SuggestionController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PostMapping("/suggestions/{suggestionId}/done")
+    @PostMapping("/{suggestionId}/done")
     public ResponseEntity<ResponseResult<EntityOutDto>> finishWork(@PathVariable Long suggestionId) throws BusyOrderException, DuplicateEntityException, NameNotValidException, BadEntryException, EmailNotValidException, PasswordNotValidException, NullFieldException, EntityNotFoundException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = suggestionService.finishWork(suggestionId);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()

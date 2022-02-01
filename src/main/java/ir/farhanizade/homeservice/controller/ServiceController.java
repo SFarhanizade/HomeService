@@ -14,6 +14,7 @@ import ir.farhanizade.homeservice.service.SubServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,41 +23,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/services")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class ServiceController {
 
     private final MainServiceService mainService;
     private final SubServiceService subService;
-
-    @GetMapping
-    public ResponseEntity<ResponseResult<List<MainServiceOutDto>>> show() {
-        ResponseResult<List<MainServiceOutDto>> response = ResponseResult.<List<MainServiceOutDto>>builder()
-                .code(1)
-                .message("Done!")
-                .build();
-        HttpStatus status = HttpStatus.OK;
-        List<MainService> mainServices = null;
-        List<MainServiceOutDto> result;
-        try {
-            mainServices = mainService.loadAll();
-            result = mainServices.stream()
-                    .map(m -> MainServiceOutDto.builder()
-                            .id(m.getId())
-                            .name(m.getName())
-                            .subServices(m.getSubServices().stream()
-                                    .map(s -> new ServiceOutDto(s.getId(), s.getName()))
-                                    .collect(Collectors.toList())
-                            )
-                            .build()).toList();
-        } catch (EntityNotFoundException e) {
-            e.printStackTrace();
-            status = HttpStatus.NOT_FOUND;
-            response.setMessage(e.getMessage());
-            result = null;
-        }
-
-        response.setData(result);
-        return ResponseEntity.status(status).body(response);
-    }
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> save(@RequestBody ServiceInDto service) throws DuplicateEntityException, EntityNotFoundException {
