@@ -12,6 +12,7 @@ import java.util.Date;
 public class ExpertSuggestionOutDto {
     private Long id;
     private String service;
+    private Long orderId;
     private BigDecimal price;
     private Date suggestedDateTime;
     private SuggestionStatus status;
