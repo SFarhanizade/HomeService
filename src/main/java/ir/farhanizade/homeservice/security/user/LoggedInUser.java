@@ -18,8 +18,6 @@ import java.util.Collection;
 @Component
 public class LoggedInUser {
 
-    //TODO: remove usage of user id and use LoggedInUser class instead
-
     private UserService userService;
     private static UserService service;
 
@@ -37,11 +35,11 @@ public class LoggedInUser {
         if (principal == null) throw new UserNotLoggedInException("User Not Logged In!");
 
         UserStatus status = service.getStatusByUsername(principal.toString());
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
         if (!UserStatus.ACCEPTED.equals(status))
             throw new AccountIsLockedException("Account is Locked!");
-
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
         return new UserPrincipalAndAuthorities(principal.toString(), authorities);
     }
 
