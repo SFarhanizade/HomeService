@@ -3,8 +3,8 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.out.CommentOutDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.order.Comment;
-import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.order.MyComment;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.exception.AccountIsLockedException;
 import ir.farhanizade.homeservice.exception.BadEntryException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
@@ -29,16 +29,16 @@ public class CommentService {
     private final CommentRepository repository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public EntityOutDto save(Comment comment) {
-        Expert recipient = comment.getExpert();
+    public EntityOutDto save(MyComment comment) {
+        UserExpert recipient = comment.getMyExpert();
         recipient.addPoints(comment.getPoints());
-        Comment saved = repository.save(comment);
+        MyComment saved = repository.save(comment);
         return new EntityOutDto(saved.getId());
     }
 
     public CustomPage<CommentOutDto> findAllByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
-        Page<Comment> page = repository.findAllByUserId(id, pageable);
+        Page<MyComment> page = repository.findAllByUserId(id, pageable);
         return convert2Dto(page);
     }
 
@@ -46,7 +46,7 @@ public class CommentService {
         UserTypeAndId typeAndId = LoggedInUser.getTypeAndId();
         Long userId = typeAndId.getId();
         ApplicationUserRole role = typeAndId.getRole();
-        Comment comment;
+        MyComment comment;
         switch (role) {
             case CUSTOMER -> comment = repository.findByIdAndCustomerId(id, userId);
             case EXPERT -> comment = repository.findByIdAndExpertId(id, userId);
@@ -56,21 +56,21 @@ public class CommentService {
         return result;
     }
 
-    private CustomPage<CommentOutDto> convert2Dto(Page<Comment> page) {
+    private CustomPage<CommentOutDto> convert2Dto(Page<MyComment> page) {
         List<CommentOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
         CustomPage<CommentOutDto> result = CustomPage.<CommentOutDto>builder().data(data).build();
         return result.convert(page);
     }
 
-    private CommentOutDto convert2Dto(Comment comment) {
+    private CommentOutDto convert2Dto(MyComment comment) {
         return CommentOutDto.builder()
                 .id(comment.getId())
-                .customerId(comment.getCustomer().getId())
-                .customerName(comment.getCustomer().getName())
-                .expertId(comment.getExpert().getId())
-                .expertName(comment.getExpert().getName())
+                .customerId(comment.getMyCustomer().getId())
+                .customerName(comment.getMyCustomer().getName())
+                .expertId(comment.getMyExpert().getId())
+                .expertName(comment.getMyExpert().getName())
                 .points(comment.getPoints())
-                .orderId(comment.getOrder().getId())
+                .orderId(comment.getMyOrder().getId())
                 .dateTime(comment.getCreatedTime())
                 .build();
     }

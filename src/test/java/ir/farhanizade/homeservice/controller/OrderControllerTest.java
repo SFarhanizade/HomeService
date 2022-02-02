@@ -45,7 +45,7 @@ class OrderControllerTest extends AbstractRestControllerTest {
         CustomPage<OrderOutDto> result = CustomPage.<OrderOutDto>builder()
                 .data(List.of(new OrderOutDto(), new OrderOutDto(), new OrderOutDto())).build();
 
-        Mockito.when(expertService.loadAvailableOrders(request, Pageable.ofSize(20)))
+        Mockito.when(expertService.loadAvailableOrders(notNull(), Pageable.ofSize(20)))
                 .thenReturn(result);
 
         mvc.perform(post("/orders")

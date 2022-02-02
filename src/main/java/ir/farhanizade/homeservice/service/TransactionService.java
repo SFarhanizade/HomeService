@@ -3,13 +3,11 @@ package ir.farhanizade.homeservice.service;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.dto.out.TransactionOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.Transaction;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.MyTransaction;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.TransactionRepository;
-import ir.farhanizade.homeservice.repository.user.CustomerRepository;
-import ir.farhanizade.homeservice.repository.user.ExpertRepository;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,11 +28,11 @@ public class TransactionService {
     private final TransactionRepository repository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public EntityOutDto save(Transaction transaction, String method) throws NotEnoughMoneyException, BadEntryException {
+    public EntityOutDto save(MyTransaction transaction, String method) throws NotEnoughMoneyException, BadEntryException {
         if (transaction == null)
             throw new IllegalStateException("Null Transaction!");
-        Customer payer = transaction.getPayer();
-        Expert recipient = transaction.getRecipient();
+        UserCustomer payer = transaction.getPayer();
+        UserExpert recipient = transaction.getRecipient();
         BigDecimal amount = transaction.getAmount();
         BigDecimal recipientCredit = recipient.getCredit();
         BigDecimal payerCredit = payer.getCredit();
@@ -55,17 +53,17 @@ public class TransactionService {
                 throw new NotEnoughMoneyException("");
         }
         recipient.setCredit(recipientCredit.add(amount.multiply(new BigDecimal(0.7))));
-        Transaction saved = repository.save(transaction);
+        MyTransaction saved = repository.save(transaction);
         return new EntityOutDto(saved.getId());
     }
 
     public CustomPage<TransactionOutDto> findByUserId(Pageable pageable) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         Long id = LoggedInUser.id();
-        Page<Transaction> page = repository.findByUserId(id, pageable);
+        Page<MyTransaction> page = repository.findByUserId(id, pageable);
         return convert2Dto(page);
     }
 
-    private CustomPage<TransactionOutDto> convert2Dto(Page<Transaction> page) {
+    private CustomPage<TransactionOutDto> convert2Dto(Page<MyTransaction> page) {
         List<TransactionOutDto> data = page.getContent().stream()
                 .map(this::convert2Dto).toList();
         return CustomPage.<TransactionOutDto>builder()
@@ -77,7 +75,7 @@ public class TransactionService {
                 .build();
     }
 
-    private TransactionOutDto convert2Dto(Transaction transaction) {
+    private TransactionOutDto convert2Dto(MyTransaction transaction) {
         return TransactionOutDto.builder()
                 .id(transaction.getId())
                 .customerId(transaction.getPayer().getId())
@@ -91,8 +89,8 @@ public class TransactionService {
 
     public TransactionOutDto findById(Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         Long id = LoggedInUser.id();
-        Optional<Transaction> byId = repository.findByIdAndOwnerId(transaction, id);
-        Transaction result = byId.orElseThrow(() -> new EntityNotFoundException("Transaction Not Found!"));
+        Optional<MyTransaction> byId = repository.findByIdAndOwnerId(transaction, id);
+        MyTransaction result = byId.orElseThrow(() -> new EntityNotFoundException("Transaction Not Found!"));
         return convert2Dto(result);
     }
 }

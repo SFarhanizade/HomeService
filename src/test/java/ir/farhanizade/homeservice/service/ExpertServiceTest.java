@@ -194,7 +194,6 @@ class ExpertServiceTest {
 
     @Test
     void test_load_available_orders_throws_exception() {
-        ExpertInDto expertInDto = new ExpertInDto(1L);
 
         repository.save(getValidUser());
 
@@ -208,7 +207,7 @@ class ExpertServiceTest {
             Mockito.when(orderService.loadByExpertises(notNull(), notNull()))
                     .thenReturn(result);
             assertThrows(EntityNotFoundException.class,
-                    () -> expertService.loadAvailableOrders(expertInDto, Pageable.ofSize(10)));
+                    () -> expertService.loadAvailableOrders(1L, Pageable.ofSize(10)));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -217,7 +216,6 @@ class ExpertServiceTest {
 
     @Test
     void test_load_available_orders_is_ok() {
-        ExpertInDto expertInDto = new ExpertInDto(1L);
 
         Expert expert = repository.save(getValidUser());
 
@@ -244,7 +242,7 @@ class ExpertServiceTest {
             Mockito.when(orderService.loadByExpertises(notNull(), notNull()))
                     .thenReturn(result);
             assertEquals(3,
-                    expertService.loadAvailableOrders(expertInDto, Pageable.ofSize(10)).getData().size());
+                    expertService.loadAvailableOrders(1L, Pageable.ofSize(10)).getData().size());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

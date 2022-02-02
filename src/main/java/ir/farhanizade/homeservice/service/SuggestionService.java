@@ -2,7 +2,7 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
@@ -36,7 +36,7 @@ public class SuggestionService {
     @Transactional(rollbackFor = Exception.class)
     public ExpertAddSuggestionOutDto save(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException, DuplicateEntityException {
         Validation.isValid(suggestion);
-        Order order = suggestion.getOrder();
+        MyOrder order = suggestion.getMyOrder();
         if (suggestion.getId() == null) {
             order.suggest(suggestion);
         }
@@ -99,8 +99,8 @@ public class SuggestionService {
         List<ExpertSuggestionOutDto> data = page.getContent().stream().map(s ->
                 ExpertSuggestionOutDto.builder()
                         .id(s.getId())
-                        .orderId(s.getOrder().getId())
-                        .service(s.getOrder().getService().getName())
+                        .orderId(s.getMyOrder().getId())
+                        .service(s.getMyOrder().getService().getName())
                         .price(s.getPrice())
                         .suggestedDateTime(s.getSuggestedDateTime())
                         .status(s.getSuggestionStatus())
@@ -148,7 +148,7 @@ public class SuggestionService {
         if (suggestion.getOwner().getId() != ownerId) throw new BadEntryException("This Suggestion is not yours!");
         if (!suggestion.getStatus().equals(BaseMessageStatus.WAITING))
             throw new BadEntryException("This suggestion is done!");
-        Order order = suggestion.getOrder();
+        MyOrder order = suggestion.getMyOrder();
         Request request = order.getRequest();
         if (status.equals(BUSY)) {
             suggestion.setStatus(status);
@@ -213,7 +213,7 @@ public class SuggestionService {
     public EntityOutDto startToWork(Long suggestionId) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         Suggestion suggestion = findByIdAndOwnerId(suggestionId);
         if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED)) {
-            Order order = suggestion.getOrder();
+            MyOrder order = suggestion.getMyOrder();
             order.setStatus(OrderStatus.STARTED);
             repository.save(suggestion);
             return new EntityOutDto(suggestionId);
@@ -224,7 +224,7 @@ public class SuggestionService {
         Suggestion suggestion = findByIdAndOwnerId(suggestionId);
         if (suggestion.getSuggestionStatus().equals(SuggestionStatus.ACCEPTED) &&
                 suggestion.getStatus().equals(BUSY)) {
-            Order order = suggestion.getOrder();
+            MyOrder order = suggestion.getMyOrder();
             order.setStatus(OrderStatus.DONE);
             order.getRequest().setStatus(DONE);
             suggestion.setStatus(DONE);

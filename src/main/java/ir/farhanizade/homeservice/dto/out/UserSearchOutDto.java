@@ -1,8 +1,7 @@
 package ir.farhanizade.homeservice.dto.out;
 
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.MyUser;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -18,7 +17,7 @@ public class UserSearchOutDto {
     protected String lastname;
     protected String email;
 
-    public UserSearchOutDto convert2Dto(User user){
+    public UserSearchOutDto convert2Dto(MyUser user){
         return UserSearchOutDto.builder()
                 .id(user.getId())
                 .firstname(user.getFName())

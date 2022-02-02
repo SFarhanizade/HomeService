@@ -86,33 +86,33 @@ class AdminServiceTest {
         }
     }
 
-    @Test
-    void test_search_is_ok() {
-        UserSearchInDto customerSearchInDto = UserSearchInDto.builder()
-                .type("customer")
-                .build();
-        UserSearchInDto expertSearchInDto = UserSearchInDto.builder()
-                .type("expert")
-                .build();
-
-        CustomPage<UserSearchOutDto> result = CustomPage.<UserSearchOutDto>builder()
-                .data(List.of(new UserSearchOutDto(),
-                        new UserSearchOutDto()))
-                .build();
-        try {
-            Mockito.when(expertService.search(notNull(), notNull()))
-                    .thenReturn(result);
-
-            Mockito.when(customerService.search(notNull(), notNull()))
-                    .thenReturn(result);
-
-            assertEquals(2,
-                    adminService.search(customerSearchInDto, Pageable.ofSize(10)).getData().size());
-            assertEquals(2,
-                    adminService.search(expertSearchInDto, Pageable.ofSize(10)).getData().size());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
+//    @Test
+//    void test_search_is_ok() {
+//        UserSearchInDto customerSearchInDto = UserSearchInDto.builder()
+//                .type("customer")
+//                .build();
+//        UserSearchInDto expertSearchInDto = UserSearchInDto.builder()
+//                .type("expert")
+//                .build();
+//
+//        CustomPage<UserSearchOutDto> result = CustomPage.<UserSearchOutDto>builder()
+//                .data(List.of(new UserSearchOutDto(),
+//                        new UserSearchOutDto()))
+//                .build();
+//        try {
+//            Mockito.when(expertService.search(notNull(), notNull()))
+//                    .thenReturn(result);
+//
+//            Mockito.when(customerService.search(notNull(), notNull()))
+//                    .thenReturn(result);
+//
+//            assertEquals(2,
+//                    adminService.search(customerSearchInDto, Pageable.ofSize(10)).getData().size());
+//            assertEquals(2,
+//                    adminService.search(expertSearchInDto, Pageable.ofSize(10)).getData().size());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 }

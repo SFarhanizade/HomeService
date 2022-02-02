@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface RequestRepository extends BaseRepository<Request> {
     Page<Request> findByStatus(BaseMessageStatus waiting, Pageable pageable);
 
-    @Query("From Request r where r.order.id=:orderId")
+    @Query("From Request r where r.myOrder.id=:orderId")
     Optional<Request> findByOrderId(Long orderId);
 
     @Query("Select Count(r) From Request r")

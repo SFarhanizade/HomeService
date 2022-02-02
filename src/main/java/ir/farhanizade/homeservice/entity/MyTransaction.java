@@ -1,15 +1,14 @@
 package ir.farhanizade.homeservice.entity;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Entity
 @Setter
@@ -18,15 +17,14 @@ import java.util.Date;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
-        name = "transactions",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"my_order_id"})}
 )
-public class Transaction extends BaseEntity {
+public class MyTransaction extends BaseEntity {
     @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Order order;
+    private MyOrder myOrder;
     private BigDecimal amount;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Customer payer;
+    private UserCustomer payer;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Expert recipient;
+    private UserExpert recipient;
 }

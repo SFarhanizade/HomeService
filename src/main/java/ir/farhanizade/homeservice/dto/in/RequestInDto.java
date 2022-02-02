@@ -1,7 +1,5 @@
 package ir.farhanizade.homeservice.dto.in;
 
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.order.message.Request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

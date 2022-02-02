@@ -1,11 +1,9 @@
 package ir.farhanizade.homeservice.controller.api.filter;
 
 import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
-import ir.farhanizade.homeservice.entity.user.Expert;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;

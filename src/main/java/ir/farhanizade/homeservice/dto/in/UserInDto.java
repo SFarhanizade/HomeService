@@ -1,15 +1,12 @@
 package ir.farhanizade.homeservice.dto.in;
 
-import ir.farhanizade.homeservice.entity.user.Admin;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.UserAdmin;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 @Data
@@ -30,8 +27,8 @@ public class UserInDto {
     @Size(min = 8, max = 20)
     private String password;
 
-    public Expert convert2Expert() {
-        return Expert.builder()
+    public UserExpert convert2Expert() {
+        return UserExpert.builder()
                 .fName(firstname)
                 .lName(lastname)
                 .email(email)
@@ -39,8 +36,8 @@ public class UserInDto {
                 .build();
     }
 
-    public Customer convert2Customer() {
-        return Customer.builder()
+    public UserCustomer convert2Customer() {
+        return UserCustomer.builder()
                 .fName(firstname)
                 .lName(lastname)
                 .email(email)
@@ -48,8 +45,8 @@ public class UserInDto {
                 .build();
     }
 
-    public Admin convert2Admin() {
-        return Admin.builder()
+    public UserAdmin convert2Admin() {
+        return UserAdmin.builder()
                 .fName(firstname)
                 .lName(lastname)
                 .email(email)

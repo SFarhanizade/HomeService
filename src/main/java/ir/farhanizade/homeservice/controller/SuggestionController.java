@@ -21,7 +21,7 @@ import static ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus.
 @RestController
 @RequestMapping("/suggestions")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('EXPERT')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
 public class SuggestionController {
     private final SuggestionService suggestionService;
 

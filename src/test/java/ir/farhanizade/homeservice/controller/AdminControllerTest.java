@@ -89,7 +89,7 @@ class AdminControllerTest extends AbstractRestControllerTest {
                 .data(List.of(new UserSearchOutDto()))
                 .build();
 
-        Mockito.when(adminService.search(notNull(), notNull()))
+        Mockito.when(adminService.search(notNull(), notNull(), notNull()))
                 .thenReturn(result);
 
         mvc.perform(post("/admins/1/search")

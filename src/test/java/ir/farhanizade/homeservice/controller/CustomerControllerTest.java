@@ -1,6 +1,5 @@
 package ir.farhanizade.homeservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.RequestInDto;
@@ -9,14 +8,12 @@ import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.service.CustomerService;
 import ir.farhanizade.homeservice.service.RequestService;
 import ir.farhanizade.homeservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
@@ -30,16 +27,16 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = RANDOM_PORT)
 @WebMvcTest(CustomerController.class)
 class CustomerControllerTest extends AbstractRestControllerTest {
-
+//TODO: @SpyBean
     @MockBean
     private UserController userController;
 
@@ -209,7 +206,7 @@ class CustomerControllerTest extends AbstractRestControllerTest {
     void test_showTransactions_isOk() throws Exception {
         CustomPage<TransactionOutDto> result = CustomPage.<TransactionOutDto>builder().pageSize(20).build();
 
-        Mockito.when(userService.getTransactions(1L, Pageable.ofSize(20)))
+        Mockito.when(userService.getTransactions(Pageable.ofSize(20)))
                 .thenReturn(result);
 
         mvc.perform(get("/customers/1/transactions"))
@@ -222,7 +219,7 @@ class CustomerControllerTest extends AbstractRestControllerTest {
     void test_showTransaction_isOk() throws Exception {
         TransactionOutDto result = TransactionOutDto.builder().id(1L).build();
 
-        Mockito.when(userService.getTransaction(1L, 1L))
+        Mockito.when(userService.getTransaction(1L))
                 .thenReturn(result);
 
         mvc.perform(get("/customers/1/transactions/1"))
@@ -250,10 +247,10 @@ class CustomerControllerTest extends AbstractRestControllerTest {
     void test_showComments_isOk() throws Exception {
         CustomPage<CommentOutDto> result = CustomPage.<CommentOutDto>builder().pageSize(3).build();
 
-        Mockito.when(userService.getComments(1L, Pageable.ofSize(20)))
+        Mockito.when(userService.getComments(Pageable.ofSize(20)))
                 .thenReturn(result);
 
-        mvc.perform(get("/customers/1/comments"))
+        mvc.perform(get("/customers/comments"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize").value(3));
     }
@@ -274,10 +271,10 @@ class CustomerControllerTest extends AbstractRestControllerTest {
     void test_showCredit_isOk() throws Exception {
         UserCreditOutDto result = new UserCreditOutDto(1L, new BigDecimal(3500));
 
-        Mockito.when(userService.loadCreditById(1L))
+        Mockito.when(userService.loadCredit())
                 .thenReturn(result);
 
-        mvc.perform(get("/customers/1/credit"))
+        mvc.perform(get("/customers/credit"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.credit").value(result.getCredit()));
     }
@@ -292,7 +289,7 @@ class CustomerControllerTest extends AbstractRestControllerTest {
                 .balance(new BigDecimal(request.getAmount()))
                 .build();
 
-        Mockito.when(userService.increaseCredit(1L, request))
+        Mockito.when(userService.increaseCredit(request))
                 .thenReturn(result);
 
         mvc.perform(post("/customers/1/credit")

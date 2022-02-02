@@ -5,9 +5,9 @@ import ir.farhanizade.homeservice.controller.api.filter.UserSpecification;
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
+import ir.farhanizade.homeservice.entity.user.MyUser;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
@@ -51,7 +51,7 @@ public class UserService {
         }
         String currentPassword = user.getCurrentPassword();
         Long id = LoggedInUser.id();
-        User entity = findById(id);
+        MyUser entity = findById(id);
 
         if (!passwordEncoder.matches(currentPassword, entity.getPassword())) {
             throw new WrongPasswordException("The current password is not correct!");
@@ -78,7 +78,7 @@ public class UserService {
     @Transactional
     public EntityOutDto verifyEmail(String uuid) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, UUIDNotFoundException {
         Long id = UserUUID.getIdByUUID(uuid);
-        User user = findById(id);
+        MyUser user = findById(id);
         ApplicationUserRole role = getRole(user);
         UserStatus status = null;
         switch (role) {
@@ -90,7 +90,7 @@ public class UserService {
         return new EntityOutDto(id);
     }
 
-    private ApplicationUserRole getRole(User user) throws BadEntryException {
+    private ApplicationUserRole getRole(MyUser user) throws BadEntryException {
         String roleStr = user.getAuthorities().stream()
                 .filter(a -> a.getAuthority().startsWith("ROLE_"))
                 .findFirst()
@@ -105,10 +105,10 @@ public class UserService {
         if (isExpert(user)) {
             return expertService.search(user, pageable);
         }
-        UserSpecification<User> specification = new UserSpecification<>();
-        Specification<User> filter = specification.getUsers(user);
-        Page<User> all = repository.findAll(filter, pageable);
-        CustomPage<User> result = new CustomPage<>();
+        UserSpecification<MyUser> specification = new UserSpecification<>();
+        Specification<MyUser> filter = specification.getUsers(user);
+        Page<MyUser> all = repository.findAll(filter, pageable);
+        CustomPage<MyUser> result = new CustomPage<>();
         result.setPageSize(all.getSize());
         result.setLastPage(all.getTotalPages());
         result.setPageNumber(all.getNumber());
@@ -129,7 +129,7 @@ public class UserService {
         return transactionService.findByUserId(pageable);
     }
 
-    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<User> list) {
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<MyUser> list) {
         List<UserSearchOutDto> data = list.getData().stream()
                 .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
         return CustomPage.<UserSearchOutDto>builder()
@@ -161,15 +161,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserCreditOutDto loadCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        User user = findById(LoggedInUser.id());
+        MyUser user = findById(LoggedInUser.id());
         return new UserCreditOutDto(user.getId(), user.getCredit());
     }
 
     @Transactional
     public UserIncreaseCreditOutDto increaseCredit(UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        User user = findById(LoggedInUser.id());
+        MyUser user = findById(LoggedInUser.id());
         user.setCredit(user.getCredit().add(new BigDecimal(request.getAmount())));
-        User saved = repository.save(user);
+        MyUser saved = repository.save(user);
         return UserIncreaseCreditOutDto.builder()
                 .id(saved.getId())
                 .amount(request.getAmount())
@@ -177,8 +177,8 @@ public class UserService {
                 .build();
     }
 
-    public User findById(Long id) throws EntityNotFoundException {
-        Optional<User> byId = repository.findById(id);
+    public MyUser findById(Long id) throws EntityNotFoundException {
+        Optional<MyUser> byId = repository.findById(id);
         return byId.orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
@@ -204,12 +204,12 @@ public class UserService {
     }
 
     public UserSearchOutDto getUserById(Long id) throws EntityNotFoundException {
-        Optional<User> byId = repository.findById(id);
-        User user = byId.orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
+        Optional<MyUser> byId = repository.findById(id);
+        MyUser user = byId.orElseThrow(() -> new EntityNotFoundException("User Not Found!"));
         UserSearchOutDto result = new UserSearchOutDto().convert2Dto(user);
-        if (user instanceof Expert) {
+        if (user instanceof UserExpert) {
             result.setType("expert");
-        } else if (user instanceof Customer) {
+        } else if (user instanceof UserCustomer) {
             result.setType("customer");
         }
         return result;

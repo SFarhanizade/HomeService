@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class OrderController {
     private final CustomerService customerService;
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<EntityOutDto>> request(@RequestBody RequestInDto request) throws NameNotValidException, NullFieldException, BadEntryException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = orderService.request(request);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -33,6 +35,7 @@ public class OrderController {
     }
 
     @PostMapping("/{order}/suggestion")
+    @PreAuthorize("hasAnyAuthority('SUGGESTION_WRITE')")
     public ResponseEntity<ResponseResult<ExpertAddSuggestionOutDto>>
     suggest(@PathVariable Long order, @RequestBody ExpertAddSuggestionInDto request) throws Exception {
         ExpertAddSuggestionOutDto result = orderService.suggest(order, request);
@@ -46,6 +49,7 @@ public class OrderController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<CustomPage<OrderOfUserOutDto>>> showOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<OrderOfUserOutDto> result = orderService.getOrders(pageable);
         ResponseResult<CustomPage<OrderOfUserOutDto>> response = ResponseResult.<CustomPage<OrderOfUserOutDto>>builder()
@@ -58,6 +62,7 @@ public class OrderController {
     }
 
     @GetMapping("/{order}")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<OrderOutDto>> showOrder(@PathVariable Long order) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         OrderOutDto result = orderService.findByIdAndCustomerId(order);
         ResponseResult<OrderOutDto> response = ResponseResult.<OrderOutDto>builder()
@@ -70,6 +75,7 @@ public class OrderController {
     }
 
     @PostMapping("/{order}/remove")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<EntityOutDto>> removeOrder(@PathVariable Long order) throws EntityNotFoundException, BadEntryException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = orderService.removeOrderByIdAndOwnerId(order);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -82,6 +88,7 @@ public class OrderController {
     }
 
     @GetMapping("/suggestions")
+    @PreAuthorize("hasAnyAuthority('SUGGESTION_READ')")
     public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showAllSuggestions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<SuggestionOutDto> result = suggestionService.findAllByCustomerId(pageable);
         ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
@@ -94,6 +101,7 @@ public class OrderController {
     }
 
     @GetMapping("/{order}/suggestions")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<CustomPage<SuggestionOutDto>>> showSuggestionsByOrder(@PathVariable Long order, Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<SuggestionOutDto> result = orderService.getSuggestionsByOrder(order, pageable);
         ResponseResult<CustomPage<SuggestionOutDto>> response = ResponseResult.<CustomPage<SuggestionOutDto>>builder()
@@ -106,6 +114,7 @@ public class OrderController {
     }
 
     @GetMapping("/suggestions/{suggestion}")
+    @PreAuthorize("hasAnyAuthority('SUGGESTION_READ')")
     public ResponseEntity<ResponseResult<SuggestionOutDto>> showSuggestion(@PathVariable Long suggestion) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         SuggestionOutDto result = suggestionService.getById(suggestion);
         ResponseResult<SuggestionOutDto> response = ResponseResult.<SuggestionOutDto>builder()
@@ -118,6 +127,7 @@ public class OrderController {
     }
 
     @PostMapping("/suggestions/{suggestion}/accept")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<EntityOutDto>> acceptSuggestion(@PathVariable Long suggestion) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = orderService.acceptSuggestion(suggestion);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -130,6 +140,7 @@ public class OrderController {
     }
 
     @PostMapping("/suggestions/{suggestion}/pay/{method}")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<EntityOutDto>> pay(@PathVariable Long suggestion, @PathVariable String method) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = customerService.pay(suggestion, method);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -142,6 +153,7 @@ public class OrderController {
     }
 
     @PostMapping("/suggestions/{suggestion}/comment")
+    @PreAuthorize("hasAnyAuthority('ORDER_WRITE')")
     public ResponseEntity<ResponseResult<EntityOutDto>> comment(@PathVariable Long suggestion, @RequestBody CommentInDto comment) throws EntityNotFoundException, BusyOrderException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, DuplicateEntityException, NotEnoughMoneyException, UserNotLoggedInException, AccountIsLockedException {
         EntityOutDto result = customerService.comment(suggestion, comment);
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
@@ -154,6 +166,7 @@ public class OrderController {
     }
 
     @GetMapping("experts")
+    @PreAuthorize("hasAnyAuthority('SUGGESTION_WRITE')")
     public ResponseEntity<ResponseResult<CustomPage<OrderOutDto>>> showList(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<OrderOutDto> result = null;
         result = orderService.loadAvailableOrders(pageable);

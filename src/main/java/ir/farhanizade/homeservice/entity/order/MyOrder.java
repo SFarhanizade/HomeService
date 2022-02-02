@@ -1,17 +1,13 @@
 package ir.farhanizade.homeservice.entity.order;
 
-import ir.farhanizade.homeservice.entity.Transaction;
+import ir.farhanizade.homeservice.entity.MyTransaction;
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.*;
@@ -19,34 +15,33 @@ import java.util.*;
 //@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Table(name = "MyOrder")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Order extends BaseEntity {
+public class MyOrder extends BaseEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private SubService service;
 
     private Date finishDateTime;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "order")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "myOrder")
     private Request request;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "myOrder", fetch = FetchType.EAGER)
     private Set<Suggestion> suggestions;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.WAITING_FOR_SUGGESTION;
 
-    @OneToOne(mappedBy = "order")
-    private Transaction transaction;
+    @OneToOne(mappedBy = "myOrder")
+    private MyTransaction myTransaction;
 
-    @OneToOne(mappedBy = "order")
-    private Comment comment;
+    @OneToOne(mappedBy = "myOrder")
+    private MyComment myComment;
 
     public void suggest(Suggestion suggestion) throws DuplicateEntityException {
         if (suggestion == null)
@@ -54,7 +49,7 @@ public class Order extends BaseEntity {
         if (suggestions == null)
             suggestions = new HashSet<>();
         boolean exists = !suggestions.add(suggestion);
-        if(exists) throw new DuplicateEntityException("You Can't Suggest On This Order More Than Once!");
+        if (exists) throw new DuplicateEntityException("You Can't Suggest On This Order More Than Once!");
         status = OrderStatus.WAITING_FOR_SELECTION;
     }
 

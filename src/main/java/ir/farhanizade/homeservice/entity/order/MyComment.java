@@ -1,8 +1,8 @@
 package ir.farhanizade.homeservice.entity.order;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -17,20 +17,19 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
-        name = "comments",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "customer_id", "expert_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"my_order_id", "my_customer_id", "my_expert_id"})}
 )
-public class Comment extends BaseEntity {
+public class MyComment extends BaseEntity {
     @Column(nullable = false)
     private Integer points;
     private String description;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Customer customer;
+    private UserCustomer myCustomer;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Expert expert;
+    private UserExpert myExpert;
 
     @OneToOne
-    private Order order;
+    private MyOrder myOrder;
 }

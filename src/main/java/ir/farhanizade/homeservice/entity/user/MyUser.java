@@ -1,6 +1,5 @@
 package ir.farhanizade.homeservice.entity.user;
 
-import ir.farhanizade.homeservice.entity.Transaction;
 import ir.farhanizade.homeservice.entity.core.BasePerson;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import lombok.*;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 //@EqualsAndHashCode(callSuper = true)
 //@Data
@@ -21,7 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-public class User extends BasePerson implements UserDetails {
+public class MyUser extends BasePerson implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<ApplicationUserRole> roles;

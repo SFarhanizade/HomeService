@@ -1,20 +1,17 @@
 package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.CommentInDto;
-import ir.farhanizade.homeservice.dto.in.RequestInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.in.UserSearchInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.Transaction;
-import ir.farhanizade.homeservice.entity.order.Comment;
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.order.OrderStatus;
+import ir.farhanizade.homeservice.entity.MyTransaction;
+import ir.farhanizade.homeservice.entity.order.MyComment;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.CustomerRepository;
@@ -24,7 +21,6 @@ import ir.farhanizade.homeservice.service.util.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +44,7 @@ public class CustomerService {
 
     @Transactional(rollbackFor = Exception.class)
     public Long save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
-        Customer customer = user.convert2Customer();
+        UserCustomer customer = user.convert2Customer();
         boolean isValid = Validation.isValid(customer);
 
         if (!isValid)
@@ -59,47 +55,47 @@ public class CustomerService {
         customer.setRoles(Set.of(ApplicationUserRole.CUSTOMER));
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         Validation.enableUser(customer);
-        Customer result = repository.save(customer);
+        UserCustomer result = repository.save(customer);
         return result.getId();
     }
 
     @Transactional(readOnly = true)
     public UserOutDto findByEmail(String email) throws EntityNotFoundException, EmailNotValidException, NullFieldException {
         Validation.isEmailValid(email);
-        Customer byEmail = repository.findByEmail(email);
+        UserCustomer byEmail = repository.findByEmail(email);
         if (byEmail == null) throw new EntityNotFoundException("User Doesn't Exist!");
         return convert2Dto(byEmail);
     }
 
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findByCredit(BigDecimal credit, Pageable pageable) throws EntityNotFoundException {
-        Page<Customer> page = repository.findByCredit(credit, pageable);
+        Page<UserCustomer> page = repository.findByCredit(credit, pageable);
         //if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findByStatus(UserStatus status, Pageable pageable) throws EntityNotFoundException {
-        Page<Customer> page = repository.findByStatus(status, pageable);
+        Page<UserCustomer> page = repository.findByStatus(status, pageable);
         //if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findAll(Pageable pageable) throws EntityNotFoundException {
-        Page<Customer> page = repository.findAll(pageable);
+        Page<UserCustomer> page = repository.findAll(pageable);
         if (page.getContent().isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    boolean finalCheck(Customer customer) {
+    boolean finalCheck(UserCustomer customer) {
         String email = customer.getEmail();
-        Customer byEmail = repository.findByEmail(email);
+        UserCustomer byEmail = repository.findByEmail(email);
         return byEmail != null && customer.getId() == null;
     }
 
-    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<Customer> list) {
+    private CustomPage<UserSearchOutDto> convert2Dto(CustomPage<UserCustomer> list) {
         List<UserSearchOutDto> data = list.getData().stream()
                 .map(c -> new UserSearchOutDto().convert2Dto(c)).toList();
         return CustomPage.<UserSearchOutDto>builder()
@@ -112,8 +108,8 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public Customer findById(Long id) throws EntityNotFoundException {
-        Optional<Customer> byId = repository.findById(id);
+    public UserCustomer findById(Long id) throws EntityNotFoundException {
+        Optional<UserCustomer> byId = repository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
         } else
@@ -130,7 +126,7 @@ public class CustomerService {
             throw new EntityNotFoundException("User Doesn't Exist!");
     }
 
-    private UserOutDto convert2Dto(Customer customer) {
+    private UserOutDto convert2Dto(UserCustomer customer) {
         return UserOutDto.builder()
                 .id(customer.getId())
                 .name(customer.getName())
@@ -139,7 +135,7 @@ public class CustomerService {
                 .build();
     }
 
-    private CustomPage<UserOutDto> convert2Dto(Page<Customer> page) {
+    private CustomPage<UserOutDto> convert2Dto(Page<UserCustomer> page) {
         List<UserOutDto> data = page.getContent().stream().map(this::convert2Dto).toList();
         return CustomPage.<UserOutDto>builder()
                 .pageSize(page.getSize())
@@ -152,21 +148,21 @@ public class CustomerService {
 
     @Transactional
     public EntityOutDto pay(Long suggestionId, String method) throws EntityNotFoundException, NotEnoughMoneyException, BusyOrderException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, UserNotLoggedInException, AccountIsLockedException {
-        Customer customer = findById(LoggedInUser.id());
+        UserCustomer customer = findById(LoggedInUser.id());
         Suggestion suggestion = suggestionService.findById(suggestionId);
-        if (suggestion.getOrder().getStatus().equals(PAID))
+        if (suggestion.getMyOrder().getStatus().equals(PAID))
             throw new BadEntryException("You can't pay more than once!");
-        Expert expert = suggestion.getOwner();
+        UserExpert expert = suggestion.getOwner();
         BigDecimal price = suggestion.getPrice();
 
-        Order order = suggestion.getOrder();
+        MyOrder order = suggestion.getMyOrder();
         order.setStatus(PAID);
 
-        Transaction transaction = Transaction.builder()
+        MyTransaction transaction = MyTransaction.builder()
                 .payer(customer)
                 .recipient(expert)
                 .amount(price)
-                .order(order)
+                .myOrder(order)
                 .build();
 
         EntityOutDto result = transactionService.save(transaction, method);
@@ -182,14 +178,14 @@ public class CustomerService {
 
     @Transactional
     public EntityOutDto comment(Long suggestionId, CommentInDto commentDto) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
-        Customer customer = findById(LoggedInUser.id());
+        UserCustomer customer = findById(LoggedInUser.id());
         Suggestion suggestion = suggestionService.findById(suggestionId);
-        Expert expert = suggestion.getOwner();
-        Order order = suggestion.getOrder();
-        Comment comment = Comment.builder()
-                .customer(customer)
-                .expert(expert)
-                .order(order)
+        UserExpert expert = suggestion.getOwner();
+        MyOrder order = suggestion.getMyOrder();
+        MyComment comment = MyComment.builder()
+                .myCustomer(customer)
+                .myExpert(expert)
+                .myOrder(order)
                 .points(commentDto.getPoints())
                 .description(commentDto.getDescription())
                 .build();

@@ -12,7 +12,6 @@ import ir.farhanizade.homeservice.entity.order.message.SuggestionStatus;
 import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -23,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -208,7 +206,7 @@ class ExpertControllerTest extends AbstractRestControllerTest {
                         new TransactionOutDto()))
                 .build();
 
-        Mockito.when(userService.getTransactions(1L, Pageable.ofSize(20)))
+        Mockito.when(userService.getTransactions(Pageable.ofSize(20)))
                 .thenReturn(result);
 
         mvc.perform(get("/experts/1/transactions"))
@@ -220,7 +218,7 @@ class ExpertControllerTest extends AbstractRestControllerTest {
     void test_showTransaction_isOk() throws Exception {
         TransactionOutDto result = new TransactionOutDto();
 
-        Mockito.when(userService.getTransaction(1L, 1L))
+        Mockito.when(userService.getTransaction(1L))
                 .thenReturn(result);
 
         mvc.perform(get("/experts/1/transactions/1"))
@@ -235,10 +233,10 @@ class ExpertControllerTest extends AbstractRestControllerTest {
                         new CommentOutDto(),
                         new CommentOutDto())).build();
 
-        Mockito.when(userService.getComments(1L, Pageable.ofSize(20)))
+        Mockito.when(userService.getComments(Pageable.ofSize(20)))
                 .thenReturn(result);
 
-        mvc.perform(get("/experts/1/comments"))
+        mvc.perform(get("/experts/comments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.data", hasSize(3)));
     }
@@ -274,10 +272,10 @@ class ExpertControllerTest extends AbstractRestControllerTest {
     void showCredit() throws Exception {
         UserCreditOutDto result = new UserCreditOutDto();
 
-        Mockito.when(userService.loadCreditById(1L))
+        Mockito.when(userService.loadCredit())
                 .thenReturn(result);
 
-        mvc.perform(get("/experts/1/credit"))
+        mvc.perform(get("/experts/credit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(result));
     }
@@ -289,7 +287,7 @@ class ExpertControllerTest extends AbstractRestControllerTest {
         UserIncreaseCreditOutDto result = UserIncreaseCreditOutDto.builder()
                 .amount(1500L).build();
 
-        Mockito.when(userService.increaseCredit(1L, request))
+        Mockito.when(userService.increaseCredit(request))
                 .thenReturn(result);
 
         mvc.perform(post("/experts/1/credit")

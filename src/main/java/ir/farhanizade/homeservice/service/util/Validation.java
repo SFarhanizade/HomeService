@@ -1,15 +1,14 @@
 package ir.farhanizade.homeservice.service.util;
 
-import ir.farhanizade.homeservice.entity.order.Order;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
 import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.entity.service.SubService;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
+import ir.farhanizade.homeservice.entity.user.MyUser;
 import ir.farhanizade.homeservice.exception.*;
 
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ public class Validation {
     static Pattern pattern;
     static Matcher matcher;
 
-    public static boolean isValid(User user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
+    public static boolean isValid(MyUser user) throws EmailNotValidException, PasswordNotValidException, NameNotValidException, NullFieldException {
         if (user == null)
             throw new NullFieldException("User is null!");
         isEmailValid(user.getEmail());
@@ -37,7 +36,7 @@ public class Validation {
     }
 
     public static boolean isValid(Request request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException {
-        Order order = request.getOrder();
+        MyOrder order = request.getMyOrder();
         isValid(order);
         if (request.getAddress() == null)
             throw new NullFieldException("The address is null");
@@ -52,7 +51,7 @@ public class Validation {
         return true;
     }
 
-    private static boolean isValid(Order order) throws NullFieldException, BadEntryException {
+    private static boolean isValid(MyOrder order) throws NullFieldException, BadEntryException {
         if (order == null)
             throw new NullFieldException("Order is null!");
         SubService service = order.getService();
@@ -82,8 +81,8 @@ public class Validation {
 
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         if (suggestion.getId() != null) return true;
-        Expert owner = suggestion.getOwner();
-        Order order = suggestion.getOrder();
+        UserExpert owner = suggestion.getOwner();
+        MyOrder order = suggestion.getMyOrder();
         if (!owner.getExpertises().contains(order.getService()))
             throw new BadEntryException("This Order Is Not Available For This Expert!");
         Request request = order.getRequest();
@@ -124,7 +123,7 @@ public class Validation {
         return true;
     }
 
-    public static void enableUser(User user) {
+    public static void enableUser(MyUser user) {
         user.setEnabled(true);
         user.setAccountNonLocked(true);
         user.setAccountNonExpired(true);

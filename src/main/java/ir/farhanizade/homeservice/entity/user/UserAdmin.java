@@ -1,6 +1,5 @@
 package ir.farhanizade.homeservice.entity.user;
 
-import ir.farhanizade.homeservice.entity.core.BasePerson;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,5 +12,5 @@ import javax.persistence.Entity;
 @Entity
 @AllArgsConstructor
 @SuperBuilder
-public class Admin extends User {
+public class UserAdmin extends MyUser {
 }

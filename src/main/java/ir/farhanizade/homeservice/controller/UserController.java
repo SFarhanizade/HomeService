@@ -58,6 +58,7 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT') or hasRole('CUSTOMER')")
     public ResponseEntity<ResponseResult<EntityOutDto>> changePassword(@RequestBody UserPasswordInDto user) throws PasswordNotValidException, WrongPasswordException, EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
@@ -70,6 +71,7 @@ public class UserController {
     }
 
     @GetMapping("/transactions")
+    @PreAuthorize("hasAnyAuthority('TRANSACTION_READ')")
     public ResponseEntity<ResponseResult<CustomPage<TransactionOutDto>>> showTransactions(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<TransactionOutDto> result = userService.getTransactions(pageable);
         ResponseResult<CustomPage<TransactionOutDto>> response = ResponseResult.<CustomPage<TransactionOutDto>>builder()
@@ -82,6 +84,7 @@ public class UserController {
     }
 
     @GetMapping("/transactions/{transaction}")
+    @PreAuthorize("hasAnyAuthority('TRANSACTION_READ')")
     public ResponseEntity<ResponseResult<TransactionOutDto>> showTransaction(@PathVariable Long transaction) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         TransactionOutDto result = userService.getTransaction(transaction);
         ResponseResult<TransactionOutDto> response = ResponseResult.<TransactionOutDto>builder()
@@ -94,6 +97,7 @@ public class UserController {
     }
 
     @GetMapping("/comments")
+    @PreAuthorize("hasAnyAuthority('COMMENT_READ')")
     public ResponseEntity<ResponseResult<CustomPage<CommentOutDto>>> showComments(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         CustomPage<CommentOutDto> result = userService.getComments(pageable);
         ResponseResult<CustomPage<CommentOutDto>> response = ResponseResult.<CustomPage<CommentOutDto>>builder()
@@ -106,6 +110,7 @@ public class UserController {
     }
 
     @GetMapping("/comments/{comment}")
+    @PreAuthorize("hasAnyAuthority('COMMENT_READ')")
     public ResponseEntity<ResponseResult<CommentOutDto>> showComment(@PathVariable Long comment) throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         CommentOutDto result = commentService.getCommentById(comment);
         ResponseResult<CommentOutDto> response = ResponseResult.<CommentOutDto>builder()
@@ -118,6 +123,7 @@ public class UserController {
     }
 
     @GetMapping("/credit")
+    @PreAuthorize("hasAnyAuthority('CREDIT_READ')")
     public ResponseEntity<ResponseResult<UserCreditOutDto>> showCredit() throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         UserCreditOutDto result = userService.loadCredit();
         ResponseResult<UserCreditOutDto> response = ResponseResult.<UserCreditOutDto>builder()
@@ -130,6 +136,7 @@ public class UserController {
     }
 
     @PostMapping("/credit")
+    @PreAuthorize("hasAnyAuthority('COMMENT_WRITE')")
     public ResponseEntity<ResponseResult<UserIncreaseCreditOutDto>> addCredit(@RequestBody UserIncreaseCreditInDto request) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         UserIncreaseCreditOutDto result = userService.increaseCredit(request);
         ResponseResult<UserIncreaseCreditOutDto> response = ResponseResult.<UserIncreaseCreditOutDto>builder()
@@ -142,6 +149,7 @@ public class UserController {
     }
 
     @PostMapping("/addService")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<ResponseResult<ExpertAddServiceOutDto>>
     addService(@RequestBody ExpertAddServiceInDto request)
             throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {

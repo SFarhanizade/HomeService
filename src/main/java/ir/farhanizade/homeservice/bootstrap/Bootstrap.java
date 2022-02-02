@@ -1,21 +1,10 @@
 package ir.farhanizade.homeservice.bootstrap;
 
 import ir.farhanizade.homeservice.dto.in.*;
-import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
-import ir.farhanizade.homeservice.entity.service.MainService;
-import ir.farhanizade.homeservice.entity.service.SubService;
-import ir.farhanizade.homeservice.entity.user.Admin;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
 import ir.farhanizade.homeservice.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor

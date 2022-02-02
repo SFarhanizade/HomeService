@@ -1,8 +1,7 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
+import ir.farhanizade.homeservice.entity.user.UserExpert;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
@@ -20,17 +19,17 @@ import javax.persistence.*;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {"owner"})
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "owner_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"my_order_id", "owner_id"})}
 )
 public class Suggestion extends BaseMessage {
 
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(cascade = CascadeType.ALL)
-    protected Order order;
+    protected MyOrder myOrder;
 
     @ManyToOne
-    private Expert owner;
+    private UserExpert owner;
 
     @Column(nullable = false)
     private Double duration;

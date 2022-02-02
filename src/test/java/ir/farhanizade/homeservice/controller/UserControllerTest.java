@@ -93,7 +93,7 @@ public class UserControllerTest extends AbstractRestControllerTest {
         CustomPage<OrderOfUserOutDto> result = CustomPage.<OrderOfUserOutDto>builder()
                 .data(List.of(new OrderOfUserOutDto())).build();
 
-        Mockito.when(userService.getOrders(notNull(), notNull()))
+        Mockito.when(userService.getOrders(notNull()))
                 .thenReturn(result);
 
         mvc.perform(get("/users/1/orders"))

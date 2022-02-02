@@ -1,8 +1,7 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
-import ir.farhanizade.homeservice.entity.order.Order;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.order.MyOrder;
+import ir.farhanizade.homeservice.entity.user.UserCustomer;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
@@ -19,16 +18,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"order_id", "owner_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"my_order_id", "owner_id"})}
 )
 public class Request extends BaseMessage {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToOne(cascade = CascadeType.ALL)
-    protected Order order;
+    protected MyOrder myOrder;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Customer owner;
+    private UserCustomer owner;
 
     @Column(nullable = false)
     private String address;

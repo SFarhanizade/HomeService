@@ -1,7 +1,6 @@
 package ir.farhanizade.homeservice.entity.order.message;
 
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.order.Order;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
