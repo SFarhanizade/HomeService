@@ -44,6 +44,8 @@ public class MainServiceService {
                 .map(m -> MainServiceOutDto.builder()
                         .id(m.getId())
                         .name(m.getName())
+                        .subServices(m.getSubServices().stream().map(
+                                s -> new ServiceOutDto(s.getId(), s.getName(), s.getBasePrice())).toList())
                         .build()).toList();
         CustomPage<MainServiceOutDto> result = new CustomPage<>();
         result.setData(data);
@@ -56,6 +58,6 @@ public class MainServiceService {
         List<SubService> subServices = mainService.getSubServices();
         List<ServiceOutDto> serviceOutDtos = subServices.stream()
                 .map(s -> new ServiceOutDto(s.getId(), s.getName(), null)).toList();
-        return new MainServiceOutDto(id,mainService.getName(),serviceOutDtos);
+        return new MainServiceOutDto(id, mainService.getName(), serviceOutDtos);
     }
 }

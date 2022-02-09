@@ -25,7 +25,6 @@ import java.util.Set;
 public class AdminService {
     private final AdminRepository repository;
     private final ExpertService expertService;
-    private final CustomerService customerService;
     private final UserService userService;
     private final SuggestionService suggestionService;
     private final PasswordEncoder passwordEncoder;
@@ -51,7 +50,7 @@ public class AdminService {
         return byEmail != null && admin.getId() == null;
     }
 
-    public EntityOutDto acceptExpert(Long expertId) throws UserNotValidException, EntityNotFoundException, UserNotLoggedInException, BadEntryException {
+    public EntityOutDto acceptExpert(Long expertId) throws EntityNotFoundException {
         return expertService.acceptExpert(expertId);
     }
 

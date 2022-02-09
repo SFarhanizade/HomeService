@@ -5,40 +5,33 @@ import ir.farhanizade.homeservice.dto.in.UserIncreaseCreditInDto;
 import ir.farhanizade.homeservice.dto.in.UserPasswordInDto;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.user.Admin;
-import ir.farhanizade.homeservice.entity.user.Customer;
-import ir.farhanizade.homeservice.entity.user.Expert;
-import ir.farhanizade.homeservice.entity.user.User;
+import ir.farhanizade.homeservice.entity.user.*;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
+import ir.farhanizade.homeservice.security.user.LoggedInUser;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.math.BigDecimal;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.notNull;
 
-@DataJpaTest
-@ActiveProfiles("test")
+@SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserServiceTest {
-
-    @TestConfiguration
-    @EnableAspectJAutoProxy
-    @ComponentScan("ir.farhanizade.homeservice")
-    public static class UserServiceTestConfig {
-    }
 
     @Autowired
     private UserService userService;
@@ -46,10 +39,15 @@ class UserServiceTest {
     @Autowired
     private UserRepository repository;
 
-    @MockBean
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private static MockedStatic<LoggedInUser> loggedInUserMockedStatic;
+
+    @SpyBean
     private ExpertService expertService;
 
-    @MockBean
+    @SpyBean
     private CustomerService customerService;
 
     @MockBean
@@ -61,9 +59,19 @@ class UserServiceTest {
     @MockBean
     private CommentService commentService;
 
+    @BeforeAll()
+    public static void init() {
+        loggedInUserMockedStatic = Mockito.mockStatic(LoggedInUser.class);
+    }
+
+    @AfterAll()
+    public static void close() {
+        loggedInUserMockedStatic.close();
+    }
 
     private UserInDto getValidUserDto() {
         return UserInDto.builder()
+                .type("customer")
                 .firstname("User")
                 .lastname("User")
                 .email("User@User.ir")
@@ -71,30 +79,26 @@ class UserServiceTest {
                 .build();
     }
 
-    private User getValidUser() {
+    private MyUser getValidUser() {
         return getValidUserDto().convert2Expert();
     }
 
     @Test
     void test_save_user_is_ok() {
         UserInDto user = getValidUserDto();
-        EntityOutDto result = new EntityOutDto(1L);
+
 
         try {
-            Mockito.when(adminService.save(user))
-                    .thenReturn(result);
-            Mockito.when(expertService.save(user))
-                    .thenReturn(result);
-            Mockito.when(customerService.save(user))
-                    .thenReturn(result);
 
+            Mockito.doReturn(1L).when(expertService).save(user);
 
-            assertEquals(result,
-                    userService.save(user, Admin.class));
-            assertEquals(result,
-                    userService.save(user, Expert.class));
-            assertEquals(result,
-                    userService.save(user, Customer.class));
+            Mockito.doReturn(1L).when(customerService).save(user);
+
+            user.setType("expert");
+            assertTrue(userService.save(user) instanceof UUIDOutDto);
+
+            user.setType("customer");
+            assertTrue(userService.save(user) instanceof UUIDOutDto);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +110,6 @@ class UserServiceTest {
     @Test
     void test_changePassword_same_password_throws_exception() {
         UserPasswordInDto userPasswordInDto = new UserPasswordInDto(
-                1L,
                 "abcd1234",
                 "abcd1234");
 
@@ -123,7 +126,6 @@ class UserServiceTest {
     @Test
     void test_changePassword_invalid_password_throws_exception() {
         UserPasswordInDto userPasswordInDto = new UserPasswordInDto(
-                1L,
                 "abcd1234",
                 "1234");
 
@@ -140,12 +142,12 @@ class UserServiceTest {
     @Test
     void test_changePassword_wrong_password_throws_exception() {
         UserPasswordInDto userPasswordInDto = new UserPasswordInDto(
-                1L,
                 "abcd1235",
                 "abcd1236");
 
         try {
             repository.save(getValidUser());
+            loggedInUserMockedStatic.when(LoggedInUser::id).thenReturn(1L);
             assertThrows(WrongPasswordException.class,
                     () -> userService.changePassword(userPasswordInDto));
         } catch (Exception e) {
@@ -157,61 +159,22 @@ class UserServiceTest {
     @Test
     void test_changePassword_is_ok() {
         UserPasswordInDto userPasswordInDto = new UserPasswordInDto(
-                1L,
                 "abcd1234",
                 "abcd12345");
         EntityOutDto result = new EntityOutDto(1L);
 
         try {
-            repository.save(getValidUser());
+            MyUser user = getValidUser();
+            String password = user.getPassword();
+            user.setPassword(passwordEncoder.encode(password));
+            repository.save(user);
+            loggedInUserMockedStatic.when(LoggedInUser::id).thenReturn(1L);
             assertEquals(result, userService.changePassword(userPasswordInDto));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
-
-//    @Test
-//    void test_search_user_is_ok() {
-//        UserSearchInDto customerSearchInDto = UserSearchInDto.builder()
-//                .type("customer")
-//                .build();
-//
-//        UserSearchInDto expertSearchInDto = UserSearchInDto.builder()
-//                .type("expert")
-//                .build();
-//
-//
-//        UserSearchOutDto customer = UserSearchOutDto.builder()
-//                .type("customer").build();
-//
-//        UserSearchOutDto expert = UserSearchOutDto.builder()
-//                .type("expert").build();
-//
-//        CustomPage<UserSearchOutDto> resultCustomer = CustomPage.<UserSearchOutDto>builder()
-//                .data(List.of(customer)).build();
-//
-//        CustomPage<UserSearchOutDto> resultExpert = CustomPage.<UserSearchOutDto>builder()
-//                .data(List.of(expert)).build();
-//
-//        try {
-//            Mockito.when(expertService.search(notNull(), notNull()))
-//                    .thenReturn(resultExpert);
-//
-//            Mockito.when(customerService.search(notNull(), notNull()))
-//                    .thenReturn(resultCustomer);
-//
-//            assertEquals(resultExpert,
-//                    userService.search(expertSearchInDto, Pageable.ofSize(10)));
-//
-//            assertEquals(resultCustomer,
-//                    userService.search(customerSearchInDto, Pageable.ofSize(10)));
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            fail();
-//        }
-//    }
 
     @Test
     void test_get_transaction_is_ok() {
@@ -222,19 +185,14 @@ class UserServiceTest {
             Mockito.when(transactionService.findById(1L))
                     .thenReturn(result);
             assertEquals(result, userService.getTransaction(1L));
-        } catch (EntityNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
-        } catch (UserNotLoggedInException e) {
-            e.printStackTrace();
-        } catch (BadEntryException e) {
-            e.printStackTrace();
         }
-
     }
 
     @Test
-    void test_get_comments_is_ok() throws UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+    void test_get_comments_is_ok() throws UserNotLoggedInException, BadEntryException, EntityNotFoundException, AccountIsLockedException {
         CustomPage<CommentOutDto> result = CustomPage.<CommentOutDto>builder()
                 .data(List.of(new CommentOutDto(),
                         new CommentOutDto(),
@@ -242,6 +200,7 @@ class UserServiceTest {
                 .build();
 
         repository.save(getValidUser());
+        loggedInUserMockedStatic.when(LoggedInUser::id).thenReturn(1L);
         Mockito.when(commentService.findAllByUserId(notNull()))
                 .thenReturn(result);
 
@@ -255,6 +214,7 @@ class UserServiceTest {
 
         try {
             repository.save(getValidUser());
+            loggedInUserMockedStatic.when(LoggedInUser::id).thenReturn(1L);
             assertEquals(1L, userService.loadCredit().getId());
         } catch (Exception e) {
             e.printStackTrace();
@@ -270,12 +230,20 @@ class UserServiceTest {
 
         try {
             repository.save(getValidUser());
-            assertEquals(new BigDecimal(5000), userService.increaseCredit(userIncreaseCreditInDto).getBalance());
+            loggedInUserMockedStatic.when(LoggedInUser::id).thenReturn(1L);
+            assertEquals("5000.00", userService.increaseCredit(userIncreaseCreditInDto).getBalance().toString());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
+    }
 
+    @Test
+    public void test_verify_email_is_ok() throws DuplicateEntityException, NameNotValidException, UnsupportedEncodingException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, NoSuchAlgorithmException, UUIDNotFoundException, UserNotLoggedInException, BadEntryException, EntityNotFoundException {
+        UUIDOutDto uuid = userService.save(getValidUserDto());
 
+        EntityOutDto result = userService.verifyEmail(uuid.getUuid());
+
+        assertEquals(1L, result.getId());
     }
 }

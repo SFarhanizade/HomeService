@@ -18,6 +18,7 @@ import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,11 +46,7 @@ public class CustomerService {
     @Transactional(rollbackFor = Exception.class)
     public Long save(UserInDto user) throws UserNotValidException, DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException {
         UserCustomer customer = user.convert2Customer();
-        boolean isValid = Validation.isValid(customer);
-
-        if (!isValid)
-            throw new UserNotValidException("User is not valid!");
-
+        Validation.isValid(customer);
         if (finalCheck(customer))
             throw new DuplicateEntityException("User exists!");
         customer.setRoles(Set.of(ApplicationUserRole.CUSTOMER));
@@ -70,14 +67,12 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findByCredit(BigDecimal credit, Pageable pageable) throws EntityNotFoundException {
         Page<UserCustomer> page = repository.findByCredit(credit, pageable);
-        //if (byCredit.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findByStatus(UserStatus status, Pageable pageable) throws EntityNotFoundException {
         Page<UserCustomer> page = repository.findByStatus(status, pageable);
-        //if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 

@@ -80,7 +80,8 @@ public class ExpertService {
     }
 
     @Transactional(readOnly = true)
-    public UserOutDto findByEmail(String email) throws EntityNotFoundException {
+    public UserOutDto findByEmail(String email) throws EntityNotFoundException, EmailNotValidException, NullFieldException {
+        Validation.isEmailValid(email);
         if (email == null)
             throw new IllegalStateException("Null Email");
         UserExpert byEmail = repository.findByEmail(email);
@@ -98,14 +99,12 @@ public class ExpertService {
     @Transactional(readOnly = true)
     public CustomPage<UserOutDto> findByStatus(UserStatus status, Pageable pageable) throws EntityNotFoundException {
         Page<UserExpert> page = repository.findByStatus(status, pageable);
-        //if (byStatus.isEmpty()) throw new EntityNotFoundException("No Users Found!");
         return convert2Dto(page);
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<UserOutDto> findByExpertise(SubService service, Pageable pageable) throws EntityNotFoundException {
-        Page<UserExpert> page = repository.findByExpertise(service.getId(), pageable);
-        //if (byExpertise.isEmpty()) throw new EntityNotFoundException("No Users Found!");
+    public CustomPage<UserOutDto> findByExpertise(Long service, Pageable pageable) throws EntityNotFoundException {
+        Page<UserExpert> page = repository.findByExpertise(service, pageable);
         return convert2Dto(page);
     }
 
@@ -162,7 +161,6 @@ public class ExpertService {
                 .build();
     }
 
-    //TODO: move to AdminService
     @Transactional(propagation = Propagation.REQUIRED)
     public EntityOutDto acceptExpert(Long expertId) throws EntityNotFoundException {
         UserExpert expert = findById(expertId);
