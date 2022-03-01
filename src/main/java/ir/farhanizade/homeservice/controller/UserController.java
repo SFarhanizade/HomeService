@@ -27,6 +27,11 @@ public class UserController {
     private final ExpertService expertService;
     private final CommentService commentService;
 
+    @GetMapping
+    public String get(){
+        return "test";
+    }
+
     @PostMapping("sign-up")
     public ResponseEntity<ResponseResult<UUIDOutDto>>
     create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException, UnsupportedEncodingException, NoSuchAlgorithmException {
