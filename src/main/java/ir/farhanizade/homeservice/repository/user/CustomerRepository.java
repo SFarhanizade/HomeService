@@ -8,10 +8,13 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 
-public interface CustomerRepository extends BaseRepository<UserCustomer>, CustomCustomerRepository {
+public interface CustomerRepository extends BaseRepository<UserCustomer> {
     UserCustomer findByEmail(String email);
+
     Page<UserCustomer> findByCredit(BigDecimal credit, Pageable pageable);
+
     Page<UserCustomer> findAll(Pageable pageable);
+
     Page<UserCustomer> findByStatus(UserStatus status, Pageable pageable);
 
 }

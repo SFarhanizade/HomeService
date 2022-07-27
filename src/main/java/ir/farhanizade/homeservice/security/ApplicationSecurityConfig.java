@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
 
+//@Profile("test")//TODO Disable if need security
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -39,7 +40,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/users","/users/sign-up", "/users/verify/**", "/users/login").permitAll()
+                .antMatchers("/users", "/users/sign-up", "/users/verify/**", "/users/login",
+                        "/v2/api-docs",
+                        "/swagger-resources/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/webjars/**").permitAll()
                 .anyRequest()
                 .authenticated();
     }

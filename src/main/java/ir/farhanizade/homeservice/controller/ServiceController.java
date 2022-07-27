@@ -3,10 +3,6 @@ package ir.farhanizade.homeservice.controller;
 import ir.farhanizade.homeservice.controller.api.ResponseResult;
 import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
-import ir.farhanizade.homeservice.dto.out.MainServiceOutDto;
-import ir.farhanizade.homeservice.dto.out.ServiceOutDto;
-import ir.farhanizade.homeservice.entity.core.BaseEntity;
-import ir.farhanizade.homeservice.entity.service.MainService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
 import ir.farhanizade.homeservice.service.MainServiceService;
@@ -15,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/services")

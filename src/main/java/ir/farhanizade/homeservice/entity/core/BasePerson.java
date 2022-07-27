@@ -1,7 +1,9 @@
 package ir.farhanizade.homeservice.entity.core;
 
-import com.sun.istack.Nullable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;

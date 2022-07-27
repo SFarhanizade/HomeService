@@ -18,7 +18,6 @@ import java.util.Collection;
 @Component
 public class LoggedInUser {
 
-    private UserService userService;
     private static UserService service;
 
     @Autowired

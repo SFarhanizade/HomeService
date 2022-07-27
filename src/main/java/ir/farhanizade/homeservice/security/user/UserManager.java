@@ -3,7 +3,6 @@ package ir.farhanizade.homeservice.security.user;
 import ir.farhanizade.homeservice.repository.user.UserRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,9 +44,5 @@ public class UserManager implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(""));
-        /*return users.stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(() -> new UsernameNotFoundException(""));*/
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Date;
 import java.util.Optional;
 
-public interface UserRepository extends BaseRepository<MyUser>, CustomUserRepository {
+public interface UserRepository extends BaseRepository<MyUser> {
 
     @Query("select Count(c) From UserCustomer c where c.createdTime between :time1 and :time2")
     Long getNumberOfCustomersByRegisterTime(Date time1, Date time2);

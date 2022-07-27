@@ -1,6 +1,5 @@
 package ir.farhanizade.homeservice.entity;
 
-import ir.farhanizade.homeservice.dto.out.UserOutDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

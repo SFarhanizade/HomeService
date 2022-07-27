@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.math.BigDecimal;
 
 
-public interface ExpertRepository extends BaseRepository<UserExpert>, CustomExpertRepository {
+public interface ExpertRepository extends BaseRepository<UserExpert> {
     UserExpert findByEmail(String email);
 
     Page<UserExpert> findByCredit(BigDecimal credit, Pageable pageable);

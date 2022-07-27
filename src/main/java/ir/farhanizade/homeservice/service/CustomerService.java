@@ -2,7 +2,9 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.CommentInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
-import ir.farhanizade.homeservice.dto.out.*;
+import ir.farhanizade.homeservice.dto.out.EntityOutDto;
+import ir.farhanizade.homeservice.dto.out.UserOutDto;
+import ir.farhanizade.homeservice.dto.out.UserSearchOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.MyTransaction;
 import ir.farhanizade.homeservice.entity.order.MyComment;
@@ -18,7 +20,6 @@ import ir.farhanizade.homeservice.repository.user.CustomerRepository;
 import ir.farhanizade.homeservice.security.ApplicationUserRole;
 import ir.farhanizade.homeservice.security.user.LoggedInUser;
 import ir.farhanizade.homeservice.service.util.Validation;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
