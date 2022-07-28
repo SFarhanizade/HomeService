@@ -5,6 +5,7 @@ import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.exception.*;
+import ir.farhanizade.homeservice.security.jwt.UsernameAndPasswordAuthenticationRequest;
 import ir.farhanizade.homeservice.service.CommentService;
 import ir.farhanizade.homeservice.service.ExpertService;
 import ir.farhanizade.homeservice.service.UserService;
@@ -53,7 +54,7 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String getLogin() {
+    public String getLogin(UsernameAndPasswordAuthenticationRequest request) {
         return "login";
     }
 

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.SerializationUtils;
 
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
@@ -37,8 +38,12 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                                 HttpServletResponse response) throws AuthenticationException {
 
         try {
-            UsernameAndPasswordAuthenticationRequest authenticationRequest = new ObjectMapper()
-                    .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequest.class);
+//            UsernameAndPasswordAuthenticationRequest authenticationRequest = new ObjectMapper()
+//                    .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequest.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            UsernameAndPasswordAuthenticationRequest authenticationRequest =
+                    mapper.readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequest.class);
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(),
