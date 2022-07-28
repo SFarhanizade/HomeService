@@ -4,7 +4,7 @@ import ir.farhanizade.homeservice.dto.in.ExpertAddServiceInDto;
 import ir.farhanizade.homeservice.dto.in.UserInDto;
 import ir.farhanizade.homeservice.dto.out.UserOutDto;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -42,7 +42,7 @@ class ExpertServiceTest {
     private ExpertRepository repository;
 
     @MockBean
-    private SubServiceService serviceManager;
+    private ServiceService serviceManager;
 
     @BeforeAll()
     public static void init() {
@@ -215,15 +215,15 @@ class ExpertServiceTest {
                 .id(1L)
                 .status(UserStatus.PENDING).build();
         Mockito.doReturn(expert).when(expertService).findById(notNull());
-        SubService service = SubService.builder()
+        MyService service = MyService.builder()
                 .id(1L)
                 .name("service1")
                 .build();
         try {
             Mockito.doReturn(expert).when(expertService).findById(notNull());
-            Mockito.when(serviceManager.loadById(1L))
+            Mockito.when(serviceManager.getByID(1L))
                     .thenReturn(service);
-            Mockito.when(serviceManager.loadById(1L))
+            Mockito.when(serviceManager.getByID(1L))
                     .thenReturn(service);
             assertThrows(ExpertNotAcceptedException.class,
                     () -> expertService.addService(request));
@@ -243,13 +243,13 @@ class ExpertServiceTest {
                 .id(1L)
                 .status(UserStatus.ACCEPTED).build();
         Mockito.doReturn(expert).when(expertService).findById(notNull());
-        SubService service = SubService.builder()
+        MyService service = MyService.builder()
                 .id(1L)
                 .name("service1")
                 .build();
         try {
             Mockito.doReturn(expert).when(repository).save(notNull());
-            Mockito.when(serviceManager.loadById(1L))
+            Mockito.when(serviceManager.getByID(1L))
                     .thenReturn(service);
             expertService.addService(request);
             assertThrows(DuplicateEntityException.class,
@@ -270,13 +270,13 @@ class ExpertServiceTest {
                 .id(1L)
                 .status(UserStatus.ACCEPTED).build();
         Mockito.doReturn(expert).when(expertService).findById(notNull());
-        SubService service = SubService.builder()
+        MyService service = MyService.builder()
                 .id(1L)
                 .name("service1")
                 .build();
         try {
             Mockito.doReturn(expert).when(repository).save(notNull());
-            Mockito.when(serviceManager.loadById(1L))
+            Mockito.when(serviceManager.getByID(1L))
                     .thenReturn(service);
             assertEquals(1L,
                     expertService.addService(request).getExpertId());

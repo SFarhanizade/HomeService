@@ -3,7 +3,7 @@ package ir.farhanizade.homeservice.repository.order;
 import ir.farhanizade.homeservice.entity.order.MyOrder;
 import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.repository.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +19,7 @@ public interface OrderRepository extends BaseRepository<MyOrder> {
             "where o.service in :expertises " +
             "and (o.status=:forSuggestion or o.status=:forSelection)" +
             "and not (o.request.status=:cancelled or o.request.status=:busy)")
-    Page<MyOrder> loadByExpertises(Set<SubService> expertises,
+    Page<MyOrder> loadByExpertises(Set<MyService> expertises,
                                    OrderStatus forSuggestion, OrderStatus forSelection,
                                    BaseMessageStatus cancelled, BaseMessageStatus busy, Pageable pageable);
 

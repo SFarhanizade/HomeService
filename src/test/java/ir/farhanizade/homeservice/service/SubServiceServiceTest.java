@@ -2,23 +2,13 @@ package ir.farhanizade.homeservice.service;
 
 import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.dto.out.MainServiceOutDto;
-import ir.farhanizade.homeservice.entity.service.MainService;
-import ir.farhanizade.homeservice.entity.service.SubService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
-import ir.farhanizade.homeservice.exception.NullFieldException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class SubServiceServiceTest {
     @Autowired
-    private SubServiceService repository;
+    private ServiceService repository;
     @Autowired
-    private MainServiceService parentRepository;
+    private ServiceService parentRepository;
 
     private ServiceInDto getMainService() {
         return new ServiceInDto(
@@ -56,16 +46,18 @@ class SubServiceServiceTest {
         ServiceInDto s2 = getSubService();
 
         try {
-            repository.save(s1,1L);
+            s1.setParent(1L);
+            repository.save(s1);
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
         }
         try {
-            repository.save(s2, parent.getParent());
+            s2.setParent(parent.getParent());
+            repository.save(s2);
             fail();
         } catch (DuplicateEntityException e) {
             e.printStackTrace();
-            MainServiceOutDto mainService = parentRepository.loadAll(Pageable.ofSize(10)).getData().get(0);
+            MainServiceOutDto mainService = parentRepository.loadAllMain(Pageable.ofSize(10)).getData().get(0);
             assertEquals(1, mainService.getSubServices().size());
         }
 

@@ -7,7 +7,7 @@ import ir.farhanizade.homeservice.entity.CustomPage;
 import ir.farhanizade.homeservice.entity.order.MyOrder;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserCustomer;
 import ir.farhanizade.homeservice.exception.*;
 import ir.farhanizade.homeservice.repository.order.message.RequestRepository;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RequestService {
     private final RequestRepository repository;
-    private final SubServiceService subService;
+    private final ServiceService subService;
 
     @Transactional(rollbackFor = Exception.class)
     public EntityOutDto save(UserCustomer owner, RequestInDto request) throws NullFieldException, BadEntryException, NameNotValidException, EmailNotValidException, PasswordNotValidException, EntityNotFoundException {
@@ -42,7 +42,7 @@ public class RequestService {
         Date suggestedDateTime = request.getSuggestedDateTime();
         String details = request.getDetails();
         String address = request.getAddress();
-        SubService service = subService.loadById(serviceId);
+        MyService service = subService.getByID(serviceId);
         Request result = Request.builder()
                 .owner(owner)
                 .myOrder(

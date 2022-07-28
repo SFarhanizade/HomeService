@@ -4,7 +4,7 @@ import ir.farhanizade.homeservice.entity.MyTransaction;
 import ir.farhanizade.homeservice.entity.core.BaseEntity;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -23,7 +23,7 @@ import java.util.*;
 public class MyOrder extends BaseEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private SubService service;
+    private MyService service;
 
     private Date finishDateTime;
 

@@ -1,6 +1,6 @@
 package ir.farhanizade.homeservice.entity.user;
 
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -21,7 +21,7 @@ public class UserExpert extends MyUser {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
-    private Set<SubService> expertises = new HashSet<>();
+    private Set<MyService> expertises = new HashSet<>();
 
     @Builder.Default
     private Integer points = 0;
@@ -30,7 +30,7 @@ public class UserExpert extends MyUser {
         this.points += points;
     }
 
-    public boolean addService(SubService service) {
+    public boolean addService(MyService service) {
         return expertises.add(service);
     }
 }

@@ -9,7 +9,7 @@ import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserCustomer;
 import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.exception.*;
@@ -74,7 +74,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<OrderOutDto> loadByExpertises(Set<SubService> expertises, Pageable pageable) throws EntityNotFoundException {
+    public CustomPage<OrderOutDto> loadByExpertises(Set<MyService> expertises, Pageable pageable) throws EntityNotFoundException {
         Page<MyOrder> page = repository.loadByExpertises(expertises, WAITING_FOR_SUGGESTION, WAITING_FOR_SELECTION, CANCELLED, BUSY, pageable);
         return convert2Dto(page);
     }
@@ -121,7 +121,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public CustomPage<OrderOutDto> loadAvailableOrders(Pageable pageable) throws EntityNotFoundException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         UserExpert entity = expertService.findById(LoggedInUser.id());
-        Set<SubService> expertises = entity.getExpertises();
+        Set<MyService> expertises = entity.getExpertises();
         if (expertises.size() == 0) throw new EntityNotFoundException("No Expertises Found For This User!");
         return loadByExpertises(expertises, pageable);
     }

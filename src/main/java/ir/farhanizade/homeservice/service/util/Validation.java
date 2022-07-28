@@ -5,8 +5,7 @@ import ir.farhanizade.homeservice.entity.order.OrderStatus;
 import ir.farhanizade.homeservice.entity.order.message.BaseMessageStatus;
 import ir.farhanizade.homeservice.entity.order.message.Request;
 import ir.farhanizade.homeservice.entity.order.message.Suggestion;
-import ir.farhanizade.homeservice.entity.service.MainService;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.entity.user.MyUser;
 import ir.farhanizade.homeservice.exception.*;
@@ -41,7 +40,7 @@ public class Validation {
         if (request.getAddress() == null)
             throw new NullFieldException("The address is null");
 
-        SubService service = order.getService();
+        MyService service = order.getService();
         if (request.getPrice().compareTo(service.getBasePrice()) == -1) {
             throw new BadEntryException("The price show be equal or greater than the service base price!");
         }
@@ -54,12 +53,12 @@ public class Validation {
     private static boolean isValid(MyOrder order) throws NullFieldException, BadEntryException {
         if (order == null)
             throw new NullFieldException("Order is null!");
-        SubService service = order.getService();
+        MyService service = order.getService();
         boolean serviceIsValid = isValid(service);
         return true && serviceIsValid;
     }
 
-    private static boolean isValid(SubService service) throws NullFieldException, BadEntryException {
+    private static boolean isValid(MyService service) throws NullFieldException, BadEntryException {
         if (service == null)
             throw new NullFieldException("Service is null!");
         isValid(service.getParent());
@@ -71,14 +70,6 @@ public class Validation {
         return true;
     }
 
-    private static boolean isValid(MainService parent) throws NullFieldException {
-        if (parent == null)
-            throw new NullFieldException("MainService is null!");
-        if (parent.getName() == null)
-            throw new NullFieldException("MainService name is null!");
-        return true;
-    }
-
     public static boolean isValid(Suggestion suggestion) throws NameNotValidException, EmailNotValidException, PasswordNotValidException, NullFieldException, BadEntryException, BusyOrderException {
         if (suggestion.getId() != null) return true;
         UserExpert owner = suggestion.getOwner();
@@ -87,7 +78,7 @@ public class Validation {
             throw new BadEntryException("This Order Is Not Available For This Expert!");
         Request request = order.getRequest();
         isValid(order);
-        SubService service = order.getService();
+        MyService service = order.getService();
         if ((!(order.getStatus().equals(OrderStatus.WAITING_FOR_SUGGESTION) ||
                 order.getStatus().equals(OrderStatus.WAITING_FOR_SELECTION))) ||
                 !request.getStatus().equals(BaseMessageStatus.WAITING))

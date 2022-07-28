@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.notNull;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class AdminServiceTest {
+class AdminMyServiceTest {
 
     @Autowired
     private AdminService adminService;

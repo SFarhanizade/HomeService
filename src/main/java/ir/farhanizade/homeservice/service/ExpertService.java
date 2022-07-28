@@ -4,7 +4,7 @@ import ir.farhanizade.homeservice.controller.api.filter.UserSpecification;
 import ir.farhanizade.homeservice.dto.in.*;
 import ir.farhanizade.homeservice.dto.out.*;
 import ir.farhanizade.homeservice.entity.CustomPage;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserExpert;
 import ir.farhanizade.homeservice.entity.user.UserStatus;
 import ir.farhanizade.homeservice.exception.*;
@@ -33,7 +33,7 @@ import static ir.farhanizade.homeservice.entity.user.UserStatus.ACCEPTED;
 @RequiredArgsConstructor
 public class ExpertService {
     private final ExpertRepository repository;
-    private final SubServiceService serviceManager;
+    private final ServiceService serviceManager;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -56,7 +56,7 @@ public class ExpertService {
     public ExpertAddServiceOutDto addService(ExpertAddServiceInDto request) throws EntityNotFoundException, DuplicateEntityException, ExpertNotAcceptedException, UserNotLoggedInException, BadEntryException, AccountIsLockedException {
         UserExpert expert = findById(LoggedInUser.id());
         if (!expert.getStatus().equals(ACCEPTED)) throw new ExpertNotAcceptedException("User is not allowed!");
-        SubService service = serviceManager.loadById(request.getServiceId());
+        MyService service = serviceManager.getByID(request.getServiceId());
         boolean serviceExists = !expert.addService(service);
         if (serviceExists) {
             throw new DuplicateEntityException("The service exists for this expert!");

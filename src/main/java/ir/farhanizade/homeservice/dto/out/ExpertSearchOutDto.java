@@ -1,6 +1,6 @@
 package ir.farhanizade.homeservice.dto.out;
 
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import ir.farhanizade.homeservice.entity.user.UserExpert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpertSearchOutDto extends UserSearchOutDto{
-    private Set<SubService> expertises;
+    private Set<MyService> expertises;
     private int points;
 
     public ExpertSearchOutDto convert2Dto(UserExpert expert){

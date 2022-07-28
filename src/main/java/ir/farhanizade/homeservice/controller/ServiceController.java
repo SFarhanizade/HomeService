@@ -5,8 +5,7 @@ import ir.farhanizade.homeservice.dto.in.ServiceInDto;
 import ir.farhanizade.homeservice.dto.out.EntityOutDto;
 import ir.farhanizade.homeservice.exception.DuplicateEntityException;
 import ir.farhanizade.homeservice.exception.EntityNotFoundException;
-import ir.farhanizade.homeservice.service.MainServiceService;
-import ir.farhanizade.homeservice.service.SubServiceService;
+import ir.farhanizade.homeservice.service.ServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,24 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('ADMIN')")
 public class ServiceController {
 
-    private final MainServiceService mainService;
-    private final SubServiceService subService;
+    private final ServiceService mainService;
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> save(@RequestBody ServiceInDto service) throws DuplicateEntityException, EntityNotFoundException {
         ResponseResult<EntityOutDto> response = ResponseResult.<EntityOutDto>builder()
                 .code(1)
-                .message("add successfully!")
+                .message("added successfully!")
                 .build();
         HttpStatus status = HttpStatus.CREATED;
         EntityOutDto result;
-            if (service.getParent() == 0) {
-                result = mainService.save(service);
-                response.setMessage("MainService " + response.getMessage());
-            } else {
-                result = subService.save(service, service.getParent());
-                response.setMessage("SubService " + response.getMessage());
-            }
+        result = mainService.save(service);
+        response.setMessage("Service " + response.getMessage());
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }

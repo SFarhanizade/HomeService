@@ -1,7 +1,6 @@
 package ir.farhanizade.homeservice.dto.in;
 
-import ir.farhanizade.homeservice.entity.service.MainService;
-import ir.farhanizade.homeservice.entity.service.SubService;
+import ir.farhanizade.homeservice.entity.service.MyService;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ServiceInDto {
-    @NonNull
+
     private Long parent;
     @NonNull
     @Size(min = 3, max = 20)
@@ -22,12 +21,15 @@ public class ServiceInDto {
     @Size(min = 1000)
     private Long basePrice;
 
-    public MainService convert2MainService() {
-        return MainService.builder().name(name).build();
+    public ServiceInDto(Long parent, @NonNull String name, @NonNull String description, @NonNull Long basePrice) {
+        this.parent = parent;
+        this.name = name;
+        this.description = description;
+        this.basePrice = basePrice;
     }
 
-    public SubService convert2SubService() {
-        return SubService.builder()
+    public MyService convert2Service() {
+        return MyService.builder()
                 .name(name)
                 .description(description)
                 .basePrice(new BigDecimal(basePrice))

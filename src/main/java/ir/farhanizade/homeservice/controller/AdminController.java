@@ -24,8 +24,7 @@ public class AdminController {
     private final UserService userService;
     private final AdminService adminService;
     private final OrderService orderService;
-    private final MainServiceService mainService;
-    private final SubServiceService subService;
+    private final ServiceService mainService;
 
     @PostMapping
     public ResponseEntity<ResponseResult<EntityOutDto>> create(@RequestBody UserInDto user) throws DuplicateEntityException, NameNotValidException, EmailNotValidException, PasswordNotValidException, UserNotValidException, NullFieldException {
@@ -46,13 +45,8 @@ public class AdminController {
                 .build();
         HttpStatus status = HttpStatus.CREATED;
         EntityOutDto result;
-        if (service.getParent() == 0) {
-            result = mainService.save(service);
-            response.setMessage("MainService " + response.getMessage());
-        } else {
-            result = subService.save(service, service.getParent());
-            response.setMessage("SubService " + response.getMessage());
-        }
+        result = mainService.save(service);
+        response.setMessage("MainService " + response.getMessage());
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
@@ -64,7 +58,7 @@ public class AdminController {
                 .message("Done!")
                 .build();
         HttpStatus status = HttpStatus.OK;
-        CustomPage<MainServiceOutDto> result = mainService.loadAll(pageable);
+        CustomPage<MainServiceOutDto> result = mainService.loadAllMain(pageable);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
@@ -76,7 +70,7 @@ public class AdminController {
                 .message("Done!")
                 .build();
         HttpStatus status = HttpStatus.OK;
-        MainServiceOutDto result = mainService.findById(mainId);
+        MainServiceOutDto result = mainService.getDTOByID(mainId);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
@@ -88,19 +82,19 @@ public class AdminController {
                 .message("Done!")
                 .build();
         HttpStatus status = HttpStatus.OK;
-        CustomPage<ServiceOutDto> result = subService.loadAll(pageable);
+        CustomPage<ServiceOutDto> result = mainService.loadAllSub(pageable);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
 
     @GetMapping("/services/sub-services/{id}")
-    public ResponseEntity<ResponseResult<ServiceOutDto>> showSubServices(@PathVariable Long id) throws EntityNotFoundException {
-        ResponseResult<ServiceOutDto> response = ResponseResult.<ServiceOutDto>builder()
+    public ResponseEntity<ResponseResult<MainServiceOutDto>> showSubServices(@PathVariable Long id) throws EntityNotFoundException {
+        ResponseResult<MainServiceOutDto> response = ResponseResult.<MainServiceOutDto>builder()
                 .code(1)
                 .message("Done!")
                 .build();
         HttpStatus status = HttpStatus.OK;
-        ServiceOutDto result = subService.findById(id);
+        MainServiceOutDto result = mainService.getDTOByID(id);
         response.setData(result);
         return ResponseEntity.status(status).body(response);
     }
